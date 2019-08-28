@@ -11,8 +11,9 @@ import com.example.httpurlconnection.Pojos.Result
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
-
 import java.io.IOException
+
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -20,8 +21,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        var url1 = "https://api.themoviedb.org/3/movie/550?api_key=3e68c56cf7097768305e38273efd342c"
+        var url2 = "https://api.themoviedb.org/3/movie/549?api_key=3e68c56cf7097768305e38273efd342c"
         findViewById<Button>(R.id.btnHttp).setOnClickListener {
             val asyncTask = AsyncTaskExample()
+
             var url = "https://api.themoviedb.org/3/discover/movie?api_key=3e68c56cf7097768305e38273efd342c"
             asyncTask.execute(url)
             Toast.makeText(applicationContext,"ResponsePojo code is : "+asyncTask.get()[0],Toast.LENGTH_SHORT).show()
@@ -30,7 +34,10 @@ class MainActivity : AppCompatActivity() {
             var someList : Array<Result>? = jsonObject.getResults()
             someList!!.forEach { findViewById<TextView>(R.id.tv_body).append(it.toString())}
                         }
+
         }
+    }
+
 
     private inner class AsyncTaskExample : AsyncTask<String, String, Array<String>>() {
         var code = 0
@@ -45,6 +52,7 @@ class MainActivity : AppCompatActivity() {
                 client.newCall(request).execute().use { response ->
                     body = response.body?.string()!!
                     ;code = response.code
+
                 }
 
             } catch (e: IOException) {
