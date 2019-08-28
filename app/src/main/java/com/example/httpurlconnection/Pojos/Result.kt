@@ -13,7 +13,7 @@ class Result : Serializable {
 
     private var title: String? = null
 
-    private var genre_ids: Array<String>? = null
+    private var genre_ids: List<String>? = null
 
     private var poster_path: String? = null
 
@@ -56,7 +56,7 @@ class Result : Serializable {
     }
 
 
-    fun getGenre_ids(): Array<String>? {
+    fun getGenre_ids(): List<String>? {
         return genre_ids
     }
 
