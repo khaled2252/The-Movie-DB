@@ -8,12 +8,15 @@ import android.widget.TextView
 import android.widget.Toast
 import com.example.httpurlconnection.Pojos.ResponsePojo
 import com.example.httpurlconnection.Pojos.Result
-import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import org.json.JSONArray
+import org.json.JSONObject
+
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -84,9 +87,17 @@ class MainActivity : AppCompatActivity() {
         override fun onPostExecute(result: Array<String?>?) {
             super.onPostExecute(result)
             Toast.makeText(applicationContext, "Response code is : " + this.get()[0], Toast.LENGTH_SHORT).show()
-            val jsonObject = Gson().fromJson(this.get()[1], ResponsePojo::class.java)
-            var someList: Array<Result>? = jsonObject.getResults()
-            someList!!.forEach { findViewById<TextView>(R.id.tv_body).append(it.toString()) }
+            val jsonObject = JSONObject(this.get()[1])
+            val jsonArray = jsonObject.getJSONArray("results") //List of objects (results)
+
+            val list = ArrayList<String>() //list of items in each object to be printed
+            for (i in 0 until jsonArray.length()) {
+                list.add(jsonArray.getJSONObject(i).getString("original_title")+"\n"+"\n")
+                list.add(jsonArray.getJSONObject(i).getString("overview")+"\n"+"\n"+"\n")
+            }
+
+            list!!.forEach { findViewById<TextView>(R.id.tv_body).append(it) }
+
             if (result!![2]!!.toInt() == 1) {
                 findViewById<TextView>(R.id.tv_status).text = "Serialized object from Ok-HTTP"
             } else

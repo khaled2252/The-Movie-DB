@@ -13,7 +13,7 @@ class Result : Serializable {
 
     private var title: String? = null
 
-    private var genre_ids: List<String>? = null
+    private var genre_ids: Array<String>? = null
 
     private var poster_path: String? = null
 
@@ -56,7 +56,7 @@ class Result : Serializable {
     }
 
 
-    fun getGenre_ids(): List<String>? {
+    fun getGenre_ids(): Array<String>? {
         return genre_ids
     }
 
@@ -104,6 +104,6 @@ class Result : Serializable {
 
 
     override fun toString(): String {
-        return "overview = $overview\n original_language = $original_language\n, original_title = $original_title\n, video = $video\n, title = $title\n, genre_ids = $genre_ids\n, poster_path = $poster_path\n, backdrop_path = $backdrop_path\n, release_date = $release_date\n, popularity = $popularity\n, vote_average = $vote_average\n, id = $id\n, adult = $adult\n, vote_count = $vote_count\n\n\n"
+        return "overview = $overview\n original_language = $original_language\n, original_title = $original_title\n, video = $video\n, title = $title\n, genre_ids = ${genre_ids!!.contentToString()}\n, poster_path = $poster_path\n, backdrop_path = $backdrop_path\n, release_date = $release_date\n, popularity = $popularity\n, vote_average = $vote_average\n, id = $id\n, adult = $adult\n, vote_count = $vote_count\n\n\n"
     }
 }
