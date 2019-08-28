@@ -3,15 +3,16 @@ package com.example.httpurlconnection
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import com.example.httpurlconnection.Pojos.Movie
+import com.example.httpurlconnection.Pojos.ResponsePojo
+import com.example.httpurlconnection.Pojos.Result
 import com.google.gson.Gson
+import okhttp3.OkHttpClient
+import okhttp3.Request
+
 import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 
 
 class MainActivity : AppCompatActivity() {
@@ -21,16 +22,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         findViewById<Button>(R.id.btnHttp).setOnClickListener {
             val asyncTask = AsyncTaskExample()
-            var url = "https://api.themoviedb.org/3/movie/550?api_key=3e68c56cf7097768305e38273efd342c"
+            var url = "https://api.themoviedb.org/3/discover/movie?api_key=3e68c56cf7097768305e38273efd342c"
             asyncTask.execute(url)
-            Toast.makeText(applicationContext,"Response code is : "+asyncTask.get()[0],Toast.LENGTH_SHORT).show()
-            Log.i("response_code",asyncTask.get()[1])
-            findViewById<TextView>(R.id.tv_body).text=asyncTask.get()[1]
-            val jsonObject = Gson().fromJson(asyncTask.get()[1], Movie::class.java)
-            Log.i("json_object",jsonObject.title)
+            Toast.makeText(applicationContext,"ResponsePojo code is : "+asyncTask.get()[0],Toast.LENGTH_SHORT).show()
 
-
-        }
+            val jsonObject = Gson().fromJson(asyncTask.get()[1], ResponsePojo::class.java)
+            var someList : Array<Result>? = jsonObject.getResults()
+            someList!!.forEach { findViewById<TextView>(R.id.tv_body).append(it.toString())}
+                        }
         }
 
     private inner class AsyncTaskExample : AsyncTask<String, String, Array<String>>() {
@@ -38,22 +37,21 @@ class MainActivity : AppCompatActivity() {
         var body = ""
         override fun doInBackground(vararg strings: String): Array<String> {
             try {
-                val url = URL(strings[0])
-                val urlConnection = url.openConnection() as HttpURLConnection
-                urlConnection.requestMethod="GET"
-                try {
-                    body = URL(strings[0]).readText()
-                    code = urlConnection.responseCode
+                var client = OkHttpClient()
 
-                } finally {
-                    urlConnection.disconnect()
+                val request = Request.Builder()
+                    .url(strings[0])
+                    .build()
+                client.newCall(request).execute().use { response ->
+                    body = response.body?.string()!!
+                    ;code = response.code
                 }
+
             } catch (e: IOException) {
                 e.printStackTrace()
             }
+            return arrayOf(code.toString(), body)
 
-            return arrayOf(code.toString(),body)
         }
-
     }
 }
