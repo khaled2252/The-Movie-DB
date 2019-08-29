@@ -3,7 +3,10 @@ package com.example.httpurlconnection
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.widget.Button
+import android.widget.ListAdapter
 import android.widget.TextView
 import android.widget.Toast
 import com.example.httpurlconnection.Pojos.ResponsePojo
@@ -15,6 +18,10 @@ import java.net.HttpURLConnection
 import java.net.URL
 import org.json.JSONArray
 import org.json.JSONObject
+import android.support.v4.app.SupportActivity
+import android.support.v4.app.SupportActivity.ExtraData
+import android.support.v4.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
 
 
@@ -24,85 +31,56 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val manager = LinearLayoutManager(this)
+        manager.orientation = LinearLayoutManager.VERTICAL
+        var url ="https://api.themoviedb.org/3/person/popular?api_key=3e68c56cf7097768305e38273efd342cc"
+        val asyncTask = AsyncTaskExample()
+        asyncTask.execute(url)
 
-        var url = "https://api.themoviedb.org/3/discover/movie?api_key=3e68c56cf7097768305e38273efd342c"
 
-        findViewById<Button>(R.id.btn_http_url_connection).setOnClickListener {
-            val asyncTask = AsyncTaskExample()
-            asyncTask.execute(arrayOf("0", url))
-        }
-
-        findViewById<Button>(R.id.btn_ok_http).setOnClickListener {
-            val asyncTask = AsyncTaskExample()
-            asyncTask.execute(arrayOf("1", url))
-        }
 
     }
 
 
-    private inner class AsyncTaskExample : AsyncTask<Array<String>, String, Array<String?>>() {
-        var code: Int? = 0
-        var body: String? = ""
-        var type: Int? = 0
+    private inner class AsyncTaskExample : AsyncTask<String, String, String?>() {
+
         override fun onPreExecute() {
             super.onPreExecute()
-            findViewById<TextView>(R.id.tv_body).text = ""
-            findViewById<TextView>(R.id.tv_status).text = ""
-
         }
 
-        override fun doInBackground(vararg params: Array<String>?): Array<String?>? {
+        override fun doInBackground(vararg params: String): String? {
+            var body : String ? = null
             try {
-                val url = params[0]!![1]
-                if (params[0]!![0].toInt() == 0) {
-                    type = 0
-                    val urlConnection = URL(url).openConnection() as HttpURLConnection
-                    urlConnection.requestMethod = "GET"
-                    try {
-                        body = URL(url).readText()
-                        code = urlConnection.responseCode
-
-                    } finally {
-                        urlConnection.disconnect()
-                    }
-                } else {
-                    type = 1
-                    var client = OkHttpClient()
-                    val request = Request.Builder()
-                        .url(url)
-                        .build()
-                    client.newCall(request).execute().use { response ->
-                        body = response.body?.string()
-                        ;code = response.code
-                    }
+                val url = params[0]
+                val urlConnection = URL(url).openConnection() as HttpURLConnection
+                urlConnection.requestMethod = "GET"
+                try {
+                    body = URL(url).readText()
+                } finally {
+                    urlConnection.disconnect()
                 }
 
             } catch (e: IOException) {
                 e.printStackTrace()
             }
 
-            return arrayOf(code.toString(), body, type.toString())
+            return body
         }
 
-        override fun onPostExecute(result: Array<String?>?) {
+        override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-            Toast.makeText(applicationContext, "Response code is : " + this.get()[0], Toast.LENGTH_SHORT).show()
-            val jsonObject = JSONObject(this.get()[1])
+
+            val jsonObject = JSONObject(this.get())
             val jsonArray = jsonObject.getJSONArray("results") //List of objects (results)
 
-            val list = ArrayList<String>() //list of items in each object to be printed
+            val resultList = ArrayList<Result>()
             for (i in 0 until jsonArray.length()) {
-                list.add(jsonArray.getJSONObject(i).getString("original_title")+"\n"+"\n")
-                list.add(jsonArray.getJSONObject(i).getString("overview")+"\n"+"\n"+"\n")
+                resultList.add(jsonArray.opt(i) as Result)
             }
 
-            list!!.forEach { findViewById<TextView>(R.id.tv_body).append(it) }
-
-            if (result!![2]!!.toInt() == 1) {
-                findViewById<TextView>(R.id.tv_status).text = "Serialized object from Ok-HTTP"
-            } else
-                findViewById<TextView>(R.id.tv_status).text = "Serialized object from HTTP-URL-Connection"
-
+            findViewById<RecyclerView>(R.id.rv_popular_popular).apply { layoutManager = LinearLayoutManager(this@MainActivity)
+                adapter = CustomAdapter(resultList)
+            }
 
         }
     }
