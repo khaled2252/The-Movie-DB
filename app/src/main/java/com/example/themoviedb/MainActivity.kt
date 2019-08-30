@@ -1,11 +1,11 @@
-package com.example.httpurlconnection
+package com.example.themoviedb
 
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import com.example.httpurlconnection.Pojos.Result
+import com.example.themoviedb.pojos.Person
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
@@ -69,17 +69,16 @@ class MainActivity : AppCompatActivity() {
             val jsonObject = JSONObject(result)
             val jsonArray = jsonObject.getJSONArray("results") //List of objects (results)
 
-
             for (i in 0 until jsonArray.length()) {
-                var resultObject = Result()
-                resultObject.name=jsonArray.getJSONObject(i).getString("name")
-                resultObject.known_for_department=jsonArray.getJSONObject(i).getString("known_for_department")
-                resultList.add(resultObject)
+                var person = Person()
+                person.name=jsonArray.getJSONObject(i).getString("name")
+                person.known_for_department=jsonArray.getJSONObject(i).getString("known_for_department")
+                resultList.add(person)
             }
             findViewById<RecyclerView>(R.id.rv_popular_popular).apply { adapter?.notifyDataSetChanged() }
 
         }
     }
-    companion object var resultList = ArrayList<Result>()
+    companion object var resultList = ArrayList<Person>()
 
 }

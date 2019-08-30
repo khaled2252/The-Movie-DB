@@ -1,10 +1,10 @@
-package com.example.httpurlconnection
+package com.example.themoviedb
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
-import com.example.httpurlconnection.Pojos.Result
+import com.example.themoviedb.pojos.Person
 
 class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
     RecyclerView.ViewHolder(inflater.inflate(R.layout.row_layout, parent, false)) {
@@ -16,9 +16,9 @@ class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         mKnownForDepartementView= itemView.findViewById(R.id.tv_known_for_department)
     }
 
-    fun bind(result : Result) {
-        mNameView?.text = result.name
-        mKnownForDepartementView?.text = result.known_for_department
+    fun bind(person : Person) {
+        mNameView?.text = person.name
+        mKnownForDepartementView?.text = person.known_for_department
     }
 
 }

@@ -1,11 +1,11 @@
-package com.example.httpurlconnection
+package com.example.themoviedb
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.example.httpurlconnection.Pojos.Result
+import com.example.themoviedb.pojos.Person
 
-class CustomAdapter(private val list: List<Result>): RecyclerView.Adapter<PopularPeopleViewHolder>() {
+class CustomAdapter(private val list: List<Person>): RecyclerView.Adapter<PopularPeopleViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PopularPeopleViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -13,8 +13,8 @@ class CustomAdapter(private val list: List<Result>): RecyclerView.Adapter<Popula
     }
 
     override fun onBindViewHolder(holder: PopularPeopleViewHolder, position: Int) {
-        val result :Result = list[position]
-        holder.bind(result)
+        val person :Person = list[position]
+        holder.bind(person)
     }
     override fun getItemCount(): Int = list.size
 

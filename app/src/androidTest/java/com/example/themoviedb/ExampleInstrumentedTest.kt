@@ -1,4 +1,4 @@
-package com.example.httpurlconnection
+package com.example.themoviedb
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4

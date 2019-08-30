@@ -1,4 +1,4 @@
-package com.example.httpurlconnection
+package com.example.themoviedb
 
 import org.junit.Test
 
