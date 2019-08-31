@@ -12,6 +12,14 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.support.v4.app.SupportActivity
+import android.support.v4.app.SupportActivity.ExtraData
+import android.support.v4.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.util.Log
+import android.widget.ImageView
 
 
 class MainActivity : AppCompatActivity() {
@@ -23,17 +31,13 @@ class MainActivity : AppCompatActivity() {
         findViewById<RecyclerView>(R.id.rv_popular_popular).apply { layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = CustomAdapter(resultList)}
 
-        var url ="https://api.themoviedb.org/3/person/popular?api_key=3e68c56cf7097768305e38273efd342c"
+        var url =Constants.POPULAR_PEOPLE+Constants.API_KEY
         val asyncTask = AsyncTaskExample()
         asyncTask.execute(url)
     }
 
 
-    private inner class AsyncTaskExample : AsyncTask<String, String, String?>() {
-        var body : StringBuffer = StringBuffer()
-        override fun onPreExecute() {
-            super.onPreExecute()
-        }
+    private inner class AsyncTaskExample(internal var body : StringBuffer = StringBuffer()): AsyncTask<String, String, String?>() {
 
         override fun doInBackground(vararg params: String): String? {
             try {
@@ -73,6 +77,7 @@ class MainActivity : AppCompatActivity() {
                 var person = Person()
                 person.name=jsonArray.getJSONObject(i).getString("name")
                 person.known_for_department=jsonArray.getJSONObject(i).getString("known_for_department")
+                person.profile_path=jsonArray.getJSONObject(i).getString("profile_path")
                 resultList.add(person)
             }
             findViewById<RecyclerView>(R.id.rv_popular_popular).apply { adapter?.notifyDataSetChanged() }
