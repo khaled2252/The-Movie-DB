@@ -1,25 +1,25 @@
 package com.example.themoviedb
 
+import android.graphics.Color
 import android.os.AsyncTask
 import android.os.Bundle
+import android.os.Handler
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import com.example.themoviedb.pojos.Person
+import kotlinx.android.synthetic.main.progress_bar.*
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.support.v4.app.SupportActivity
-import android.support.v4.app.SupportActivity.ExtraData
-import android.support.v4.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.util.Log
-import android.widget.ImageView
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,16 +28,72 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<RecyclerView>(R.id.rv_popular_popular).apply { layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = CustomAdapter(resultList)}
+        val mRecyclerView = findViewById<RecyclerView>(R.id.rv_popular_popular)
+        mRecyclerView.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = CustomAdapter(resultList)
+        }
 
-        var url =Constants.POPULAR_PEOPLE+Constants.API_KEY
+        loadData(baseURL+pageAttr+currentPage.toString())
+
+        val recyclerViewOnScrollListener = object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val layoutManager = mRecyclerView.layoutManager as LinearLayoutManager
+                val pos = layoutManager.findLastCompletelyVisibleItemPosition()
+                val numItems = mRecyclerView.adapter?.itemCount!! -1
+
+                if(pos >= numItems&&!isLoadingMore ) //Reached end of screen
+                {
+                    isLoadingMore=true
+
+                    val initialSize = resultList.size
+                    resultList.add(null)
+
+                    Handler().postDelayed({
+                        resultList.remove(null)
+                        recyclerView.apply { recyclerView.adapter?.notifyItemRemoved(resultList.size) }
+                        loadData(baseURL+pageAttr+currentPage.toString())
+
+                    }, 1000)
+                    recyclerView.apply { mRecyclerView.adapter?.notifyItemRangeInserted(initialSize, initialSize+visibleThreshold)}
+
+                }
+            }
+        }
+        mRecyclerView.addOnScrollListener(recyclerViewOnScrollListener)
+
+        val mSwipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.srl)
+        mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
+        mSwipeRefreshLayout.setOnRefreshListener {
+            currentPage= 1
+            resultList.clear()
+            findViewById<RecyclerView>(R.id.rv_popular_popular).apply { adapter?.notifyItemRangeChanged(0,0)}
+            loadData(baseURL+pageAttr+currentPage.toString())
+        }
+
+    }
+
+    fun loadData(url : String){
         val asyncTask = AsyncTaskExample()
         asyncTask.execute(url)
     }
 
+    fun updateResultList() {
+        //Map jsonArray to person pojo
+        for (i in 0 until visibleThreshold) {
+            val person = Person()
+            person.name = jsonArrayOfResults.getJSONObject(i).getString("name")
+            person.known_for_department = jsonArrayOfResults.getJSONObject(i).getString("known_for_department")
+            person.profile_path = jsonArrayOfResults.getJSONObject(i).getString("profile_path")
+            resultList.add(person)
+        }
+        findViewById<RecyclerView>(R.id.rv_popular_popular).apply { adapter?.notifyDataSetChanged() }
+    }
 
-    private inner class AsyncTaskExample(internal var body : StringBuffer = StringBuffer()): AsyncTask<String, String, String?>() {
+    private inner class AsyncTaskExample(internal var body: StringBuffer = StringBuffer()) :
+        AsyncTask<String, String, String?>() {
 
         override fun doInBackground(vararg params: String): String? {
             try {
@@ -50,11 +106,10 @@ class MainActivity : AppCompatActivity() {
                     )
 
                     var inputLine: String?
-                    do{
+                    do {
                         inputLine = input.readLine()
                         body.append(inputLine)
-                    }
-                    while ( inputLine !=null)
+                    } while (inputLine != null)
                     input.close()
                 } finally {
                     urlConnection.disconnect()
@@ -63,27 +118,34 @@ class MainActivity : AppCompatActivity() {
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-
             return body.toString()
         }
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
+            currentPage++
+            isLoadingMore=false
 
-            val jsonObject = JSONObject(result)
-            val jsonArray = jsonObject.getJSONArray("results") //List of objects (results)
-
-            for (i in 0 until jsonArray.length()) {
-                var person = Person()
-                person.name=jsonArray.getJSONObject(i).getString("name")
-                person.known_for_department=jsonArray.getJSONObject(i).getString("known_for_department")
-                person.profile_path=jsonArray.getJSONObject(i).getString("profile_path")
-                resultList.add(person)
+            jsonArrayOfResults = JSONObject(result).getJSONArray("results") //List of objects (results)
+            visibleThreshold=jsonArrayOfResults.length()
+            updateResultList()
+            val mSwipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.srl)
+            //Disable the refreshing icon when the result list is changed
+            if (mSwipeRefreshLayout.isRefreshing) {
+                mSwipeRefreshLayout.isRefreshing = false
             }
-            findViewById<RecyclerView>(R.id.rv_popular_popular).apply { adapter?.notifyDataSetChanged() }
-
         }
     }
-    companion object var resultList = ArrayList<Person>()
+
+    companion object
+
+    val baseURL = Constants.POPULAR_PEOPLE + Constants.API_KEY
+    val pageAttr = Constants.PAGE_ATTRIBUTE
+    var jsonArrayOfResults = JSONArray()
+    var resultList = ArrayList<Person?>()
+    var currentPage = 1
+    var visibleThreshold = 0
+    var isLoadingMore = false
+
 
 }
