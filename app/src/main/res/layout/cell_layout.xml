@@ -6,8 +6,8 @@
 
     <ImageView
             android:id="@+id/iv_image"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             app:layout_constraintBottom_toBottomOf="parent"

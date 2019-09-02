@@ -54,6 +54,9 @@ class PopularPeopleAdapter(private val list: List<Person?>): RecyclerView.Adapte
                 saveFile(holder.itemView.context,bitmap,"profile_picture")
                 intent.putExtra("profile_id",person.id)
                 intent.putExtra("person_name",person.name)
+                intent.putExtra("known_for",person.known_for)
+                intent.putExtra("known_for_department",person.known_for_department)
+                intent.putExtra("popularity",person.popularity)
                 holder.itemView.context.startActivity(intent)}
         }
         else {

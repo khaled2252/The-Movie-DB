@@ -21,6 +21,8 @@ import android.R.attr.right
 import android.R.attr.left
 import android.graphics.Rect
 import android.view.View
+import com.example.themoviedb.pojos.KnownFor
+import java.lang.StringBuilder
 
 
 class PersonDetails : AppCompatActivity() {
@@ -30,22 +32,33 @@ class PersonDetails : AppCompatActivity() {
         setContentView(R.layout.activity_person_details)
         val profileId = intent.getStringExtra("profile_id")
         val personName = intent.getStringExtra("person_name")
+        val popularity = intent.getStringExtra("popularity")
+        val knownFor = intent.getSerializableExtra("known_for") as ArrayList<KnownFor?>?
+
+        val knownForArrayList: ArrayList<String> = ArrayList()
+        if(knownFor!=null) {
+            for (i in 0 until knownFor!!.size)
+                knownForArrayList.add(knownFor.get(i)!!.original_title!!)
+        }
+        else knownForArrayList.add("No movies found")
+        val knownForDepartment = intent.getStringExtra("known_for_department")
 
         val photoPath= this.openFileInput("profile_picture")
         val bitmap = BitmapFactory.decodeStream(photoPath)
         findViewById<ImageView>(R.id.iv_profileImage).setImageBitmap(bitmap)
 
         findViewById<TextView>(R.id.tv_name).text = personName
+
+        findViewById<TextView>(R.id.tv_knownFor).text = StringBuilder("$personName is known for $knownForDepartment in $knownForArrayList with popularity score of $popularity")
+
         val mRecyclerView = findViewById<RecyclerView>(R.id.rv_pictures)
         mRecyclerView.apply {
-            layoutManager = GridLayoutManager(this@PersonDetails,2)
+            layoutManager = GridLayoutManager(this@PersonDetails,3)
             adapter = PopularPersonAdapter(resultList)
             mRecyclerView.addItemDecoration(RecyclerViewItemDecorator(10))
         }
         val asyncTask = AsyncTaskExample()
         asyncTask.execute(Constants.PERSON_DETAIL+profileId+Constants.PERSON_IMAGES_ATTRIBUTE+Constants.API_KEY)
-
-
     }
     inner class AsyncTaskExample(private var body: StringBuffer = StringBuffer()) :
         AsyncTask<String, String, String?>() {
@@ -79,9 +92,8 @@ class PersonDetails : AppCompatActivity() {
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
 
-            val jsonArrayOfProfiles = JSONObject(result).getJSONArray("profiles") //List of objects (results)
+            val jsonArrayOfProfiles = JSONObject(result).getJSONArray("profiles")
 
-            //Map jsonArray to result list of pojos
             for (i in 0 until jsonArrayOfProfiles.length()) {
                 var personImages = PersonImages()
                 personImages.personId = JSONObject(result).getString("id")
@@ -98,6 +110,8 @@ class PersonDetails : AppCompatActivity() {
     var resultList = ArrayList<PersonImages?>()
 
 }
+
+//To remove spaces in grid view
 class RecyclerViewItemDecorator(private val spaceInPixels: Int) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(

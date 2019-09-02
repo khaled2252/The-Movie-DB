@@ -1,6 +1,8 @@
 package com.example.themoviedb
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -19,6 +21,10 @@ import android.support.v4.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.os.Environment
+import android.support.design.widget.FloatingActionButton
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.widget.Toast
 import java.io.File
@@ -32,18 +38,45 @@ class ImageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image)
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            ) {
+                Toast.makeText(this, "Request is needed!", Toast.LENGTH_SHORT).show()
+            } else {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    1
+                )
+            }
+        }
+
         val photoPath= this.openFileInput("profile_picture")
         val bitmap = BitmapFactory.decodeStream(photoPath)
         findViewById<ImageView>(R.id.iv_saveToGallery).setImageBitmap(bitmap)
-        findViewById<Button>(R.id.btn_saveToGallery).setOnClickListener {
-//            MediaStore.Images.Media.insertImage(contentResolver, bitmap, "Image" , "No description available")
-            saveImage(bitmap)
+        findViewById<FloatingActionButton>(R.id.btn_saveToGallery).setOnClickListener {
+            val builder = AlertDialog.Builder(this@ImageActivity)
+            builder.setTitle("Download image")
+            builder.setMessage("Do you want to save image to gallery?")
+            builder.setPositiveButton("YES"){ _, _ ->
+               saveImage(bitmap)
+                }
+            builder.setNegativeButton("No"){ _, _ ->
+            }
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
         }
     }
     private fun saveImage(finalBitmap: Bitmap) {
 
-        val root = Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_PICTURES
+        val root = getExternalStoragePublicDirectory(
+            DIRECTORY_PICTURES
         ).toString()
         val myDir = File(root)
         myDir.mkdirs()
@@ -57,8 +90,6 @@ class ImageActivity : AppCompatActivity() {
         try {
             val out = FileOutputStream(file)
             finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
-//             sendBroadcast(Intent(Intent.ACTION_MEDIA_MOUNTED,
-//                 Uri.parse("file://"+ Environment.getExternalStorageDirectory())))
             out.flush()
             out.close()
             Toast.makeText(this,"Image saved to gallery !",Toast.LENGTH_LONG).show()
