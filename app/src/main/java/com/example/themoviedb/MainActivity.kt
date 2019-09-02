@@ -1,13 +1,18 @@
 package com.example.themoviedb
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.widget.Toast
 import com.example.themoviedb.pojos.Person
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -23,10 +28,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            ) {
+                Toast.makeText(this, "Request is needed!", Toast.LENGTH_SHORT).show()
+            } else {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    1
+                )
+            }
+        }
+
         val mRecyclerView = findViewById<RecyclerView>(R.id.rv_popular_popular)
         mRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = CustomAdapter(resultList)
+            adapter = PopularPeopleAdapter(resultList)
         }
 
         loadData(baseURL+pageAttr+currentPage.toString())
@@ -61,9 +85,18 @@ class MainActivity : AppCompatActivity() {
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
             currentPage= 1
-            resultList.clear()
-            findViewById<RecyclerView>(R.id.rv_popular_popular).apply { adapter?.notifyItemRangeChanged(0,0)}
-            loadData(baseURL+pageAttr+currentPage.toString())
+
+            val size = resultList.size
+            if (size > 0) {
+                for (i in 0 until size) {
+                    resultList.removeAt(0)
+                }
+                mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
+            }
+            Handler().postDelayed({
+                loadData(baseURL+pageAttr+currentPage.toString())
+            }, 1000)
+
         }
 
     }
@@ -117,6 +150,8 @@ class MainActivity : AppCompatActivity() {
                 person.name = jsonArrayOfResults.getJSONObject(i).getString("name")
                 person.known_for_department = jsonArrayOfResults.getJSONObject(i).getString("known_for_department")
                 person.profile_path = jsonArrayOfResults.getJSONObject(i).getString("profile_path")
+                person.id = jsonArrayOfResults.getJSONObject(i).getString("id")
+                //person.known_for = jsonArrayOfResults.getJSONObject(i).getJSONArray("known_for")
                 resultList.add(person)
             }
             findViewById<RecyclerView>(R.id.rv_popular_popular).apply { adapter?.notifyDataSetChanged() }
