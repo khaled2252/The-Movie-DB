@@ -1,6 +1,5 @@
 package com.example.themoviedb
 
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
@@ -10,9 +9,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.example.themoviedb.R.drawable
 import com.example.themoviedb.pojos.Person
 import java.net.URL
-import com.example.themoviedb.R.drawable
 
 class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
     RecyclerView.ViewHolder(inflater.inflate(R.layout.row_layout, parent, false)) {
@@ -31,7 +30,7 @@ class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         mKnownForDepartementView?.text = person.known_for_department
         mPofilePicture?.setImageBitmap(DownloadImageTask(mPofilePicture!!).execute(Constants.PROFILE_IMAGE_PATH+person.profile_path).get())
     }
-    private inner class DownloadImageTask(internal var bmImage: ImageView) : AsyncTask<String, Void, Bitmap?>() {
+    private inner class DownloadImageTask(internal var imageView: ImageView) : AsyncTask<String, Void, Bitmap?>() {
 
         override fun doInBackground(vararg params: String): Bitmap? {
             var bmp: Bitmap? = null
@@ -47,9 +46,9 @@ class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
 
         override fun onPostExecute(result: Bitmap?) {
             if(result!=null)
-            bmImage.setImageBitmap(result)
+                imageView.setImageBitmap(result)
             else
-            bmImage.setImageResource(drawable.no_image)
+                imageView.setImageResource(drawable.no_image)
         }
     }
 

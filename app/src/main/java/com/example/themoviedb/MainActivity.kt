@@ -8,12 +8,8 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
-import android.widget.LinearLayout
-import android.widget.ProgressBar
+import com.example.themoviedb.pojos.KnownFor
 import com.example.themoviedb.pojos.Person
-import kotlinx.android.synthetic.main.progress_bar.*
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
@@ -31,10 +27,10 @@ class MainActivity : AppCompatActivity() {
         val mRecyclerView = findViewById<RecyclerView>(R.id.rv_popular_popular)
         mRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = CustomAdapter(resultList)
+            adapter = PopularPeopleAdapter(resultList)
         }
 
-        loadData(baseURL+pageAttr+currentPage.toString())
+        loadData(baseURL+pageAttr+currentPage.toString()) //Load first page
 
         val recyclerViewOnScrollListener = object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -48,17 +44,16 @@ class MainActivity : AppCompatActivity() {
                 {
                     isLoadingMore=true
 
-                    val initialSize = resultList.size
+                    //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
                     resultList.add(null)
+                    recyclerView.apply { mRecyclerView.adapter?.notifyDataSetChanged()}
 
+                    //Progress bar loads for 1 second then request new data to load
                     Handler().postDelayed({
                         resultList.remove(null)
                         recyclerView.apply { recyclerView.adapter?.notifyItemRemoved(resultList.size) }
                         loadData(baseURL+pageAttr+currentPage.toString())
-
                     }, 1000)
-                    recyclerView.apply { mRecyclerView.adapter?.notifyItemRangeInserted(initialSize, initialSize+visibleThreshold)}
-
                 }
             }
         }
@@ -68,9 +63,19 @@ class MainActivity : AppCompatActivity() {
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
             currentPage= 1
-            resultList.clear()
-            findViewById<RecyclerView>(R.id.rv_popular_popular).apply { adapter?.notifyItemRangeChanged(0,0)}
-            loadData(baseURL+pageAttr+currentPage.toString())
+
+            val size = resultList.size
+            if (size > 0) {
+                for (i in 0 until size) {
+                    resultList.removeAt(0)
+                }
+                mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
+            }
+
+            Handler().postDelayed({
+                loadData(baseURL+pageAttr+currentPage.toString())
+            }, 1000)
+
         }
 
     }
@@ -80,17 +85,6 @@ class MainActivity : AppCompatActivity() {
         asyncTask.execute(url)
     }
 
-    fun updateResultList() {
-        //Map jsonArray to person pojo
-        for (i in 0 until visibleThreshold) {
-            val person = Person()
-            person.name = jsonArrayOfResults.getJSONObject(i).getString("name")
-            person.known_for_department = jsonArrayOfResults.getJSONObject(i).getString("known_for_department")
-            person.profile_path = jsonArrayOfResults.getJSONObject(i).getString("profile_path")
-            resultList.add(person)
-        }
-        findViewById<RecyclerView>(R.id.rv_popular_popular).apply { adapter?.notifyDataSetChanged() }
-    }
 
     private inner class AsyncTaskExample(internal var body: StringBuffer = StringBuffer()) :
         AsyncTask<String, String, String?>() {
@@ -123,12 +117,48 @@ class MainActivity : AppCompatActivity() {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
+
+            //Loaded a page
             currentPage++
             isLoadingMore=false
 
-            jsonArrayOfResults = JSONObject(result).getJSONArray("results") //List of objects (results)
-            visibleThreshold=jsonArrayOfResults.length()
-            updateResultList()
+            val jsonArrayOfResults = JSONObject(result).getJSONArray("results") //jsonArray of objects (results)
+            visibleThreshold=jsonArrayOfResults.length() //Number of elements visible in one page
+
+            //Map jsonArray to result list of pojos
+            for (i in 0 until visibleThreshold) {
+                val person = Person()
+
+                person.name = jsonArrayOfResults.getJSONObject(i).getString("name")
+                person.known_for_department = jsonArrayOfResults.getJSONObject(i).getString("known_for_department")
+                person.profile_path = jsonArrayOfResults.getJSONObject(i).getString("profile_path")
+                person.id = jsonArrayOfResults.getJSONObject(i).getString("id")
+                person.popularity= jsonArrayOfResults.getJSONObject(i).getString("popularity")
+
+                val jsonArrayOfKnownFor= jsonArrayOfResults.getJSONObject(i).getJSONArray("known_for") //jsonArray of objects (knownFor)
+                if(jsonArrayOfKnownFor.length()!=0) {
+                    var knownForArrayList = arrayListOf<KnownFor>()
+                    for (j in 0 until jsonArrayOfKnownFor.length() - 1) {
+                        var knownFor = KnownFor()
+                        try {
+                            knownFor.original_title =
+                                jsonArrayOfKnownFor.getJSONObject(j).getString("original_title")
+                        }
+                        catch (e:Exception){
+                            knownFor.original_title =
+                                jsonArrayOfKnownFor.getJSONObject(j).getString("original_name")
+                        }
+                        finally {
+                            knownForArrayList.add(knownFor)
+                        }
+
+                    }
+                    person.known_for = knownForArrayList
+                }
+                resultList.add(person)
+            }
+            findViewById<RecyclerView>(R.id.rv_popular_popular).apply { adapter?.notifyDataSetChanged() }
+
             val mSwipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.srl)
             //Disable the refreshing icon when the result list is changed
             if (mSwipeRefreshLayout.isRefreshing) {
@@ -141,7 +171,6 @@ class MainActivity : AppCompatActivity() {
 
     val baseURL = Constants.POPULAR_PEOPLE + Constants.API_KEY
     val pageAttr = Constants.PAGE_ATTRIBUTE
-    var jsonArrayOfResults = JSONArray()
     var resultList = ArrayList<Person?>()
     var currentPage = 1
     var visibleThreshold = 0
