@@ -37,21 +37,21 @@ class MainActivity : AppCompatActivity() {
         val mSwipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.srl)
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
+            if (!isLoadingMore) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
 
-            isreloadingData=true
-            currentPage= 1
-            mRecyclerView.clearOnScrollListeners() //because scrollListener is called when list is empty ?
+                currentPage = 1
+                mRecyclerView.clearOnScrollListeners() //because scrollListener is called when list is empty ?
 
-            val size = resultList.size
-            if (size > 0) {
-                for (i in 0 until size) {
-                    resultList.removeAt(0)
+                val size = resultList.size
+                if (size > 0) {
+                    for (i in 0 until size) {
+                        resultList.removeAt(0)
+                    }
+                    mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
                 }
-                mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
+                loadData(baseURL + pageAttr + currentPage.toString())
             }
-                loadData(baseURL+pageAttr+currentPage.toString())
         }
-
     }
 
     fun loadData(url : String){
@@ -94,9 +94,8 @@ class MainActivity : AppCompatActivity() {
             //Loaded a page
             currentPage++
             isLoadingMore=false
+            mRecyclerView.addOnScrollListener(recyclerViewOnScrollListener)
 
-            if(isreloadingData) {mRecyclerView.addOnScrollListener(recyclerViewOnScrollListener)
-                isreloadingData=false}
 
 
 
@@ -182,7 +181,4 @@ class MainActivity : AppCompatActivity() {
     var visibleThreshold = 0
     var isLoadingMore = false
     var numItems = 0
-    var isreloadingData = false
-
-
 }
