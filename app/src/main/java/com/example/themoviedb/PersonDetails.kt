@@ -1,13 +1,16 @@
 package com.example.themoviedb
 
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.example.themoviedb.pojos.KnownFor
 import com.example.themoviedb.pojos.PersonImages
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -15,14 +18,6 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import android.R.attr.top
-import android.R.attr.bottom
-import android.R.attr.right
-import android.R.attr.left
-import android.graphics.Rect
-import android.view.View
-import com.example.themoviedb.pojos.KnownFor
-import java.lang.StringBuilder
 
 
 class PersonDetails : AppCompatActivity() {
@@ -56,6 +51,7 @@ class PersonDetails : AppCompatActivity() {
             layoutManager = GridLayoutManager(this@PersonDetails,3)
             adapter = PopularPersonAdapter(resultList)
             mRecyclerView.addItemDecoration(RecyclerViewItemDecorator(10))
+            this.setItemViewCacheSize(50)
         }
         val asyncTask = AsyncTaskExample()
         asyncTask.execute(Constants.PERSON_DETAIL+profileId+Constants.PERSON_IMAGES_ATTRIBUTE+Constants.API_KEY)

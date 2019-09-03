@@ -8,7 +8,6 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.View
 import com.example.themoviedb.pojos.KnownFor
 import com.example.themoviedb.pojos.Person
 import org.json.JSONObject
@@ -38,8 +37,7 @@ class MainActivity : AppCompatActivity() {
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
             if (!isLoadingMore) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
-
-                currentPage = 1
+                currentPage = 0
                 mRecyclerView.clearOnScrollListeners() //because scrollListener is called when list is empty ?
 
                 val size = resultList.size

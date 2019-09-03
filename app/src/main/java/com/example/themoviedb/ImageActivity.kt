@@ -47,7 +47,11 @@ class ImageActivity : AppCompatActivity() {
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
             ) {
-                Toast.makeText(this, "Request is needed!", Toast.LENGTH_SHORT).show()
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    1
+                )
             } else {
                 ActivityCompat.requestPermissions(
                     this,
@@ -66,7 +70,13 @@ class ImageActivity : AppCompatActivity() {
             builder.setMessage("Do you want to save image to gallery?")
             builder.setPositiveButton("YES"){ _, _ ->
                saveImage(bitmap)
-                }
+                   //This line works as well but saves to Pictures directory
+//                val n = Random().nextInt()
+//                val fname = "TheMovieDB/Image$n.jpg"
+//                val url =MediaStore.Images.Media.insertImage(contentResolver, bitmap,fname ,"No Description")
+//                if(url!=null)
+//                    Toast.makeText(this,"Image saved to gallery !",Toast.LENGTH_LONG).show()
+            }
             builder.setNegativeButton("No"){ _, _ ->
             }
             val dialog: AlertDialog = builder.create()
@@ -78,7 +88,7 @@ class ImageActivity : AppCompatActivity() {
         val root = getExternalStoragePublicDirectory(
             DIRECTORY_PICTURES
         ).toString()
-        val myDir = File(root)
+        val myDir = File("$root/TheMovieDB")
         myDir.mkdirs()
         val generator = Random()
 
