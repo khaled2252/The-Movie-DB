@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
             if (!isLoadingMore) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
-                currentPage = 0
+                currentPage = 1
                 mRecyclerView.clearOnScrollListeners() //because scrollListener is called when list is empty ?
 
                 val size = resultList.size
