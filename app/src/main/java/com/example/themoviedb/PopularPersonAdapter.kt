@@ -39,7 +39,8 @@ class PopularPersonAdapter(private val list: List<PersonImages?>): RecyclerView.
    inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         private val mImageView: ImageView = mView.findViewById(R.id.iv_image)
         fun bind(personImages: PersonImages) {
-            mImageView.setImageBitmap(DownloadImageTask(mImageView).execute(Constants.PROFILE_IMAGE_PATH+personImages.filePath).get())
+            mImageView.setImageResource(R.drawable.no_image)
+            DownloadImageTask(mImageView).execute(Constants.PROFILE_IMAGE_PATH+personImages.filePath)
             mImageView.setOnClickListener {
                 val intent = Intent(itemView.context,ImageActivity::class.java)
                 val image = itemView.findViewById<ImageView>(R.id.iv_image)
@@ -67,8 +68,6 @@ class PopularPersonAdapter(private val list: List<PersonImages?>): RecyclerView.
         override fun onPostExecute(result: Bitmap?) {
             if(result!=null)
                 imageView.setImageBitmap(result)
-            else
-                imageView.setImageResource(R.drawable.no_image)
         }
     }
 
