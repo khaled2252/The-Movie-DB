@@ -38,7 +38,7 @@ class PersonDetails : AppCompatActivity() {
         val knownForArrayList: ArrayList<String> = ArrayList()
         if(knownFor!=null) {
             for (i in 0 until knownFor!!.size)
-                knownForArrayList.add(knownFor.get(i)!!.original_title!!)
+                knownForArrayList.add(knownFor[i]!!.original_title!!)
         }
         else knownForArrayList.add("No movies found")
         val knownForDepartment = intent.getStringExtra("known_for_department")

@@ -28,7 +28,8 @@ class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
     fun bind(person : Person) {
         mNameView?.text = person.name
         mKnownForDepartementView?.text = person.known_for_department
-        mPofilePicture?.setImageBitmap(DownloadImageTask(mPofilePicture!!).execute(Constants.PROFILE_IMAGE_PATH+person.profile_path).get())
+        mPofilePicture?.setImageResource(drawable.no_image)
+        DownloadImageTask(mPofilePicture!!).execute(Constants.PROFILE_IMAGE_PATH+person.profile_path)
     }
     private inner class DownloadImageTask(internal var imageView: ImageView) : AsyncTask<String, Void, Bitmap?>() {
 
@@ -47,8 +48,6 @@ class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         override fun onPostExecute(result: Bitmap?) {
             if(result!=null)
                 imageView.setImageBitmap(result)
-            else
-                imageView.setImageResource(drawable.no_image)
         }
     }
 
