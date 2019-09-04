@@ -4,9 +4,9 @@ import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.os.AsyncTask
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -48,7 +48,7 @@ class PersonDetails : AppCompatActivity() {
 
         val mRecyclerView = findViewById<RecyclerView>(R.id.rv_pictures)
         mRecyclerView.apply {
-            layoutManager = GridLayoutManager(this@PersonDetails,3)
+            layoutManager = GridLayoutManager(this@PersonDetails, 3)
             adapter = PopularPersonAdapter(resultList)
             mRecyclerView.addItemDecoration(RecyclerViewItemDecorator(10))
             this.setItemViewCacheSize(50)

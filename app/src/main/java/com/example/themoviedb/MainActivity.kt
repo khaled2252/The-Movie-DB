@@ -1,13 +1,17 @@
 package com.example.themoviedb
 
+import android.app.SearchManager
+import android.content.Context
 import android.graphics.Color
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.view.Menu
+import android.widget.SearchView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.pojos.KnownFor
 import com.example.themoviedb.pojos.Person
 import org.json.JSONObject
@@ -29,32 +33,65 @@ class MainActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = PopularPeopleAdapter(resultList)
             this.setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
+            loadData(baseURL + pageAttr + currentPage.toString()) //Load first page
         }
-
-        loadData(baseURL+pageAttr+currentPage.toString()) //Load first page
 
         val mSwipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.srl)
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
-            if (!isLoadingMore) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
-                currentPage = 1
-                mRecyclerView.clearOnScrollListeners() //because scrollListener is called when list is empty ?
-
-                val size = resultList.size
-                if (size > 0) {
-                    for (i in 0 until size) {
-                        resultList.removeAt(0)
-                    }
-                    mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
-                }
-                loadData(baseURL + pageAttr + currentPage.toString())
-            }
+            clearThenRequestData(baseURL + pageAttr)
         }
     }
 
-    fun loadData(url : String){
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+//         Associate searchable configuration with the SearchView
+//        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+//        (menu?.findItem(R.id.menu_search)?.actionView as SearchView).apply {
+//            setSearchableInfo(searchManager.getSearchableInfo(componentName))
+//        }
+
+        val searchItem = menu?.findItem(R.id.menu_search)
+        if (searchItem != null) {
+            val searchView = searchItem.actionView as SearchView
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    //Make a request for search
+                    clearThenRequestData(Constants.SEARCH_BY_PERSON+Constants.API_KEY+Constants.QUERY_ATTRIBUTE+query)
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    return true
+                }
+
+            })
+        }
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    fun loadData(url: String) {
         val asyncTask = AsyncTaskExample()
         asyncTask.execute(url)
+    }
+
+    fun clearThenRequestData(url: String){
+        currentPage = 1
+        val mRecyclerView = findViewById<RecyclerView>(R.id.rv_popular_popular)
+        if (!isLoadingMore) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
+            mRecyclerView.clearOnScrollListeners() //because scrollListener is called when list is empty ?
+
+            val size = resultList.size
+            if (size > 0) {
+                for (i in 0 until size) {
+                    resultList.removeAt(0)
+                }
+                mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
+            }
+            loadData(url+currentPage)
+        }
     }
 
 
@@ -91,39 +128,38 @@ class MainActivity : AppCompatActivity() {
 
             //Loaded a page
             currentPage++
-            isLoadingMore=false
+            isLoadingMore = false
             mRecyclerView.addOnScrollListener(recyclerViewOnScrollListener)
 
 
-
-
-            val jsonArrayOfResults = JSONObject(result).getJSONArray("results") //jsonArray of objects (results)
-            visibleThreshold=jsonArrayOfResults.length() //Number of elements visible in one page
+            val jsonArrayOfResults =
+                JSONObject(result).getJSONArray("results") //jsonArray of objects (results)
+            visibleThreshold = jsonArrayOfResults.length() //Number of elements visible in one page
 
             //Map jsonArray to result list of pojos
             for (i in 0 until visibleThreshold) {
                 val person = Person()
 
                 person.name = jsonArrayOfResults.getJSONObject(i).getString("name")
-                person.known_for_department = jsonArrayOfResults.getJSONObject(i).getString("known_for_department")
+                person.known_for_department =
+                    jsonArrayOfResults.getJSONObject(i).getString("known_for_department")
                 person.profile_path = jsonArrayOfResults.getJSONObject(i).getString("profile_path")
                 person.id = jsonArrayOfResults.getJSONObject(i).getString("id")
-                person.popularity= jsonArrayOfResults.getJSONObject(i).getString("popularity")
+                person.popularity = jsonArrayOfResults.getJSONObject(i).getString("popularity")
 
-                val jsonArrayOfKnownFor= jsonArrayOfResults.getJSONObject(i).getJSONArray("known_for") //jsonArray of objects (knownFor)
-                if(jsonArrayOfKnownFor.length()!=0) {
+                val jsonArrayOfKnownFor = jsonArrayOfResults.getJSONObject(i)
+                    .getJSONArray("known_for") //jsonArray of objects (knownFor)
+                if (jsonArrayOfKnownFor.length() != 0) {
                     var knownForArrayList = arrayListOf<KnownFor>()
                     for (j in 0 until jsonArrayOfKnownFor.length() - 1) {
                         var knownFor = KnownFor()
                         try {
                             knownFor.original_title =
                                 jsonArrayOfKnownFor.getJSONObject(j).getString("original_title")
-                        }
-                        catch (e:Exception){
+                        } catch (e: Exception) {
                             knownFor.original_title =
                                 jsonArrayOfKnownFor.getJSONObject(j).getString("original_name")
-                        }
-                        finally {
+                        } finally {
                             knownForArrayList.add(knownFor)
                         }
 
@@ -133,7 +169,10 @@ class MainActivity : AppCompatActivity() {
                 resultList.add(person)
             }
             mRecyclerView.apply {
-                mRecyclerView.adapter?.notifyItemRangeChanged(mRecyclerView?.adapter!!.itemCount,visibleThreshold)
+                mRecyclerView.adapter?.notifyItemRangeChanged(
+                    mRecyclerView?.adapter!!.itemCount,
+                    visibleThreshold
+                )
             }
             val mSwipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.srl)
             //Disable the refreshing icon when the result list is changed
@@ -149,21 +188,26 @@ class MainActivity : AppCompatActivity() {
 
                 val layoutManager = mRecyclerView.layoutManager as LinearLayoutManager
                 val pos = layoutManager.findLastCompletelyVisibleItemPosition()
-                numItems = mRecyclerView.adapter?.itemCount!! -1
+                numItems = mRecyclerView.adapter?.itemCount!! - 1
 
-                if(pos >= numItems&&!isLoadingMore ) //Reached end of screen
+                if (pos >= numItems && !isLoadingMore) //Reached end of screen
                 {
-                    isLoadingMore=true
+                    isLoadingMore = true
 
                     //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
                     resultList.add(null)
-                    recyclerView.apply { mRecyclerView.adapter?.notifyItemRangeInserted(numItems,1)}
+                    recyclerView.apply {
+                        mRecyclerView.adapter?.notifyItemRangeInserted(
+                            numItems,
+                            1
+                        )
+                    }
 
                     //Progress bar loads for 1 second then request new data to load
                     Handler().postDelayed({
                         resultList.remove(null)
                         recyclerView.apply { recyclerView.adapter?.notifyItemRemoved(resultList.size) }
-                        loadData(baseURL+pageAttr+currentPage.toString())
+                        loadData(baseURL + pageAttr + currentPage.toString())
                     }, 1000)
                 }
             }
