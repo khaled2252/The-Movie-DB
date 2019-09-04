@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
 //            setSearchableInfo(searchManager.getSearchableInfo(componentName))
 //        }
 
+
         val searchItem = menu?.findItem(R.id.menu_search)
         if (searchItem != null) {
             val searchView = searchItem.actionView as SearchView
