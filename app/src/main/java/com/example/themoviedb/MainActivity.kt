@@ -5,6 +5,7 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
@@ -19,15 +20,6 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import android.content.Context.SEARCH_SERVICE
-import androidx.core.content.ContextCompat.getSystemService
-import android.app.SearchManager
-import android.content.Context
-import android.view.MenuItem
-import androidx.core.view.MenuItemCompat
-import androidx.core.view.MenuItemCompat.expandActionView
-
-
 
 
 class MainActivity : AppCompatActivity() {
@@ -85,30 +77,29 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        //To override what happens when x is clicked on in searchview
+        //To override what happens when x is clicked on in searchView
         var clickedOnCloseButton = false
-        mCloseButton.setOnClickListener{
-            clickedOnCloseButton = true
-            mSearchView.setQuery("", false)
-            mSearchView.clearFocus()
-            currentPage = 1
-            clearThenRequestData(baseURL + pageAttr+currentPage)
+        mCloseButton.setOnClickListener {
+            if (mSearchView.query.isNotEmpty()) {
+                clickedOnCloseButton = true
+                mSearchView.setQuery("", false)
+                mSearchView.clearFocus()
+                currentPage = 1
+                clearThenRequestData(baseURL + pageAttr + currentPage)
+            }
         }
-
         //To override what happens when searchView is closed
-        MenuItemCompat.setOnActionExpandListener(
-            mSearchItem,
-            object : MenuItemCompat.OnActionExpandListener {
-                override fun onMenuItemActionExpand(item: MenuItem): Boolean {
-                    return true
-                }
+        mSearchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(menuItem: MenuItem): Boolean {
+                return true
+            }
 
-                override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                    if(!clickedOnCloseButton)
-                        mCloseButton.callOnClick()
-                    return true
-                }
-            })
+            override fun onMenuItemActionCollapse(menuItem: MenuItem): Boolean {
+                if(!clickedOnCloseButton)
+                    mCloseButton.callOnClick()
+                return true
+            }
+        })
 
         return super.onCreateOptionsMenu(menu)
     }
