@@ -19,8 +19,13 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 
-class PopularPeopleAdapter(private val list: List<Person?>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder{
+class PopularPeopleAdapter(private val list: List<Person?>) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    val VIEW_ITEM = 1
+    val VIEW_PROG = 0
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val vh: RecyclerView.ViewHolder
         val inflater = LayoutInflater.from(parent.context)
 
@@ -28,9 +33,8 @@ class PopularPeopleAdapter(private val list: List<Person?>): RecyclerView.Adapte
             LayoutInflater.from(parent.context).inflate(
                 R.layout.row_layout, parent, false
             )
-            vh = PopularPeopleViewHolder(inflater,parent)
-        }
-        else {
+            vh = PopularPeopleViewHolder(inflater, parent)
+        } else {
             val v = LayoutInflater.from(parent.context).inflate(
                 R.layout.progress_bar, parent, false
             )
@@ -39,31 +43,34 @@ class PopularPeopleAdapter(private val list: List<Person?>): RecyclerView.Adapte
 
         return vh
     }
+
     override fun getItemViewType(position: Int): Int {
         return if (list[position] != null) VIEW_ITEM else VIEW_PROG
     }
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is PopularPeopleViewHolder) {
-        val person : Person? = list[position]
-        holder.bind(person!!)
+            val person: Person? = list[position]
+            holder.bind(person!!)
             holder.itemView.setOnClickListener {
                 //Navigate to Person Details activity
-                val intent = Intent(holder.itemView.context,PersonDetails::class.java)
+                val intent = Intent(holder.itemView.context, PersonDetails::class.java)
 
                 val image = holder.itemView.iv_profile
                 val bitmap = (image.drawable as BitmapDrawable).bitmap
-                saveFile(holder.itemView.context,bitmap,"profile_picture")
-                intent.putExtra("profile_id",person.id)
-                intent.putExtra("person_name",person.name)
-                intent.putExtra("known_for",person.known_for)
-                intent.putExtra("known_for_department",person.known_for_department)
-                intent.putExtra("popularity",person.popularity)
-                holder.itemView.context.startActivity(intent)}
-        }
-        else {
+                saveFile(holder.itemView.context, bitmap, "profile_picture")
+                intent.putExtra("profile_id", person.id)
+                intent.putExtra("person_name", person.name)
+                intent.putExtra("known_for", person.known_for)
+                intent.putExtra("known_for_department", person.known_for_department)
+                intent.putExtra("popularity", person.popularity)
+                holder.itemView.context.startActivity(intent)
+            }
+        } else {
             (holder as ProgressViewHolder).progressBar.isIndeterminate = true
         }
     }
+
     override fun getItemCount(): Int = list.size
 
     fun saveFile(context: Context, b: Bitmap, picName: String) {
@@ -80,10 +87,6 @@ class PopularPeopleAdapter(private val list: List<Person?>): RecyclerView.Adapte
         } finally {
             //fos.close()
         }
-    }
-    companion object {
-        const val VIEW_ITEM = 1
-        const val VIEW_PROG = 0
     }
 
 }

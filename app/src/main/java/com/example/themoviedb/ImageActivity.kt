@@ -25,9 +25,12 @@ class ImageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image)
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     this,
@@ -48,28 +51,29 @@ class ImageActivity : AppCompatActivity() {
             }
         }
 
-        val photoPath= this.openFileInput("profile_picture")
+        val photoPath = this.openFileInput("profile_picture")
         val bitmap = BitmapFactory.decodeStream(photoPath)
         this.iv_saveToGallery.setImageBitmap(bitmap)
         this.btn_saveToGallery.setOnClickListener {
             val builder = AlertDialog.Builder(this@ImageActivity)
             builder.setTitle("Download image")
             builder.setMessage("Do you want to save image to gallery?")
-            builder.setPositiveButton("YES"){ _, _ ->
-               saveImage(bitmap)
-                   //This line works as well but saves to Pictures directory
+            builder.setPositiveButton("YES") { _, _ ->
+                saveImage(bitmap)
+                //This line works as well but saves to Pictures directory
 //                val n = Random().nextInt()
 //                val fname = "TheMovieDB/Image$n.jpg"
 //                val url =MediaStore.Images.Media.insertImage(contentResolver, bitmap,fname ,"No Description")
 //                if(url!=null)
 //                    Toast.makeText(this,"Image saved to gallery !",Toast.LENGTH_LONG).show()
             }
-            builder.setNegativeButton("No"){ _, _ ->
+            builder.setNegativeButton("No") { _, _ ->
             }
             val dialog: AlertDialog = builder.create()
             dialog.show()
         }
     }
+
     private fun saveImage(finalBitmap: Bitmap) {
 
         val root = getExternalStoragePublicDirectory(
@@ -89,7 +93,7 @@ class ImageActivity : AppCompatActivity() {
             finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
             out.flush()
             out.close()
-            Toast.makeText(this,"Image saved to gallery !",Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Image saved to gallery !", Toast.LENGTH_LONG).show()
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -97,7 +101,8 @@ class ImageActivity : AppCompatActivity() {
 
         // Tell the media scanner about the new file so that it is
         // immediately available to the user.
-        MediaScannerConnection.scanFile(this, arrayOf(file.toString()), null
+        MediaScannerConnection.scanFile(
+            this, arrayOf(file.toString()), null
         ) { path, uri ->
             Log.i("ExternalStorage", "Scanned $path:")
             Log.i("ExternalStorage", "-> uri=$uri")

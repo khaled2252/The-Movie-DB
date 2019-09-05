@@ -21,38 +21,42 @@ import java.io.IOException
 import java.net.URL
 
 
-class PopularPersonAdapter(private val list: List<PersonImages?>): RecyclerView.Adapter<PopularPersonAdapter.ViewHolder>() {
+class PopularPersonAdapter(private val list: List<PersonImages?>) :
+    RecyclerView.Adapter<PopularPersonAdapter.ViewHolder>() {
     override fun getItemCount(): Int {
-                return list.size
-        }
+        return list.size
+    }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder{
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.cell_layout, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val personImages : PersonImages? = list[position]
+        val personImages: PersonImages? = list[position]
         holder.bind(personImages!!)
 
     }
-   inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
+
+    inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         private val mImageView: ImageView = mView.iv_image
         fun bind(personImages: PersonImages) {
             mImageView.setImageResource(R.drawable.no_image)
-            DownloadImageTask(mImageView).execute(Constants.PROFILE_IMAGE_PATH+personImages.filePath)
+            DownloadImageTask(mImageView).execute(Constants.PROFILE_IMAGE_PATH + personImages.filePath)
             mImageView.setOnClickListener {
-                val intent = Intent(itemView.context,ImageActivity::class.java)
+                val intent = Intent(itemView.context, ImageActivity::class.java)
                 val image = itemView.iv_image
                 val bitmap = (image.drawable as BitmapDrawable).bitmap
-                saveFile(itemView.context,bitmap,"profile_picture")
-                itemView.context.startActivity(intent)}
+                saveFile(itemView.context, bitmap, "profile_picture")
+                itemView.context.startActivity(intent)
             }
         }
+    }
 
 
-    private inner class DownloadImageTask(internal var imageView: ImageView) : AsyncTask<String, Void, Bitmap?>() {
+    private inner class DownloadImageTask(internal var imageView: ImageView) :
+        AsyncTask<String, Void, Bitmap?>() {
 
         override fun doInBackground(vararg params: String): Bitmap? {
             var bmp: Bitmap? = null
@@ -67,12 +71,13 @@ class PopularPersonAdapter(private val list: List<PersonImages?>): RecyclerView.
         }
 
         override fun onPostExecute(result: Bitmap?) {
-            if(result!=null)
+            if (result != null)
                 imageView.setImageBitmap(result)
         }
     }
 
 }
+
 fun saveFile(context: Context, b: Bitmap, picName: String) {
     val fos: FileOutputStream
     try {

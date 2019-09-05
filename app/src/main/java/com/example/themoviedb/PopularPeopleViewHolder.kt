@@ -22,17 +22,19 @@ class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
 
     init {
         mNameView = itemView.tv_name
-        mKnownForDepartementView= itemView.tv_known_for_department
+        mKnownForDepartementView = itemView.tv_known_for_department
         mPofilePicture = itemView.iv_profile
     }
 
-    fun bind(person : Person) {
+    fun bind(person: Person) {
         mNameView?.text = person.name
         mKnownForDepartementView?.text = person.known_for_department
         mPofilePicture?.setImageResource(drawable.no_image)
-        DownloadImageTask(mPofilePicture!!).execute(Constants.PROFILE_IMAGE_PATH+person.profile_path)
+        DownloadImageTask(mPofilePicture!!).execute(Constants.PROFILE_IMAGE_PATH + person.profile_path)
     }
-    private inner class DownloadImageTask(internal var imageView: ImageView) : AsyncTask<String, Void, Bitmap?>() {
+
+    private inner class DownloadImageTask(internal var imageView: ImageView) :
+        AsyncTask<String, Void, Bitmap?>() {
 
         override fun doInBackground(vararg params: String): Bitmap? {
             var bmp: Bitmap? = null
@@ -47,7 +49,7 @@ class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         }
 
         override fun onPostExecute(result: Bitmap?) {
-            if(result!=null)
+            if (result != null)
                 imageView.setImageBitmap(result)
         }
     }

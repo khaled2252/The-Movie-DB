@@ -21,6 +21,8 @@ import java.net.URL
 
 class PersonDetails : AppCompatActivity() {
 
+    var resultList = ArrayList<PersonImages?>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_person_details)
@@ -30,20 +32,20 @@ class PersonDetails : AppCompatActivity() {
         val knownFor = intent.getSerializableExtra("known_for") as ArrayList<KnownFor?>?
 
         val knownForArrayList: ArrayList<String> = ArrayList()
-        if(knownFor!=null) {
+        if (knownFor != null) {
             for (i in 0 until knownFor!!.size)
                 knownForArrayList.add(knownFor[i]!!.original_title!!)
-        }
-        else knownForArrayList.add("No movies found")
+        } else knownForArrayList.add("No movies found")
         val knownForDepartment = intent.getStringExtra("known_for_department")
 
-        val photoPath= this.openFileInput("profile_picture")
+        val photoPath = this.openFileInput("profile_picture")
         val bitmap = BitmapFactory.decodeStream(photoPath)
         this.iv_profileImage.setImageBitmap(bitmap)
 
         this.tv_name.text = personName
 
-        this.tv_knownFor.text = StringBuilder("$personName is known for $knownForDepartment in $knownForArrayList with popularity score of $popularity")
+        this.tv_knownFor.text =
+            StringBuilder("$personName is known for $knownForDepartment in $knownForArrayList with popularity score of $popularity")
 
         val mRecyclerView = this.rv_pictures
         mRecyclerView.apply {
@@ -53,8 +55,9 @@ class PersonDetails : AppCompatActivity() {
             this.setItemViewCacheSize(50)
         }
         val asyncTask = AsyncTaskExample()
-        asyncTask.execute(Constants.PERSON_DETAIL+profileId+Constants.PERSON_IMAGES_ATTRIBUTE+Constants.API_KEY)
+        asyncTask.execute(Constants.PERSON_DETAIL + profileId + Constants.PERSON_IMAGES_ATTRIBUTE + Constants.API_KEY)
     }
+
     inner class AsyncTaskExample(private var body: StringBuffer = StringBuffer()) :
         AsyncTask<String, String, String?>() {
 
@@ -100,9 +103,6 @@ class PersonDetails : AppCompatActivity() {
         }
     }
 
-    companion object
-
-    var resultList = ArrayList<PersonImages?>()
 
 }
 

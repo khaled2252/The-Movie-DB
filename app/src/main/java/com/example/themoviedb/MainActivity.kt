@@ -22,6 +22,15 @@ import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
+    var resultList = ArrayList<Person?>()
+    var currentPage = 1
+    var visibleThreshold = 0
+    var isLoading = false
+    var numItems = 0
+
+    val baseURL = Constants.POPULAR_PEOPLE + Constants.API_KEY
+    val pageAttr = Constants.PAGE_ATTRIBUTE
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -29,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         val mRecyclerView = this.rv_popular_popular
         mRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
+
             adapter = PopularPeopleAdapter(resultList)
             this.setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
             loadData(baseURL + pageAttr + currentPage.toString()) //Load first page
@@ -38,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
             currentPage = 1
-            clearThenRequestData(baseURL + pageAttr+currentPage)
+            clearThenRequestData(baseURL + pageAttr + currentPage)
         }
     }
 
@@ -47,7 +57,13 @@ class MainActivity : AppCompatActivity() {
 
         val mSearchItem = menu?.findItem(R.id.menu_search)
         val mSearchView = mSearchItem?.actionView as SearchView
-        val mCloseButton = mSearchView.findViewById<View>(resources.getIdentifier("android:id/search_close_btn", null, null))
+        val mCloseButton = mSearchView.findViewById<View>(
+            resources.getIdentifier(
+                "android:id/search_close_btn",
+                null,
+                null
+            )
+        )
 
         mSearchView.queryHint = "Search by name..."
 
@@ -55,22 +71,19 @@ class MainActivity : AppCompatActivity() {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
 
-                if(query?.isNotEmpty()!!)
-                {
+                if (query?.isNotEmpty()!!) {
                     //Make a request for search
                     clearThenRequestData(Constants.SEARCH_BY_PERSON + Constants.API_KEY + Constants.QUERY_ATTRIBUTE + query)
-                }
-                else
-                {
+                } else {
                     currentPage = 1
-                    clearThenRequestData(baseURL + pageAttr+currentPage)
+                    clearThenRequestData(baseURL + pageAttr + currentPage)
                 }
 
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-               return true
+                return true
             }
 
         })
@@ -82,8 +95,7 @@ class MainActivity : AppCompatActivity() {
                 mSearchView.clearFocus()
                 currentPage = 1
                 clearThenRequestData(baseURL + pageAttr + currentPage)
-            }
-            else
+            } else
                 mSearchView.onActionViewCollapsed()
 
         }
@@ -95,7 +107,7 @@ class MainActivity : AppCompatActivity() {
         asyncTask.execute(url)
     }
 
-    fun clearThenRequestData(url: String){
+    fun clearThenRequestData(url: String) {
         val mRecyclerView = this.rv_popular_popular
         if (!isLoading) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
             mRecyclerView.clearOnScrollListeners() //because scrollListener is called when list is empty ?
@@ -231,13 +243,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    companion object
-
-    val baseURL = Constants.POPULAR_PEOPLE + Constants.API_KEY
-    val pageAttr = Constants.PAGE_ATTRIBUTE
-    var resultList = ArrayList<Person?>()
-    var currentPage = 1
-    var visibleThreshold = 0
-    var isLoading = false
-    var numItems = 0
 }
