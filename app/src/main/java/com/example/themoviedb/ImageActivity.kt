@@ -1,34 +1,21 @@
 package com.example.themoviedb
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.provider.MediaStore
-import android.widget.Button
-import android.widget.ImageView
-import android.media.MediaScannerConnection
 import android.graphics.Bitmap
-import java.nio.file.Files.delete
-import java.nio.file.Files.exists
+import android.graphics.BitmapFactory
+import android.media.MediaScannerConnection
+import android.os.Bundle
 import android.os.Environment.DIRECTORY_PICTURES
 import android.os.Environment.getExternalStoragePublicDirectory
-import androidx.core.app.ComponentActivity
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.net.Uri
-import android.os.Environment
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AlertDialog
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import kotlinx.android.synthetic.main.activity_image.*
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.*
 
@@ -63,8 +50,8 @@ class ImageActivity : AppCompatActivity() {
 
         val photoPath= this.openFileInput("profile_picture")
         val bitmap = BitmapFactory.decodeStream(photoPath)
-        findViewById<ImageView>(R.id.iv_saveToGallery).setImageBitmap(bitmap)
-        findViewById<FloatingActionButton>(R.id.btn_saveToGallery).setOnClickListener {
+        this.iv_saveToGallery.setImageBitmap(bitmap)
+        this.btn_saveToGallery.setOnClickListener {
             val builder = AlertDialog.Builder(this@ImageActivity)
             builder.setTitle("Download image")
             builder.setMessage("Do you want to save image to gallery?")

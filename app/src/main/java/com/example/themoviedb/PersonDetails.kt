@@ -4,14 +4,13 @@ import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.os.AsyncTask
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import com.example.themoviedb.pojos.KnownFor
 import com.example.themoviedb.pojos.PersonImages
+import kotlinx.android.synthetic.main.activity_person_details.*
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
@@ -40,13 +39,13 @@ class PersonDetails : AppCompatActivity() {
 
         val photoPath= this.openFileInput("profile_picture")
         val bitmap = BitmapFactory.decodeStream(photoPath)
-        findViewById<ImageView>(R.id.iv_profileImage).setImageBitmap(bitmap)
+        this.iv_profileImage.setImageBitmap(bitmap)
 
-        findViewById<TextView>(R.id.tv_name).text = personName
+        this.tv_name.text = personName
 
-        findViewById<TextView>(R.id.tv_knownFor).text = StringBuilder("$personName is known for $knownForDepartment in $knownForArrayList with popularity score of $popularity")
+        this.tv_knownFor.text = StringBuilder("$personName is known for $knownForDepartment in $knownForArrayList with popularity score of $popularity")
 
-        val mRecyclerView = findViewById<RecyclerView>(R.id.rv_pictures)
+        val mRecyclerView = this.rv_pictures
         mRecyclerView.apply {
             layoutManager = GridLayoutManager(this@PersonDetails, 3)
             adapter = PopularPersonAdapter(resultList)
@@ -96,7 +95,7 @@ class PersonDetails : AppCompatActivity() {
                 personImages.filePath = jsonArrayOfProfiles.getJSONObject(i).getString("file_path")
                 resultList.add(personImages)
             }
-            findViewById<RecyclerView>(R.id.rv_pictures).apply { adapter?.notifyDataSetChanged() }
+            this@PersonDetails.rv_pictures.apply { adapter?.notifyDataSetChanged() }
 
         }
     }

@@ -5,15 +5,14 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.themoviedb.pojos.KnownFor
 import com.example.themoviedb.pojos.Person
+import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
@@ -21,14 +20,13 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
-
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val mRecyclerView = findViewById<RecyclerView>(R.id.rv_popular_popular)
+        val mRecyclerView = this.rv_popular_popular
         mRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = PopularPeopleAdapter(resultList)
@@ -36,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             loadData(baseURL + pageAttr + currentPage.toString()) //Load first page
         }
 
-        val mSwipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.srl)
+        val mSwipeRefreshLayout = this.srl
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
             currentPage = 1
@@ -98,7 +96,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun clearThenRequestData(url: String){
-        val mRecyclerView = findViewById<RecyclerView>(R.id.rv_popular_popular)
+        val mRecyclerView = this.rv_popular_popular
         if (!isLoading) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
             mRecyclerView.clearOnScrollListeners() //because scrollListener is called when list is empty ?
 
@@ -193,14 +191,14 @@ class MainActivity : AppCompatActivity() {
                     visibleThreshold
                 )
             }
-            val mSwipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.srl)
+            val mSwipeRefreshLayout = this@MainActivity.srl
             //Disable the refreshing icon when the result list is changed
             if (mSwipeRefreshLayout.isRefreshing) {
                 mSwipeRefreshLayout.isRefreshing = false
             }
         }
 
-        var mRecyclerView: RecyclerView = findViewById(R.id.rv_popular_popular)
+        var mRecyclerView: RecyclerView = this@MainActivity.rv_popular_popular
         val recyclerViewOnScrollListener = object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)

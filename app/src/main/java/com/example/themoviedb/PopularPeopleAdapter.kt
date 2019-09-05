@@ -5,14 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.ProgressBar
+import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.pojos.Person
+import kotlinx.android.synthetic.main.progress_bar.view.*
+import kotlinx.android.synthetic.main.row_layout.view.*
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
@@ -49,7 +50,7 @@ class PopularPeopleAdapter(private val list: List<Person?>): RecyclerView.Adapte
                 //Navigate to Person Details activity
                 val intent = Intent(holder.itemView.context,PersonDetails::class.java)
 
-                val image = holder.itemView.findViewById<ImageView>(R.id.iv_profile)
+                val image = holder.itemView.iv_profile
                 val bitmap = (image.drawable as BitmapDrawable).bitmap
                 saveFile(holder.itemView.context,bitmap,"profile_picture")
                 intent.putExtra("profile_id",person.id)
@@ -88,6 +89,6 @@ class PopularPeopleAdapter(private val list: List<Person?>): RecyclerView.Adapte
 }
 
 class ProgressViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-    var progressBar: ProgressBar = v.findViewById(R.id.pb)
+    var progressBar: ProgressBar = v.pb
 
 }

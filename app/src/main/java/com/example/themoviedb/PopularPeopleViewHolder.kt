@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.themoviedb.R.drawable
 import com.example.themoviedb.pojos.Person
+import kotlinx.android.synthetic.main.row_layout.view.*
 import java.net.URL
 
 class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
@@ -20,9 +21,9 @@ class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
     private var mPofilePicture: ImageView? = null
 
     init {
-        mNameView = itemView.findViewById(R.id.tv_name)
-        mKnownForDepartementView= itemView.findViewById(R.id.tv_known_for_department)
-        mPofilePicture = itemView.findViewById(R.id.iv_profile)
+        mNameView = itemView.tv_name
+        mKnownForDepartementView= itemView.tv_known_for_department
+        mPofilePicture = itemView.iv_profile
     }
 
     fun bind(person : Person) {
