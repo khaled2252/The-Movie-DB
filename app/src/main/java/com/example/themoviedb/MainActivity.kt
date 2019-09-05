@@ -1,17 +1,16 @@
 package com.example.themoviedb
 
-import android.app.SearchManager
-import android.content.Context
 import android.graphics.Color
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.view.Menu
+import android.view.View
 import android.widget.SearchView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.themoviedb.pojos.KnownFor
 import com.example.themoviedb.pojos.Person
 import org.json.JSONObject
@@ -20,6 +19,15 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import android.content.Context.SEARCH_SERVICE
+import androidx.core.content.ContextCompat.getSystemService
+import android.app.SearchManager
+import android.content.Context
+import android.view.MenuItem
+import androidx.core.view.MenuItemCompat
+import androidx.core.view.MenuItemCompat.expandActionView
+
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -39,36 +47,68 @@ class MainActivity : AppCompatActivity() {
         val mSwipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.srl)
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
-            clearThenRequestData(baseURL + pageAttr)
+            currentPage = 1
+            clearThenRequestData(baseURL + pageAttr+currentPage)
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main, menu)
-//         Associate searchable configuration with the SearchView
-//        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-//        (menu?.findItem(R.id.menu_search)?.actionView as SearchView).apply {
-//            setSearchableInfo(searchManager.getSearchableInfo(componentName))
-//        }
 
+        val mSearchItem = menu?.findItem(R.id.menu_search)
+        val mSearchView = mSearchItem?.actionView as SearchView
+        val mCloseButton = mSearchView.findViewById<View>(resources.getIdentifier("android:id/search_close_btn", null, null))
 
-        val searchItem = menu?.findItem(R.id.menu_search)
-        if (searchItem != null) {
-            val searchView = searchItem.actionView as SearchView
-            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        mSearchView.queryHint = "Search by name..."
 
-                override fun onQueryTextSubmit(query: String?): Boolean {
+        mSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+
+                if(query?.isNotEmpty()!!)
+                {
                     //Make a request for search
-                    clearThenRequestData(Constants.SEARCH_BY_PERSON+Constants.API_KEY+Constants.QUERY_ATTRIBUTE+query)
-                    return true
+                    clearThenRequestData(Constants.SEARCH_BY_PERSON + Constants.API_KEY + Constants.QUERY_ATTRIBUTE + query)
+                }
+                else
+                {
+                    currentPage = 1
+                    clearThenRequestData(baseURL + pageAttr+currentPage)
                 }
 
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    return true
-                }
+                return true
+            }
 
-            })
+            override fun onQueryTextChange(newText: String?): Boolean {
+               return true
+            }
+
+        })
+
+        //To override what happens when x is clicked on in searchview
+        var clickedOnCloseButton = false
+        mCloseButton.setOnClickListener{
+            clickedOnCloseButton = true
+            mSearchView.setQuery("", false)
+            mSearchView.clearFocus()
+            currentPage = 1
+            clearThenRequestData(baseURL + pageAttr+currentPage)
         }
+
+        //To override what happens when searchView is closed
+        MenuItemCompat.setOnActionExpandListener(
+            mSearchItem,
+            object : MenuItemCompat.OnActionExpandListener {
+                override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                    return true
+                }
+
+                override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                    if(!clickedOnCloseButton)
+                        mCloseButton.callOnClick()
+                    return true
+                }
+            })
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -79,9 +119,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun clearThenRequestData(url: String){
-        currentPage = 1
         val mRecyclerView = findViewById<RecyclerView>(R.id.rv_popular_popular)
-        if (!isLoadingMore) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
+        if (!isLoading) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
             mRecyclerView.clearOnScrollListeners() //because scrollListener is called when list is empty ?
 
             val size = resultList.size
@@ -91,7 +130,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
             }
-            loadData(url+currentPage)
+            loadData(url)
         }
     }
 
@@ -129,7 +168,7 @@ class MainActivity : AppCompatActivity() {
 
             //Loaded a page
             currentPage++
-            isLoadingMore = false
+            isLoading = false
             mRecyclerView.addOnScrollListener(recyclerViewOnScrollListener)
 
 
@@ -191,9 +230,9 @@ class MainActivity : AppCompatActivity() {
                 val pos = layoutManager.findLastCompletelyVisibleItemPosition()
                 numItems = mRecyclerView.adapter?.itemCount!! - 1
 
-                if (pos >= numItems && !isLoadingMore) //Reached end of screen
+                if (pos >= numItems && !isLoading) //Reached end of screen
                 {
-                    isLoadingMore = true
+                    isLoading = true
 
                     //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
                     resultList.add(null)
@@ -222,6 +261,6 @@ class MainActivity : AppCompatActivity() {
     var resultList = ArrayList<Person?>()
     var currentPage = 1
     var visibleThreshold = 0
-    var isLoadingMore = false
+    var isLoading = false
     var numItems = 0
 }
