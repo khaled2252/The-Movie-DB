@@ -78,29 +78,17 @@ class MainActivity : AppCompatActivity() {
         })
 
         //To override what happens when x is clicked on in searchView
-        var clickedOnCloseButton = false
         mCloseButton.setOnClickListener {
             if (mSearchView.query.isNotEmpty()) {
-                clickedOnCloseButton = true
                 mSearchView.setQuery("", false)
                 mSearchView.clearFocus()
                 currentPage = 1
                 clearThenRequestData(baseURL + pageAttr + currentPage)
             }
+            else
+                mSearchView.onActionViewCollapsed()
+
         }
-        //To override what happens when searchView is closed
-        mSearchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(menuItem: MenuItem): Boolean {
-                return true
-            }
-
-            override fun onMenuItemActionCollapse(menuItem: MenuItem): Boolean {
-                if(!clickedOnCloseButton)
-                    mCloseButton.callOnClick()
-                return true
-            }
-        })
-
         return super.onCreateOptionsMenu(menu)
     }
 
