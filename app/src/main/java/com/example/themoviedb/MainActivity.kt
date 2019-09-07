@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.SearchView
@@ -22,6 +23,7 @@ import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
+    lateinit var mRecyclerView : RecyclerView
     var resultList = ArrayList<Person?>()
     var currentPage = 1
     var visibleThreshold = 0
@@ -35,12 +37,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val mRecyclerView = this.rv_popular_popular
+        mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-
             adapter = PopularPeopleAdapter(resultList)
             this.setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
+            mRecyclerView.addOnScrollListener(recyclerViewOnScrollListener)
             loadData(baseURL + pageAttr + currentPage.toString()) //Load first page
         }
 
@@ -68,24 +70,40 @@ class MainActivity : AppCompatActivity() {
         mSearchView.queryHint = "Search by name..."
 
         mSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            var asyncTask : asyncTask? = null
 
             override fun onQueryTextSubmit(query: String?): Boolean {
-
-                if (query?.isNotEmpty()!!) {
-                    //Make a request for search
-                    clearThenRequestData(Constants.SEARCH_BY_PERSON + Constants.API_KEY + Constants.QUERY_ATTRIBUTE + query)
-                } else {
-                    currentPage = 1
-                    clearThenRequestData(baseURL + pageAttr + currentPage)
-                }
-
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText?.isNotEmpty()!!) {
+                    if(!isLoading) {
+                        //Make a request for search
+                        asyncTask = clearThenRequestData(Constants.SEARCH_BY_PERSON + Constants.API_KEY + Constants.QUERY_ATTRIBUTE + newText)
+                    }
+                    else{
+                        //Cancel the current async task and request the new one
+                        asyncTask!!.cancel(true)
+                        isLoading=false
+                        asyncTask = clearThenRequestData(Constants.SEARCH_BY_PERSON + Constants.API_KEY + Constants.QUERY_ATTRIBUTE + newText)
+                        Log.i("kkkk",asyncTask?.body.toString())
+                    }
+
+                } else {
+                    currentPage = 1
+                    if(!isLoading) {
+                        asyncTask = clearThenRequestData(baseURL + pageAttr + currentPage)
+                    }
+                    else {
+                        asyncTask!!.cancel(true)
+                        isLoading = false
+                        asyncTask = clearThenRequestData(baseURL + pageAttr + currentPage)
+                    }
+                }
+
                 return true
             }
-
         })
 
         //To override what happens when x is clicked on in searchView
@@ -102,16 +120,40 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    fun loadData(url: String) {
-        val asyncTask = AsyncTaskExample()
+    private val recyclerViewOnScrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            val layoutManager = mRecyclerView.layoutManager as LinearLayoutManager
+            val pos = layoutManager.findLastCompletelyVisibleItemPosition()
+            numItems = mRecyclerView.adapter?.itemCount!! - 1
+
+            if (pos >= numItems && !isLoading) //Reached end of screen and loaded data
+            {
+                isLoading = true
+
+                //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
+                resultList.add(null)
+                recyclerView.apply {
+                    mRecyclerView.adapter?.notifyItemRangeInserted(
+                        numItems,
+                        1
+                    )
+                }
+
+                loadData(baseURL + pageAttr + currentPage.toString())
+            }
+        }
+    }
+    fun loadData(url: String) :asyncTask {
+        val asyncTask = asyncTask()
         asyncTask.execute(url)
+        return asyncTask
     }
 
-    fun clearThenRequestData(url: String) {
+    fun clearThenRequestData(url: String) : asyncTask? {
         val mRecyclerView = this.rv_popular_popular
         if (!isLoading) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
-            mRecyclerView.clearOnScrollListeners() //because scrollListener is called when list is empty ?
-
             val size = resultList.size
             if (size > 0) {
                 for (i in 0 until size) {
@@ -119,13 +161,21 @@ class MainActivity : AppCompatActivity() {
                 }
                 mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
             }
-            loadData(url)
+            return loadData(url)
         }
+        return null
     }
 
-
-    private inner class AsyncTaskExample(internal var body: StringBuffer = StringBuffer()) :
+    inner class asyncTask(internal var body: StringBuffer = StringBuffer()) :
         AsyncTask<String, String, String?>() {
+
+        var mRecyclerView: RecyclerView = this@MainActivity.rv_popular_popular
+
+        override fun onPreExecute() {
+            isLoading = true
+            super.onPreExecute()
+        }
+
         override fun doInBackground(vararg params: String): String? {
             try {
                 val url = params[0]
@@ -158,8 +208,13 @@ class MainActivity : AppCompatActivity() {
             //Loaded a page
             currentPage++
             isLoading = false
-            mRecyclerView.addOnScrollListener(recyclerViewOnScrollListener)
 
+            //Remove loading progress bar if exists
+            if(resultList.size!=0 && resultList[resultList.size-1]==null)
+            {
+                resultList.remove(null)
+                mRecyclerView.apply {mRecyclerView.adapter?.notifyItemRemoved(resultList.size) }
+            }
 
             val jsonArrayOfResults =
                 JSONObject(result).getJSONArray("results") //jsonArray of objects (results)
@@ -179,9 +234,9 @@ class MainActivity : AppCompatActivity() {
                 val jsonArrayOfKnownFor = jsonArrayOfResults.getJSONObject(i)
                     .getJSONArray("known_for") //jsonArray of objects (knownFor)
                 if (jsonArrayOfKnownFor.length() != 0) {
-                    var knownForArrayList = arrayListOf<KnownFor>()
+                    val knownForArrayList = arrayListOf<KnownFor>()
                     for (j in 0 until jsonArrayOfKnownFor.length() - 1) {
-                        var knownFor = KnownFor()
+                        val knownFor = KnownFor()
                         try {
                             knownFor.original_title =
                                 jsonArrayOfKnownFor.getJSONObject(j).getString("original_title")
@@ -199,7 +254,7 @@ class MainActivity : AppCompatActivity() {
             }
             mRecyclerView.apply {
                 mRecyclerView.adapter?.notifyItemRangeChanged(
-                    mRecyclerView?.adapter!!.itemCount,
+                    mRecyclerView.adapter!!.itemCount,
                     visibleThreshold
                 )
             }
@@ -210,37 +265,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        var mRecyclerView: RecyclerView = this@MainActivity.rv_popular_popular
-        val recyclerViewOnScrollListener = object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-                val layoutManager = mRecyclerView.layoutManager as LinearLayoutManager
-                val pos = layoutManager.findLastCompletelyVisibleItemPosition()
-                numItems = mRecyclerView.adapter?.itemCount!! - 1
-
-                if (pos >= numItems && !isLoading) //Reached end of screen
-                {
-                    isLoading = true
-
-                    //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
-                    resultList.add(null)
-                    recyclerView.apply {
-                        mRecyclerView.adapter?.notifyItemRangeInserted(
-                            numItems,
-                            1
-                        )
-                    }
-
-                    //Progress bar loads for 1 second then request new data to load
-                    Handler().postDelayed({
-                        resultList.remove(null)
-                        recyclerView.apply { recyclerView.adapter?.notifyItemRemoved(resultList.size) }
-                        loadData(baseURL + pageAttr + currentPage.toString())
-                    }, 1000)
-                }
-            }
-        }
     }
 
 }
