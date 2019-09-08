@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity() {
         val mSwipeRefreshLayout = this.srl
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
+            //TODO Handle refresh when searching
             currentPage = 1
             clearThenRequestData(baseURL + pageAttr + currentPage)
         }
@@ -79,6 +80,7 @@ class MainActivity : AppCompatActivity() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (newText?.isNotEmpty()!!) {
                     if(!isLoading) {
+                        //TODO stop requesting data when all data is fetched (eg. search for "jim carrey")
                         //Make a request for search
                         asyncTask = clearThenRequestData(Constants.SEARCH_BY_PERSON + Constants.API_KEY + Constants.QUERY_ATTRIBUTE + newText)
                     }
@@ -208,6 +210,8 @@ class MainActivity : AppCompatActivity() {
             //Loaded a page
             currentPage++
             isLoading = false
+            
+            //Todo Remove the progress bar when json is fetched and (make the RecyclerView Scrollable) not after all the images are fetched
 
             //Remove loading progress bar if exists
             if(resultList.size!=0 && resultList[resultList.size-1]==null)
