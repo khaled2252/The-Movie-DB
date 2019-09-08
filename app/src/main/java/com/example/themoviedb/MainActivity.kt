@@ -8,6 +8,9 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import com.example.themoviedb.pojos.KnownFor
 import com.example.themoviedb.pojos.Person
 import org.json.JSONObject
@@ -19,6 +22,9 @@ import java.net.URL
 
 
 class MainActivity : AppCompatActivity() {
+
+    var searchFlag: Boolean  = false
+    var searchedWord: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         loadData(baseURL+pageAttr+currentPage.toString()) //Load first page
-
+//------------------------------------------------------------------------------------------
         val mSwipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.srl)
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
@@ -47,10 +53,72 @@ class MainActivity : AppCompatActivity() {
                     }
                     mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
                 }
-                loadData(baseURL + pageAttr + currentPage.toString())
+                if (searchFlag == true){
+                    currentPage=1
+                    loadData(searchingByName + searchedWord + "&page="+currentPage) //Load first page
+                }
+                else{
+                    currentPage = 1
+                    loadData(baseURL + pageAttr + "1")
+                }
+
             }
         }
+        var searchEditText = findViewById<EditText>(R.id.searchEditText)
+
+        //var searchButton = Button(this)
+        var searchButton = findViewById <Button>(R.id.searchBtn)
+        searchButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                searchedWord = searchEditText.text.toString()
+                if (searchedWord.trim().isEmpty()){
+
+                }
+                else{
+                    searchFlag = true
+                    val size = resultList.size
+                    if (size > 0) {
+                        for (i in 0 until size) {
+                            resultList.removeAt(0)
+                        }
+                        mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
+                    }
+                    currentPage=1
+                    loadData(searchingByName + searchedWord + "&page="+currentPage) //Load first page
+                }
+            }
+
+        })
+
+        var finishSearchBtn = findViewById <Button>(R.id.finishSearchBtn)
+        finishSearchBtn.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                searchEditText.setText("")
+                if (searchFlag == true){
+                    if (!isLoadingMore) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
+                        currentPage = 1
+                        mRecyclerView.clearOnScrollListeners() //because scrollListener is called when list is empty ?
+                        val size = resultList.size
+                        if (size > 0) {
+                            for (i in 0 until size) {
+                                resultList.removeAt(0)
+                            }
+                            mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
+                        }
+                        currentPage = 1
+                        loadData(baseURL + pageAttr + "1")
+                    }
+                    searchFlag = false
+                }
+                else{
+
+                }
+
+            }
+        })
     }
+
+    //-----------------------------------------------------------------------------------
 
     fun loadData(url : String){
         val asyncTask = AsyncTaskExample()
@@ -163,7 +231,12 @@ class MainActivity : AppCompatActivity() {
                     Handler().postDelayed({
                         resultList.remove(null)
                         recyclerView.apply { recyclerView.adapter?.notifyItemRemoved(resultList.size) }
-                        loadData(baseURL+pageAttr+currentPage.toString())
+                        if (searchFlag == true){
+                            loadData(searchingByName + searchedWord + "&page="+currentPage)
+                        }
+                        else{
+                            loadData(baseURL+pageAttr+currentPage.toString())
+                        }
                     }, 1000)
                 }
             }
@@ -179,4 +252,5 @@ class MainActivity : AppCompatActivity() {
     var visibleThreshold = 0
     var isLoadingMore = false
     var numItems = 0
+    var searchingByName = Constants.SEARCH_PERSON_NAME
 }
