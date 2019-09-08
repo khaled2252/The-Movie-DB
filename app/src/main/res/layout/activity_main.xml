@@ -23,7 +23,10 @@
                 android:hint="Search Name"
                 android:textSize="18sp"
                 android:padding="10dp"
-                android:textColorHint="@color/colorPrimary" />
+                android:textColorHint="@color/colorPrimary"
+                android:imeOptions="actionDone"
+                android:maxLines="1"
+                android:inputType="text"/>
 
         <Button
                 android:id="@+id/finishSearchBtn"
