@@ -1,6 +1,5 @@
 package com.example.themoviedb
 
-import android.content.Context
 import android.graphics.Color
 import android.os.AsyncTask
 import android.os.Bundle
@@ -10,12 +9,11 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
-import com.example.themoviedb.pojos.KnownFor
-import com.example.themoviedb.pojos.Person
+import com.example.themoviedb.model.Constants
+import com.example.themoviedb.model.KnownFor
+import com.example.themoviedb.model.Person
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
@@ -58,18 +56,16 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (searchFlag == true){
                     currentPage=1
-                    loadData(searchingByName + searchedWord + "&page="+currentPage) //Load first page
+                    loadData(searchingByName + searchedWord + pageAttr +currentPage) //Load first page
                 }
                 else{
                     currentPage = 1
-                    loadData(baseURL + pageAttr + "1")
+                    loadData(baseURL + pageAttr + currentPage.toString())
                 }
 
             }
         }
         var searchEditText = findViewById<EditText>(R.id.searchEditText)
-
-        //var searchButton = Button(this)
         var searchButton = findViewById <Button>(R.id.searchBtn)
         searchButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
@@ -87,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                         mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
                     }
                     currentPage=1
-                    loadData(searchingByName + searchedWord + "&page="+currentPage) //Load first page
+                    loadData(searchingByName + searchedWord + pageAttr +currentPage) //Load first page
                 }
             }
 
@@ -109,7 +105,7 @@ class MainActivity : AppCompatActivity() {
                             mRecyclerView.adapter?.notifyItemRangeRemoved(0, size)
                         }
                         currentPage = 1
-                        loadData(baseURL + pageAttr + "1")
+                        loadData(baseURL + pageAttr + currentPage.toString())
                     }
                     searchFlag = false
                 }
@@ -235,7 +231,7 @@ class MainActivity : AppCompatActivity() {
                         resultList.remove(null)
                         recyclerView.apply { recyclerView.adapter?.notifyItemRemoved(resultList.size) }
                         if (searchFlag == true){
-                            loadData(searchingByName + searchedWord + "&page="+currentPage)
+                            loadData(searchingByName + searchedWord + pageAttr +currentPage)
                         }
                         else{
                             loadData(baseURL+pageAttr+currentPage.toString())

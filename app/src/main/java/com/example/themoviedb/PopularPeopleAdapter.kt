@@ -12,7 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
-import com.example.themoviedb.pojos.Person
+import com.example.themoviedb.model.Person
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException

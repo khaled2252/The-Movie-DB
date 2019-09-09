@@ -10,8 +10,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import com.example.themoviedb.pojos.KnownFor
-import com.example.themoviedb.pojos.PersonImages
+import com.example.themoviedb.model.Constants
+import com.example.themoviedb.model.KnownFor
+import com.example.themoviedb.model.PersonImages
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
@@ -54,7 +55,7 @@ class PersonDetails : AppCompatActivity() {
             this.setItemViewCacheSize(50)
         }
         val asyncTask = AsyncTaskExample()
-        asyncTask.execute(Constants.PERSON_DETAIL+profileId+Constants.PERSON_IMAGES_ATTRIBUTE+Constants.API_KEY)
+        asyncTask.execute(Constants.PERSON_DETAIL+profileId+ Constants.PERSON_IMAGES_ATTRIBUTE+ Constants.API_KEY)
     }
     inner class AsyncTaskExample(private var body: StringBuffer = StringBuffer()) :
         AsyncTask<String, String, String?>() {

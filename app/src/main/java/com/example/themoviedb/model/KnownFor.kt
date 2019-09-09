@@ -1,4 +1,4 @@
-package com.example.themoviedb.pojos
+package com.example.themoviedb.model
 
 import java.io.Serializable
 

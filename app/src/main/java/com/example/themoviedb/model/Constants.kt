@@ -1,4 +1,4 @@
-package com.example.themoviedb
+package com.example.themoviedb.model
 
 class Constants {
     companion object {

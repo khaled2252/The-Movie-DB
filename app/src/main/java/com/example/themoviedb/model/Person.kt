@@ -1,4 +1,4 @@
-package com.example.themoviedb.pojos
+package com.example.themoviedb.model
 
     class Person  {
     var gender: String? = null

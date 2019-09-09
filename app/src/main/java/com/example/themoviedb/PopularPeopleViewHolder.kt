@@ -9,8 +9,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.example.themoviedb.model.Constants
 import com.example.themoviedb.R.drawable
-import com.example.themoviedb.pojos.Person
+import com.example.themoviedb.model.Person
 import java.net.URL
 
 class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :

@@ -13,7 +13,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.example.themoviedb.pojos.PersonImages
+import com.example.themoviedb.model.Constants
+import com.example.themoviedb.model.PersonImages
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
