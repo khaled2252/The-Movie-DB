@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import com.example.themoviedb.image.ImageActivity
 import com.example.themoviedb.pojos.PersonImages
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -42,7 +43,7 @@ class PopularPersonAdapter(private val list: List<PersonImages?>): RecyclerView.
             mImageView.setImageResource(R.drawable.no_image)
             DownloadImageTask(mImageView).execute(Constants.PROFILE_IMAGE_PATH+personImages.filePath)
             mImageView.setOnClickListener {
-                val intent = Intent(itemView.context,ImageActivity::class.java)
+                val intent = Intent(itemView.context, ImageActivity::class.java)
                 val image = itemView.findViewById<ImageView>(R.id.iv_image)
                 val bitmap = (image.drawable as BitmapDrawable).bitmap
                 saveFile(itemView.context,bitmap,"profile_picture")

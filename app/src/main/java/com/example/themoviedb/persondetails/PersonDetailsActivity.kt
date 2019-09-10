@@ -1,4 +1,4 @@
-package com.example.themoviedb
+package com.example.themoviedb.persondetails
 
 import android.graphics.BitmapFactory
 import android.graphics.Rect
@@ -8,10 +8,10 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
+import com.example.themoviedb.R
 import com.example.themoviedb.pojos.KnownFor
 import com.example.themoviedb.pojos.PersonImages
+import kotlinx.android.synthetic.main.activity_person_details.*
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
@@ -20,42 +20,55 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 
-class PersonDetails : AppCompatActivity() {
+class PersonDetailsActivity : AppCompatActivity() {
+    private lateinit var personDetailsController: PersonDetailsController
+
+    var resultList = ArrayList<PersonImages?>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_person_details)
+        personDetailsController = PersonDetailsController(
+            this,
+            PersonDetailsModel()
+        )
+
         val profileId = intent.getStringExtra("profile_id")
         val personName = intent.getStringExtra("person_name")
         val popularity = intent.getStringExtra("popularity")
         val knownFor = intent.getSerializableExtra("known_for") as ArrayList<KnownFor?>?
 
         val knownForArrayList: ArrayList<String> = ArrayList()
-        if(knownFor!=null) {
+        if (knownFor != null) {
             for (i in 0 until knownFor!!.size)
                 knownForArrayList.add(knownFor[i]!!.original_title!!)
-        }
-        else knownForArrayList.add("No movies found")
+        } else knownForArrayList.add("No movies found")
         val knownForDepartment = intent.getStringExtra("known_for_department")
 
-        val photoPath= this.openFileInput("profile_picture")
+        val photoPath = this.openFileInput("profile_picture")
         val bitmap = BitmapFactory.decodeStream(photoPath)
-        findViewById<ImageView>(R.id.iv_profileImage).setImageBitmap(bitmap)
+        this.iv_profileImage.setImageBitmap(bitmap)
 
-        findViewById<TextView>(R.id.tv_name).text = personName
+        this.tv_name.text = personName
 
-        findViewById<TextView>(R.id.tv_knownFor).text = StringBuilder("$personName is known for $knownForDepartment in $knownForArrayList with popularity score of $popularity")
+        this.tv_knownFor.text =
+            StringBuilder("$personName is known for $knownForDepartment in $knownForArrayList with popularity score of $popularity")
 
-        val mRecyclerView = findViewById<RecyclerView>(R.id.rv_pictures)
+        val mRecyclerView = this.rv_pictures
         mRecyclerView.apply {
-            layoutManager = GridLayoutManager(this@PersonDetails,3)
-            adapter = PopularPersonAdapter(resultList)
-            mRecyclerView.addItemDecoration(RecyclerViewItemDecorator(10))
+            layoutManager = GridLayoutManager(this@PersonDetailsActivity, 3)
+            //adapter = PopularPersonAdapter(resultList)
+            mRecyclerView.addItemDecoration(
+                RecyclerViewItemDecorator(
+                    10
+                )
+            )
             this.setItemViewCacheSize(50)
         }
         val asyncTask = AsyncTaskExample()
-        asyncTask.execute(Constants.PERSON_DETAIL+profileId+Constants.PERSON_IMAGES_ATTRIBUTE+Constants.API_KEY)
+        //FetchData.execute(Constants.PERSON_DETAIL + profileId + Constants.PERSON_IMAGES_ATTRIBUTE + Constants.API_KEY)
     }
+
     inner class AsyncTaskExample(private var body: StringBuffer = StringBuffer()) :
         AsyncTask<String, String, String?>() {
 
@@ -96,14 +109,11 @@ class PersonDetails : AppCompatActivity() {
                 personImages.filePath = jsonArrayOfProfiles.getJSONObject(i).getString("file_path")
                 resultList.add(personImages)
             }
-            findViewById<RecyclerView>(R.id.rv_pictures).apply { adapter?.notifyDataSetChanged() }
+            this@PersonDetailsActivity.rv_pictures.apply { adapter?.notifyDataSetChanged() }
 
         }
     }
 
-    companion object
-
-    var resultList = ArrayList<PersonImages?>()
 
 }
 
