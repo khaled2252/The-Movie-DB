@@ -84,7 +84,6 @@ class MainActivity : AppCompatActivity() {
 
         //Load first page in popular people
         requestPopularPeople()
-
     }
 
     fun requestPopularPeople() {

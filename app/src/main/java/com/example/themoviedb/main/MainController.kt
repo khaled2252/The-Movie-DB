@@ -28,12 +28,12 @@ import java.io.IOException
 import java.net.URL
 
 class MainController(private val mainActivity: MainActivity) {
-    private  var model : MainModel = MainModel(this)
+    private var model : MainModel = MainModel(this)
+
     var isLoading = false
-    var currentPage = 1
     var resultList = ArrayList<Person?>()
     var visibleThreshHold = 0
-
+    var currentPage = 1
 
     fun loadData(page : Int, callback: (success: Boolean) -> Unit) {
         isLoading = true
@@ -164,8 +164,6 @@ class MainController(private val mainActivity: MainActivity) {
                         }
                         resultList.add(person)
                     }
-
-                    mainActivity.notifyItemRangeChangedInRecyclerView(visibleThreshHold)
 
                     //Disable the refreshing icon when the result list is changed
                     if (mainActivity.mSwipeRefreshLayout.isRefreshing) {
