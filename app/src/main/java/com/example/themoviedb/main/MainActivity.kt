@@ -15,38 +15,39 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mainController: MainController
+    private lateinit var controller: MainController
 
     internal lateinit var mRecyclerView: RecyclerView
     internal lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     internal lateinit var searchEditText: EditText
 
     internal var searchFlag: Boolean = false
-    private var searchedWord: String = ""
+    internal var  searchedWord: String = ""
+    internal var currentPage = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mainController = MainController(this)
+        controller = MainController(this)
 
         mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-            mainController.setRecyclerViewAdapter()
-            mainController.setRecyclerViewOnScrollListener()
+            controller.setRecyclerViewAdapter()
+            controller.setRecyclerViewOnScrollListener()
             this.setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
         }
 
         mSwipeRefreshLayout = this@MainActivity.srl
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
-            mainController.clearData()
+            controller.clearData()
 
             if (searchFlag == true) {
-                requestSearch()
+                controller.fetchData(searchedWord)
             } else {
-                requestPopularPeople()
+                controller.fetchData()
             }
 
         }
@@ -60,11 +61,10 @@ class MainActivity : AppCompatActivity() {
 
                 } else {
                     searchFlag = true
-                    mainController.clearData()
-                    requestSearch()
+                    controller.clearData()
+                    controller.fetchData(searchedWord)
                 }
             }
-
         })
 
         var finishSearchBtn = findViewById<Button>(R.id.finishSearchBtn)
@@ -72,42 +72,25 @@ class MainActivity : AppCompatActivity() {
             override fun onClick(v: View?) {
                 searchEditText.setText("")
                 if (searchFlag == true) {
-                    mainController.clearData()
-                    requestPopularPeople()
+                    controller.clearData()
+                    controller.fetchData()
                     searchFlag = false
                 } else {
 
                 }
-
             }
         })
 
         //Load first page in popular people
-        requestPopularPeople()
+        controller.fetchData()
     }
-
-    fun requestPopularPeople() {
-        mainController.loadData(mainController.currentPage) {
-            if (it) notifyItemRangeChangedInRecyclerView(mainController.visibleThreshHold)
-        }
-    }
-
-    fun requestSearch() {
-        mainController.loadData(searchedWord, mainController.currentPage) {
-            if (it) notifyItemRangeChangedInRecyclerView(mainController.visibleThreshHold)
-        }
-    }
-
 
     fun notifyItemRemovedFromRecyclerView(index: Int) {
         this.mRecyclerView.adapter?.notifyItemRemoved(index)
     }
 
     fun notifyItemRangeChangedInRecyclerView(itemCount: Int) {
-        this.mRecyclerView.adapter?.notifyItemRangeChanged(
-            this.mRecyclerView.adapter!!.itemCount,
-            itemCount
-        )
+        this.mRecyclerView.adapter?.notifyItemRangeChanged(this.mRecyclerView.adapter!!.itemCount,itemCount)
     }
 
     fun notifyItemRangeInsertedInRecyclerView(start: Int, itemCount: Int) {
@@ -117,7 +100,6 @@ class MainActivity : AppCompatActivity() {
     fun notifyItemRangeRemovedInRecyclerView(itemCount: Int) {
         this.mRecyclerView.adapter?.notifyItemRangeRemoved(0, itemCount)
     }
-
 }
 
 

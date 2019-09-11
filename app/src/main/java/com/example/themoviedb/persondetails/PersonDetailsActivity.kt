@@ -61,7 +61,8 @@ class PersonDetailsActivity : AppCompatActivity() {
     }
     private fun requestPersonImages() {
         personDetailsController.loadData {
-            if (it) notifyDataSetChangedInRecyclerView()
+            if (it) this.rv_pictures.adapter?.notifyDataSetChanged()
+
         }
     }
 }
