@@ -6,7 +6,6 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import com.example.themoviedb.R
@@ -16,14 +15,13 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var controller: MainController
+    private lateinit var searchEditText: EditText
 
     internal lateinit var mRecyclerView: RecyclerView
     internal lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
-    internal lateinit var searchEditText: EditText
 
     internal var searchFlag: Boolean = false
-    internal var  searchedWord: String = ""
-    internal var currentPage = 1
+    internal var searchedWord: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,45 +42,37 @@ class MainActivity : AppCompatActivity() {
         mSwipeRefreshLayout.setOnRefreshListener {
             controller.clearData()
 
-            if (searchFlag == true) {
-                controller.fetchData(searchedWord)
+            if (searchFlag) {
+                controller.loadSearchData(searchedWord)
             } else {
-                controller.fetchData()
+                controller.loadDefaultData()
             }
 
         }
 
-        searchEditText = findViewById<EditText>(R.id.searchEditText)
-        var searchButton = findViewById<Button>(R.id.searchBtn)
-        searchButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                searchedWord = searchEditText.text.toString()
-                if (searchedWord.trim().isEmpty()) {
-
-                } else {
-                    searchFlag = true
-                    controller.clearData()
-                    controller.fetchData(searchedWord)
-                }
+        searchEditText = findViewById(R.id.searchEditText)
+        val searchButton = findViewById<Button>(R.id.searchBtn)
+        searchButton.setOnClickListener {
+            searchedWord = searchEditText.text.toString()
+            if (searchedWord.trim().isNotEmpty()) {
+                searchFlag = true
+                controller.clearData()
+                controller.loadSearchData(searchedWord)
             }
-        })
+        }
 
-        var finishSearchBtn = findViewById<Button>(R.id.finishSearchBtn)
-        finishSearchBtn.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                searchEditText.setText("")
-                if (searchFlag == true) {
-                    controller.clearData()
-                    controller.fetchData()
-                    searchFlag = false
-                } else {
-
-                }
+        val finishSearchBtn = findViewById<Button>(R.id.finishSearchBtn)
+        finishSearchBtn.setOnClickListener {
+            searchEditText.setText("")
+            if (searchFlag) {
+                controller.clearData()
+                controller.loadDefaultData()
+                searchFlag = false
             }
-        })
+        }
 
         //Load first page in popular people
-        controller.fetchData()
+        controller.loadDefaultData()
     }
 
     fun notifyItemRemovedFromRecyclerView(index: Int) {

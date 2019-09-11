@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import android.media.Image
 import android.os.Handler
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -27,19 +26,20 @@ import java.io.IOException
 
 class MainController(private val view: MainActivity) {
     private var model: MainModel = MainModel(this)
+    private var visibleThreshHold = 0
+    private var isLoading = false
+    private var resultList = ArrayList<Person?>()
+    private var currentPage = 1
 
-    var isLoading = false
-    var resultList = ArrayList<Person?>()
-    var visibleThreshHold = 0
 
-    fun fetchData() {
+    fun loadDefaultData() {
         isLoading = true
-        model.FetchData().execute(view.currentPage.toString())
+        MainModel.FetchJson().execute(currentPage.toString())
     }
 
-    fun fetchData(searchedWord: String) {
+    fun loadSearchData(searchedWord: String) {
         isLoading = true
-        model.FetchData().execute(view.currentPage.toString(), searchedWord)
+        MainModel.FetchJson().execute(currentPage.toString(), searchedWord)
     }
 
     fun onDataFetched(result: String?) {
@@ -105,10 +105,8 @@ class MainController(private val view: MainActivity) {
 
     fun onImageFetched(array: Array<Any?>?) {
         val bitmap : Bitmap = array?.get(0) as Bitmap
-        val imageView : ImageView = array.get(1) as ImageView
-        if (bitmap!= null) {
-            imageView.setImageBitmap(bitmap)
-        }
+        val imageView : ImageView = array[1] as ImageView
+        imageView.setImageBitmap(bitmap)
     }
 
     fun setRecyclerViewAdapter() {
@@ -128,7 +126,7 @@ class MainController(private val view: MainActivity) {
                 if (pos >= numItems && !isLoading) //Reached end of screen
                 {
                     isLoading = true
-                    view.currentPage++
+                    currentPage++
 
                     //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
                     resultList.add(null)
@@ -139,10 +137,10 @@ class MainController(private val view: MainActivity) {
                         resultList.remove(null)
                         view.notifyItemRemovedFromRecyclerView(resultList.size)
 
-                        if (view.searchFlag == true) {
-                            fetchData(view.searchedWord)
+                        if (view.searchFlag) {
+                            loadSearchData(view.searchedWord)
                         } else {
-                            fetchData()
+                            loadDefaultData()
                         }
                     }, 1000)
                 }
@@ -151,7 +149,7 @@ class MainController(private val view: MainActivity) {
     }
 
     fun clearData() {
-        view.currentPage = 1
+        currentPage = 1
         if (!isLoading) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
             val size = resultList.size
             if (size > 0) {
@@ -165,30 +163,29 @@ class MainController(private val view: MainActivity) {
 
     inner class PopularPeopleAdapter(private val list: List<Person?>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        val VIEW_ITEM = 1
-        val VIEW_PROG = 0
+        private val viewItem = 1
+        private val viewProgress = 0
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             val vh: RecyclerView.ViewHolder
             val inflater = LayoutInflater.from(parent.context)
 
-            if (viewType == VIEW_ITEM) {
+            vh = if (viewType == viewItem) {
                 LayoutInflater.from(parent.context).inflate(
                     R.layout.row_layout, parent, false
                 )
-                vh = PopularPeopleViewHolder(inflater, parent)
+                PopularPeopleViewHolder(inflater, parent)
             } else {
                 val v = LayoutInflater.from(parent.context).inflate(
                     R.layout.progress_bar, parent, false
                 )
-                vh = ProgressViewHolder(v)
+                ProgressViewHolder(v)
             }
-
             return vh
         }
 
         override fun getItemViewType(position: Int): Int {
-            return if (list[position] != null) VIEW_ITEM else VIEW_PROG
+            return if (list[position] != null) viewItem else viewProgress
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -201,7 +198,7 @@ class MainController(private val view: MainActivity) {
 
                     val image = holder.itemView.findViewById<ImageView>(R.id.iv_profile)
                     val bitmap = (image.drawable as BitmapDrawable).bitmap
-                    saveFile(holder.itemView.context, bitmap, "profile_picture")
+                    saveFile(holder.itemView.context, bitmap)
                     intent.putExtra("profile_id", person.id)
                     intent.putExtra("person_name", person.name)
                     intent.putExtra("known_for", person.known_for)
@@ -216,10 +213,10 @@ class MainController(private val view: MainActivity) {
 
         override fun getItemCount(): Int = list.size
 
-        fun saveFile(context: Context, b: Bitmap, picName: String) {
+        private fun saveFile(context: Context, b: Bitmap) {
             val fos: FileOutputStream
             try {
-                fos = context.openFileOutput(picName, Context.MODE_PRIVATE)
+                fos = context.openFileOutput( "profile_picture", Context.MODE_PRIVATE)
                 b.compress(Bitmap.CompressFormat.PNG, 100, fos)
             } catch (e: FileNotFoundException) {
                 Log.d(ContentValues.TAG, "file not found")
@@ -248,7 +245,7 @@ class MainController(private val view: MainActivity) {
                 mNameView?.text = person.name
                 mKnownForDepartmentView?.text = person.known_for_department
                 mProfilePicture?.setImageResource(R.drawable.no_image)
-                model.FetchImage().execute(person.profile_path,mProfilePicture)
+                MainModel.FetchImage().execute(person.profile_path,mProfilePicture)
             }
 
         }
