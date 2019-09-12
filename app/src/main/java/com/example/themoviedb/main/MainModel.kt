@@ -55,18 +55,18 @@ init {
             controller.onDataFetched(result)
         }
     }
-     class FetchImage: AsyncTask<Any, Void, Array<Any?>>() {
+     class FetchImage: AsyncTask<String, Void, Array<Any?>>() {
 
-        override fun doInBackground(vararg params: Any): Array<Any?>{
+        override fun doInBackground(vararg params: String): Array<Any?>{
             var bmp: Bitmap? = null
             try {
-                //params[0] is image url , params[1] is imageView from viewHolder to be sent to onImageFetched
+                //params[0] is image url , params[1] is imageView id from viewHolder to be sent to onImageFetched
                 val input = URL(Companion.PROFILE_IMAGE_PATH + params[0]).openStream()
                 bmp = BitmapFactory.decodeStream(input)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            return arrayOf(bmp,params[1])
+            return arrayOf(bmp,params[0])
         }
 
         override fun onPostExecute(result: Array<Any?>?) {

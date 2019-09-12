@@ -77,13 +77,13 @@ class MainController(private val view: MainActivity) {
             }
 
             view.notifyItemRangeChangedInRecyclerView(visibleThreshHold)
-            view.removeRefreshingIcon()
+            view.removeRefreshingIcon() //If is refreshing
 
         }
     }
 
-    fun loadImage(arr: Array<Any?>?){
-        MainModel.FetchImage().execute(arr?.get(0), arr?.get(1))
+    fun loadImage(path : String?){
+        MainModel.FetchImage().execute(path)
     }
     fun onImageFetched(arr: Array<Any?>?) {
         view.setImage(arr)

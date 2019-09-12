@@ -104,9 +104,9 @@ class MainActivity : AppCompatActivity() {
 
     fun setImage(arr: Array<Any?>?){
         val bitmap : Bitmap? = arr?.get(0) as Bitmap?
-        if(bitmap!=null) {
-            val imageView: ImageView = arr?.get(1) as ImageView
-            imageView.setImageBitmap(bitmap)
+        if(bitmap!==null) {
+            var vieww : View = mRecyclerView.findViewWithTag<ImageView>(arr?.get(1))
+            mRecyclerView.findViewWithTag<ImageView>(arr?.get(1)).setImageBitmap(bitmap)
         }
     }
 
@@ -198,7 +198,11 @@ class MainActivity : AppCompatActivity() {
                 mNameView?.text = person.name
                 mKnownForDepartmentView?.text = person.known_for_department
                 mProfilePicture?.setImageResource(R.drawable.no_image)
-                controller.loadImage(arrayOf(person.profile_path,mProfilePicture))
+                mProfilePicture?.tag = person.profile_path
+
+                if(!person.profile_path.isNullOrEmpty()) {
+                    controller.loadImage(person.profile_path)
+                }
             }
         }
 
