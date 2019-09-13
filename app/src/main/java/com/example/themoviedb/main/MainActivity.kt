@@ -103,10 +103,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setImage(arr: Array<Any?>?){
+        //FIXME Will only set images to items that are available on screen , if you scroll down while loading , images scrolled will stop loading
         val bitmap : Bitmap? = arr?.get(0) as Bitmap?
         if(bitmap!==null) {
-            var vieww : View = mRecyclerView.findViewWithTag<ImageView>(arr?.get(1))
-            mRecyclerView.findViewWithTag<ImageView>(arr?.get(1)).setImageBitmap(bitmap)
+            mRecyclerView.findViewWithTag<ImageView>(arr?.get(1))?.setImageBitmap(bitmap)
         }
     }
 
@@ -198,9 +198,9 @@ class MainActivity : AppCompatActivity() {
                 mNameView?.text = person.name
                 mKnownForDepartmentView?.text = person.known_for_department
                 mProfilePicture?.setImageResource(R.drawable.no_image)
-                mProfilePicture?.tag = person.profile_path
 
                 if(!person.profile_path.isNullOrEmpty()) {
+                    mProfilePicture?.tag = person.profile_path
                     controller.loadImage(person.profile_path)
                 }
             }

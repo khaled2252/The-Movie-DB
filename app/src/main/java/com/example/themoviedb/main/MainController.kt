@@ -26,7 +26,7 @@ class MainController(private val view: MainActivity) {
     fun onDataFetched(result: String?) {
         if (!result.isNullOrEmpty()) {
             isLoading = false
-            //Todo Remove the progress bar when json is fetched and (make the RecyclerView Scrollable) not after all the images are fetched
+            //TODO Remove the progress bar when json is fetched and (make the RecyclerView Scrollable) not after all the images are fetched
 
             //Remove loading progress bar if exists
             if (resultList.size != 0 && resultList[resultList.size - 1] == null) {
