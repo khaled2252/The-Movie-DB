@@ -102,16 +102,7 @@ class MainController(private val view: MainActivity) {
         }
     }
 
-    fun reachedEndOfScreen (pos : Int, numItems :Int) : Boolean{
-        return (pos >= numItems && !isLoading)
-    }
-
-    fun scrollPage(){
-        isLoading = true
-        currentPage++
-    }
-
-    fun onCreated() {
+    fun viewOnCreated() {
         loadDefaultData()
     }
 
@@ -120,6 +111,46 @@ class MainController(private val view: MainActivity) {
         view.navigateToPersonDetailsActivity(person)
     }
 
+    fun recyclerViewOnScrolled(pos : Int , numItems : Int) {
+        if(pos >= numItems && !isLoading) //Reached end of screen
+        {
+            isLoading = true
+            currentPage++
+
+            //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
+            resultList.add(null)
+            view.notifyItemRangeInsertedFromRecyclerView(numItems,1)
+
+            view.removeProgressBarAndLoadDataAfterDelay(1000)
+        }
+    }
+
+    fun layoutOnRefreshed() {
+        clearData()
+
+        if (view.searchFlag) {
+            loadSearchData(view.searchedWord)
+        } else {
+            loadDefaultData()
+        }
+    }
+
+    fun searchOnClicked() {
+        if (view.searchedWord.trim().isNotEmpty()) {
+            view.searchFlag = true
+            clearData()
+            loadSearchData(view.searchedWord)
+        }
+    }
+
+    fun finishSearchOnClicked() {
+        view.clearSearch()
+        if (view.searchFlag) {
+            clearData()
+            loadDefaultData()
+            view.searchFlag = false
+        }
+    }
 
 }
 

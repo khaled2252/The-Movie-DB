@@ -27,8 +27,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
-    private var searchFlag: Boolean = false
-    private var searchedWord: String = ""
+    internal var searchFlag: Boolean = false
+    internal var searchedWord: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,38 +47,26 @@ class MainActivity : AppCompatActivity() {
         mSwipeRefreshLayout = this@MainActivity.srl
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
-            controller.clearData()
-
-            if (searchFlag) {
-                controller.loadSearchData(searchedWord)
-            } else {
-                controller.loadDefaultData()
-            }
-
+            controller.layoutOnRefreshed()
         }
 
         searchEditText = findViewById(R.id.searchEditText)
         val searchButton = findViewById<Button>(R.id.searchBtn)
         searchButton.setOnClickListener {
-            searchedWord = searchEditText.text.toString()
-            if (searchedWord.trim().isNotEmpty()) {
-                searchFlag = true
-                controller.clearData()
-                controller.loadSearchData(searchedWord)
-            }
+            controller.searchOnClicked()
         }
 
         val finishSearchBtn = findViewById<Button>(R.id.finishSearchBtn)
         finishSearchBtn.setOnClickListener {
-            searchEditText.setText("")
-            if (searchFlag) {
-                controller.clearData()
-                controller.loadDefaultData()
-                searchFlag = false
-            }
+            controller.finishSearchOnClicked()
         }
 
-        controller.onCreated()
+        controller.viewOnCreated()
+    }
+
+    fun notifyItemRangeInsertedFromRecyclerView(start : Int ,itemCount : Int )
+    {
+        this.mRecyclerView.adapter?.notifyItemRangeInserted(start,itemCount)
     }
 
     fun notifyItemRemovedFromRecyclerView(index: Int) {
@@ -117,6 +105,23 @@ class MainActivity : AppCompatActivity() {
         applicationContext.startActivity(intent)
     }
 
+    fun removeProgressBarAndLoadDataAfterDelay(delay: Long) {
+        Handler().postDelayed({
+            controller.resultList.remove(null)
+            notifyItemRemovedFromRecyclerView(controller.resultList.size)
+
+            if (searchFlag) {
+                controller.loadSearchData(searchedWord)
+            } else {
+                controller.loadDefaultData()
+            }
+        }, delay)
+    }
+
+    fun clearSearch() {
+        searchEditText.setText("")
+    }
+
     inner class PopularPeopleAdapter(private val list: List<Person?>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val viewItem = 1
@@ -132,10 +137,10 @@ class MainActivity : AppCompatActivity() {
                 )
                 PopularPeopleViewHolder(inflater, parent)
             } else {
-                val v = LayoutInflater.from(parent.context).inflate(
+                val view = LayoutInflater.from(parent.context).inflate(
                     R.layout.progress_bar, parent, false
                 )
-                ProgressViewHolder(v)
+                ProgressViewHolder(view)
             }
             return viewHolder
         }
@@ -149,7 +154,8 @@ class MainActivity : AppCompatActivity() {
                 val person: Person? = list[position]
                 holder.bind(person!!)
                 holder.itemView.setOnClickListener {
-                    controller.itemViewOnClick(arrayOf(holder.itemView.context,(holder.itemView.findViewById<ImageView>(R.id.iv_profile).drawable as BitmapDrawable).bitmap),person)
+                    val bitmap = (holder.itemView.findViewById<ImageView>(R.id.iv_profile).drawable as BitmapDrawable).bitmap
+                    controller.itemViewOnClick(arrayOf(applicationContext,bitmap),person)
                 }
             } else {
                 (holder as ProgressViewHolder).progressBar.isIndeterminate = true
@@ -157,7 +163,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun getItemCount(): Int = list.size
-        
+
         inner class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
             RecyclerView.ViewHolder(inflater.inflate(R.layout.row_layout, parent, false)) {
             private var mNameView: TextView? = null
@@ -191,30 +197,10 @@ class MainActivity : AppCompatActivity() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val pos = layoutManager.findLastCompletelyVisibleItemPosition()
+                val pos = (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
                 val numItems = recyclerView.adapter?.itemCount!! - 1
+                controller.recyclerViewOnScrolled(pos,numItems)
 
-                if(controller.reachedEndOfScreen(pos,numItems))
-                {
-                    controller.scrollPage()
-
-                    //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
-                    controller.resultList.add(null)
-                    mRecyclerView.adapter?.notifyItemRangeInserted(numItems, 1)
-
-                    //Progress bar loads for 1 second then request new data to load
-                    Handler().postDelayed({
-                        controller.resultList.remove(null)
-                        notifyItemRemovedFromRecyclerView(controller.resultList.size)
-
-                        if (searchFlag) {
-                            controller.loadSearchData(searchedWord)
-                        } else {
-                            controller.loadDefaultData()
-                        }
-                    }, 1000)
-                    }
             }
         }
     }
