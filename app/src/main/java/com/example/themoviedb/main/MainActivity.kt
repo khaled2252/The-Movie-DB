@@ -1,6 +1,5 @@
 package com.example.themoviedb.main
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -19,9 +18,6 @@ import com.example.themoviedb.R
 import com.example.themoviedb.persondetails.PersonDetailsActivity
 import com.example.themoviedb.pojos.Person
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
@@ -82,8 +78,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        //Load first page in popular people
-        controller.loadDefaultData()
+        controller.onCreated()
     }
 
     fun notifyItemRemovedFromRecyclerView(index: Int) {
@@ -92,10 +87,6 @@ class MainActivity : AppCompatActivity() {
 
     fun notifyItemRangeChangedInRecyclerView(itemCount: Int) {
         this.mRecyclerView.adapter?.notifyItemRangeChanged(this.mRecyclerView.adapter!!.itemCount,itemCount)
-    }
-
-    fun notifyItemRangeInsertedInRecyclerView(start: Int, itemCount: Int) {
-        this.mRecyclerView.adapter?.notifyItemRangeInserted(start, itemCount)
     }
 
     fun notifyItemRangeRemovedInRecyclerView(itemCount: Int) {
@@ -115,17 +106,27 @@ class MainActivity : AppCompatActivity() {
             mSwipeRefreshLayout.isRefreshing = false
         }
     }
-    
+
+    fun navigateToPersonDetailsActivity(person: Person) {
+        val intent = Intent(applicationContext, PersonDetailsActivity::class.java)
+        intent.putExtra("profile_id", person.id)
+        intent.putExtra("person_name", person.name)
+        intent.putExtra("known_for", person.known_for)
+        intent.putExtra("known_for_department", person.known_for_department)
+        intent.putExtra("popularity", person.popularity)
+        applicationContext.startActivity(intent)
+    }
+
     inner class PopularPeopleAdapter(private val list: List<Person?>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val viewItem = 1
         private val viewProgress = 0
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            val vh: RecyclerView.ViewHolder
+            val viewHolder: RecyclerView.ViewHolder
             val inflater = LayoutInflater.from(parent.context)
 
-            vh = if (viewType == viewItem) {
+            viewHolder = if (viewType == viewItem) {
                 LayoutInflater.from(parent.context).inflate(
                     R.layout.row_layout, parent, false
                 )
@@ -136,7 +137,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 ProgressViewHolder(v)
             }
-            return vh
+            return viewHolder
         }
 
         override fun getItemViewType(position: Int): Int {
@@ -148,18 +149,7 @@ class MainActivity : AppCompatActivity() {
                 val person: Person? = list[position]
                 holder.bind(person!!)
                 holder.itemView.setOnClickListener {
-                    //Navigate to Person Details activity
-                    val intent = Intent(holder.itemView.context, PersonDetailsActivity::class.java)
-
-                    val image = holder.itemView.findViewById<ImageView>(R.id.iv_profile)
-                    val bitmap = (image.drawable as BitmapDrawable).bitmap
-                    saveFile(holder.itemView.context, bitmap)
-                    intent.putExtra("profile_id", person.id)
-                    intent.putExtra("person_name", person.name)
-                    intent.putExtra("known_for", person.known_for)
-                    intent.putExtra("known_for_department", person.known_for_department)
-                    intent.putExtra("popularity", person.popularity)
-                    holder.itemView.context.startActivity(intent)
+                    controller.itemViewOnClick(arrayOf(holder.itemView.context,(holder.itemView.findViewById<ImageView>(R.id.iv_profile).drawable as BitmapDrawable).bitmap),person)
                 }
             } else {
                 (holder as ProgressViewHolder).progressBar.isIndeterminate = true
@@ -167,21 +157,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun getItemCount(): Int = list.size
-
-        private fun saveFile(context: Context, b: Bitmap) {
-            lateinit var fos: FileOutputStream
-            try {
-                fos = context.openFileOutput( "profile_picture", Context.MODE_PRIVATE)
-                b.compress(Bitmap.CompressFormat.PNG, 100, fos)
-            } catch (e: FileNotFoundException) {
-                e.printStackTrace()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            } finally {
-                fos.close()
-            }
-        }
-
+        
         inner class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
             RecyclerView.ViewHolder(inflater.inflate(R.layout.row_layout, parent, false)) {
             private var mNameView: TextView? = null
@@ -225,7 +201,8 @@ class MainActivity : AppCompatActivity() {
 
                     //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
                     controller.resultList.add(null)
-                    notifyItemRangeInsertedInRecyclerView(numItems, 1)
+                    mRecyclerView.adapter?.notifyItemRangeInserted(numItems, 1)
+
                     //Progress bar loads for 1 second then request new data to load
                     Handler().postDelayed({
                         controller.resultList.remove(null)

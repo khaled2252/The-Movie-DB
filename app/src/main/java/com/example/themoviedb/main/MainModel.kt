@@ -1,11 +1,10 @@
 package com.example.themoviedb.main
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
+import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -71,6 +70,23 @@ init {
 
         override fun onPostExecute(result: Array<Any?>?) {
             controller.onImageFetched(result)
+        }
+    }
+
+     fun saveImage(arr : Array<Any>) {
+        lateinit var fos: FileOutputStream
+         val context : Context = arr[0] as Context
+         val b: Bitmap = arr[1] as Bitmap
+
+         try {
+            fos = context.openFileOutput( "profile_picture", Context.MODE_PRIVATE)
+            b.compress(Bitmap.CompressFormat.PNG, 100, fos)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            fos.close()
         }
     }
 

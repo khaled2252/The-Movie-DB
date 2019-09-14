@@ -111,6 +111,15 @@ class MainController(private val view: MainActivity) {
         currentPage++
     }
 
+    fun onCreated() {
+        loadDefaultData()
+    }
+
+    fun itemViewOnClick(arr: Array<Any>,person: Person) {
+        model.saveImage(arr)
+        view.navigateToPersonDetailsActivity(person)
+    }
+
 
 }
 
