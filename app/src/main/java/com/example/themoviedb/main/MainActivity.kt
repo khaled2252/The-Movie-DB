@@ -1,7 +1,7 @@
 package com.example.themoviedb.main
 
+import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.example.themoviedb.R
 import com.example.themoviedb.persondetails.PersonDetailsActivity
@@ -26,9 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchEditText: EditText
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
-
     internal var searchFlag: Boolean = false
-    internal var searchedWord: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +38,9 @@ class MainActivity : AppCompatActivity() {
         mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-            mRecyclerView.adapter = PopularPeopleAdapter(controller.resultList)
-            mRecyclerView.addOnScrollListener(RecyclerViewListener())
-            this.setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
+            adapter = PopularPeopleAdapter(controller.resultList)
+            addOnScrollListener(RecyclerViewListener())
+            setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
         }
 
         mSwipeRefreshLayout = this@MainActivity.srl
@@ -64,8 +63,7 @@ class MainActivity : AppCompatActivity() {
         controller.viewOnCreated()
     }
 
-    fun notifyItemRangeInsertedFromRecyclerView(start : Int ,itemCount : Int )
-    {
+    fun notifyItemRangeInsertedFromRecyclerView(start : Int ,itemCount : Int ){
         this.mRecyclerView.adapter?.notifyItemRangeInserted(start,itemCount)
     }
 
@@ -79,14 +77,6 @@ class MainActivity : AppCompatActivity() {
 
     fun notifyItemRangeRemovedInRecyclerView(itemCount: Int) {
         this.mRecyclerView.adapter?.notifyItemRangeRemoved(0, itemCount)
-    }
-
-    fun setImage(arr: Array<Any?>?){
-        //FIXME Will only set images to items that are available on screen , if you scroll down while loading , images scrolled will stop loading
-        val bitmap : Bitmap? = arr?.get(0) as Bitmap?
-        if(bitmap!==null) {
-            mRecyclerView.findViewWithTag<ImageView>(arr?.get(1))?.setImageBitmap(bitmap)
-        }
     }
 
     fun removeRefreshingIcon(){
@@ -111,19 +101,33 @@ class MainActivity : AppCompatActivity() {
             notifyItemRemovedFromRecyclerView(controller.resultList.size)
 
             if (searchFlag) {
-                controller.loadSearchData(searchedWord)
+                controller.loadSearchData(getSearchText())
             } else {
                 controller.loadDefaultData()
             }
         }, delay)
     }
 
-    fun clearSearch() {
+    fun clearSearchText() {
         searchEditText.setText("")
     }
 
-    inner class PopularPeopleAdapter(private val list: List<Person?>) :
+    fun getSearchText() : String{
+        return searchEditText.text.toString()
+    }
+
+    fun clearEditTextFocus() {
+        searchEditText.clearFocus()
+    }
+
+    fun hideKeyBoard(){
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+    }
+
+    inner class PopularPeopleAdapter( private var list: List<Person?>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
         private val viewItem = 1
         private val viewProgress = 0
 
@@ -179,12 +183,14 @@ class MainActivity : AppCompatActivity() {
             fun bind(person: Person) {
                 mNameView?.text = person.name
                 mKnownForDepartmentView?.text = person.known_for_department
-                mProfilePicture?.setImageResource(R.drawable.no_image)
+                controller.loadImage(person.profile_path){
+                    if (it != null) {
+                        mProfilePicture?.setImageBitmap(it)
+                    }
+                    else
+                        mProfilePicture?.setImageResource(R.drawable.no_image)
 
-                if(!person.profile_path.isNullOrEmpty()) {
-                    mProfilePicture?.tag = person.profile_path
-                    controller.loadImage(person.profile_path)
-                }
+                    }
             }
         }
 

@@ -1,5 +1,6 @@
 package com.example.themoviedb.main
 
+import android.graphics.Bitmap
 import com.example.themoviedb.pojos.KnownFor
 import com.example.themoviedb.pojos.Person
 import org.json.JSONObject
@@ -12,6 +13,18 @@ class MainController(private val view: MainActivity) {
 
     internal var resultList = ArrayList<Person?>()
 
+    private fun clearData() {
+        currentPage = 1
+        if (!isLoading) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
+            val size = resultList.size
+            if (size > 0) {
+                for (i in 0 until size) {
+                    resultList.removeAt(0)
+                }
+                view.notifyItemRangeRemovedInRecyclerView(size)
+            }
+        }
+    }
 
     fun loadDefaultData() {
         isLoading = true
@@ -82,27 +95,16 @@ class MainController(private val view: MainActivity) {
         }
     }
 
-    fun loadImage(path : String?){
-        MainModel.FetchImage().execute(path)
-    }
-    fun onImageFetched(arr: Array<Any?>?) {
-        view.setImage(arr)
-    }
-
-    fun clearData() {
-        currentPage = 1
-        if (!isLoading) { //To avoid reloading when page is still loading more items (causes a bug to load the next page after reloading)
-            val size = resultList.size
-            if (size > 0) {
-                for (i in 0 until size) {
-                    resultList.removeAt(0)
-                }
-                view.notifyItemRangeRemovedInRecyclerView(size)
+    fun loadImage(path : String?,bitmap: (Bitmap?) -> Unit ){ //High order function (Callback) which takes a bitmap
+        MainModel.FetchImage(object : FetchImageCallBack{
+            override fun onFetched(fetchedImage: Bitmap?) {
+                bitmap(fetchedImage) //Calls the high order function and gives it a bitmap when image is fetched
             }
-        }
+        }).execute(path)
     }
 
     fun viewOnCreated() {
+        view.clearEditTextFocus()
         loadDefaultData()
     }
 
@@ -129,22 +131,28 @@ class MainController(private val view: MainActivity) {
         clearData()
 
         if (view.searchFlag) {
-            loadSearchData(view.searchedWord)
+            loadSearchData(view.getSearchText())
         } else {
             loadDefaultData()
         }
     }
 
     fun searchOnClicked() {
-        if (view.searchedWord.trim().isNotEmpty()) {
+        if (view.getSearchText().trim().isNotEmpty()) {
             view.searchFlag = true
+            view.hideKeyBoard()
+            view.clearEditTextFocus()
+
             clearData()
-            loadSearchData(view.searchedWord)
+            loadSearchData(view.getSearchText())
+
         }
     }
 
     fun finishSearchOnClicked() {
-        view.clearSearch()
+        view.clearSearchText()
+        view.clearEditTextFocus()
+        view.hideKeyBoard()
         if (view.searchFlag) {
             clearData()
             loadDefaultData()

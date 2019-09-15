@@ -54,22 +54,21 @@ init {
             controller.onDataFetched(result)
         }
     }
-     class FetchImage: AsyncTask<String, Void, Array<Any?>>() {
-
-        override fun doInBackground(vararg params: String): Array<Any?>{
+     class FetchImage(FetchImageCallBack: FetchImageCallBack): AsyncTask<String, Void,Bitmap?>() {  //takes reference from callback interface
+         private var delegate = FetchImageCallBack //Assigning callback interface through constructor
+        override fun doInBackground(vararg params: String): Bitmap? {
             var bmp: Bitmap? = null
             try {
-                //params[0] is image url , params[1] is imageView id from viewHolder to be sent to onImageFetched
                 val input = URL(Companion.PROFILE_IMAGE_PATH + params[0]).openStream()
                 bmp = BitmapFactory.decodeStream(input)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            return arrayOf(bmp,params[0])
+            return bmp
         }
 
-        override fun onPostExecute(result: Array<Any?>?) {
-            controller.onImageFetched(result)
+        override fun onPostExecute(result: Bitmap?) {
+            delegate.onFetched(result)
         }
     }
 
@@ -100,7 +99,9 @@ init {
         const val PROFILE_IMAGE_PATH = "https://image.tmdb.org/t/p/w300/"
     }
 }
-
+interface FetchImageCallBack {
+    fun onFetched(fetchedImage: Bitmap?)//Callback method which is called at the object which implements the interface
+}
 
 
 
