@@ -2,10 +2,10 @@ package com.example.themoviedb.main
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.os.Handler
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -19,7 +19,6 @@ import com.example.themoviedb.R
 import com.example.themoviedb.persondetails.PersonDetailsActivity
 import com.example.themoviedb.pojos.Person
 import kotlinx.android.synthetic.main.activity_main.*
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -63,8 +62,8 @@ class MainActivity : AppCompatActivity() {
         controller.viewOnCreated()
     }
 
-    fun notifyItemRangeInsertedFromRecyclerView(start : Int ,itemCount : Int ){
-        this.mRecyclerView.adapter?.notifyItemRangeInserted(start,itemCount)
+    fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int) {
+        this.mRecyclerView.adapter?.notifyItemRangeInserted(start, itemCount)
     }
 
     fun notifyItemRemovedFromRecyclerView(index: Int) {
@@ -72,14 +71,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun notifyItemRangeChangedInRecyclerView(itemCount: Int) {
-        this.mRecyclerView.adapter?.notifyItemRangeChanged(this.mRecyclerView.adapter!!.itemCount,itemCount)
+        this.mRecyclerView.adapter?.notifyItemRangeChanged(
+            this.mRecyclerView.adapter!!.itemCount,
+            itemCount
+        )
     }
 
     fun notifyItemRangeRemovedInRecyclerView(itemCount: Int) {
         this.mRecyclerView.adapter?.notifyItemRangeRemoved(0, itemCount)
     }
 
-    fun removeRefreshingIcon(){
+    fun removeRefreshingIcon() {
         if (mSwipeRefreshLayout.isRefreshing) {
             mSwipeRefreshLayout.isRefreshing = false
         }
@@ -95,24 +97,15 @@ class MainActivity : AppCompatActivity() {
         applicationContext.startActivity(intent)
     }
 
-    fun removeProgressBarAndLoadDataAfterDelay(delay: Long) {
-        Handler().postDelayed({
-            controller.resultList.remove(null)
-            notifyItemRemovedFromRecyclerView(controller.resultList.size)
-
-            if (searchFlag) {
-                controller.loadSearchData(getSearchText())
-            } else {
-                controller.loadDefaultData()
-            }
-        }, delay)
+    fun instaniateNewAdapter() {
+        mRecyclerView.adapter = PopularPeopleAdapter(controller.resultList)
     }
 
     fun clearSearchText() {
         searchEditText.setText("")
     }
 
-    fun getSearchText() : String{
+    fun getSearchText(): String {
         return searchEditText.text.toString()
     }
 
@@ -120,12 +113,12 @@ class MainActivity : AppCompatActivity() {
         searchEditText.clearFocus()
     }
 
-    fun hideKeyBoard(){
+    fun hideKeyBoard() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
     }
 
-    inner class PopularPeopleAdapter( private var list: List<Person?>) :
+    inner class PopularPeopleAdapter(private var list: List<Person?>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val viewItem = 1
@@ -158,8 +151,9 @@ class MainActivity : AppCompatActivity() {
                 val person: Person? = list[position]
                 holder.bind(person!!)
                 holder.itemView.setOnClickListener {
-                    val bitmap = (holder.itemView.findViewById<ImageView>(R.id.iv_profile).drawable as BitmapDrawable).bitmap
-                    controller.itemViewOnClick(arrayOf(applicationContext,bitmap),person)
+                    val bitmap =
+                        (holder.itemView.findViewById<ImageView>(R.id.iv_profile).drawable as BitmapDrawable).bitmap
+                    controller.itemViewOnClick(arrayOf(applicationContext, bitmap), person)
                 }
             } else {
                 (holder as ProgressViewHolder).progressBar.isIndeterminate = true
@@ -183,14 +177,13 @@ class MainActivity : AppCompatActivity() {
             fun bind(person: Person) {
                 mNameView?.text = person.name
                 mKnownForDepartmentView?.text = person.known_for_department
-                controller.loadImage(person.profile_path){
+                controller.loadImage(person.profile_path) {
                     if (it != null) {
-                        mProfilePicture?.setImageBitmap(it)
-                    }
-                    else
+                        mProfilePicture?.setImageBitmap(it as Bitmap)
+                    } else
                         mProfilePicture?.setImageResource(R.drawable.no_image)
 
-                    }
+                }
             }
         }
 
@@ -199,17 +192,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    inner class  RecyclerViewListener :RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+    inner class RecyclerViewListener : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
 
-                val pos = (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
-                val numItems = recyclerView.adapter?.itemCount!! - 1
-                controller.recyclerViewOnScrolled(pos,numItems)
+            val pos =
+                (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+            val numItems = recyclerView.adapter?.itemCount!! - 1
+            controller.recyclerViewOnScrolled(pos, numItems)
 
-            }
         }
     }
+}
 
 
 
