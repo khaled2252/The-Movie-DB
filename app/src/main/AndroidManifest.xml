@@ -14,7 +14,7 @@
             android:theme="@style/AppTheme">
         <activity android:name=".image.ImageActivity"></activity>
         <activity
-                android:name=".persondetails.PersonDetailsActivity"
+                android:name=".persondetails.PersonDetailsView"
                 android:label="@string/title_activity_person_details"
                 android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".main.MainView">

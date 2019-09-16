@@ -18,9 +18,9 @@ interface Contract {
         fun hideKeyBoard()
         fun removeRefreshingIcon()
         fun instantiateNewAdapter()
-        fun notifyItemRemovedFromRecyclerView(size: Int)
-        fun notifyItemRangeInsertedFromRecyclerView(size: Int, i: Int)
-        fun notifyItemRangeChangedInRecyclerView(visibleThreshHold: Int)
+        fun notifyItemRemovedFromRecyclerView(index: Int)
+        fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int)
+        fun notifyItemRangeChangedInRecyclerView(itemCount: Int)
         fun navigateToPersonDetailsActivity(person: Person)
     }
 }

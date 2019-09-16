@@ -1,31 +1,65 @@
 package com.example.themoviedb.persondetails
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
-import android.util.Log
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
+import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 
-class PersonDetailsModel(private var personDetailsController: PersonDetailsController) {
+class PersonDetailsModel : Contract.PersonDetailsModel {
+    override fun fetchJson(
+        profileId: String,
+        fetchedData: (String?) -> Unit
+    ) {
+        FetchJson(object : FetchDataCallBack {
+            override fun onFetched(fetchedData: String?) {
+                fetchedData(fetchedData)
+            }
+        }).executeOnExecutor(
+            AsyncTask.THREAD_POOL_EXECUTOR,
+            profileId
+        )
 
-    val API_KEY = "api_key=3e68c56cf7097768305e38273efd342c"
-    val PERSON_DETAIL = "https://api.themoviedb.org/3/person/"
-    val PERSON_IMAGES_ATTRIBUTE = "/images?"
-    val PROFILE_IMAGE_PATH = "https://image.tmdb.org/t/p/w300/"
+    }
 
-    inner class FetchData(asyncCallback: FetchDataCallback) : //takes reference from callback interface
-        AsyncTask<String, String, String?>() {
+    override fun fetchImage(path: String, fetchedImage: (Any?) -> Unit) {
+        FetchImage(object : FetchImageCallBack {
+            override fun onFetched(fetchedImage: Any?) {
+                fetchedImage(fetchedImage)
+            }
+        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, path)
+    }
+
+    override fun saveImage(arr: Array<Any>) {
+        lateinit var fos: FileOutputStream
+        val context: Context = arr[0] as Context
+        val b: Bitmap = arr[1] as Bitmap
+
+        try {
+            fos = context.openFileOutput("profile_picture", Context.MODE_PRIVATE)
+            b.compress(Bitmap.CompressFormat.PNG, 100, fos)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            fos.close()
+        }
+    }
+
+    class FetchJson(fetchDataCallBack: FetchDataCallBack) :
+        AsyncTask<String, String, String?>() { //takes reference from callback interface
+
+        private var delegate = fetchDataCallBack //Assigning callback interface through constructor
         private var body: StringBuffer = StringBuffer()
-        private var delegate = asyncCallback //Assigning callback interface through constructor
 
         override fun doInBackground(vararg params: String): String? {
             try {
                 //params[0] is profile id
                 val url = PERSON_DETAIL + params[0] + PERSON_IMAGES_ATTRIBUTE + API_KEY
+
                 val urlConnection = URL(url).openConnection() as HttpURLConnection
 
                 try {
@@ -51,33 +85,42 @@ class PersonDetailsModel(private var personDetailsController: PersonDetailsContr
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-            delegate.onProcessFinish(result!!)
+            delegate.onFetched(result)
         }
     }
-     inner class FetchImages(fetchImagesCallback: FetchImagesCallback) : //takes reference from callback interface
-     AsyncTask<String, Void, Bitmap?>() {
-         private var delegate = fetchImagesCallback //Assigning callback interface through constructor
 
+    class FetchImage(FetchImageCallBack: FetchImageCallBack) : AsyncTask<String, Void, Bitmap?>() {
+        private var delegate = FetchImageCallBack
         override fun doInBackground(vararg params: String): Bitmap? {
             var bmp: Bitmap? = null
             try {
+                //params[0] is profile id
                 val input = URL(PROFILE_IMAGE_PATH+params[0]).openStream()
                 bmp = BitmapFactory.decodeStream(input)
             } catch (e: Exception) {
-                Log.e("Error", e.message)
                 e.printStackTrace()
             }
             return bmp
         }
 
         override fun onPostExecute(result: Bitmap?) {
-            delegate.onProcessFinish(result)
+            delegate.onFetched(result)
         }
     }
+
+    companion object {
+        const val PROFILE_IMAGE_PATH = "https://image.tmdb.org/t/p/w300/"
+        const val API_KEY = "api_key=3e68c56cf7097768305e38273efd342c"
+        const val PERSON_DETAIL = "https://api.themoviedb.org/3/person/"
+        const val PERSON_IMAGES_ATTRIBUTE = "/images?"
+    }
 }
-interface FetchDataCallback {
-    fun onProcessFinish(result: String)
+
+interface FetchImageCallBack {
+    fun onFetched(fetchedImage: Any?)
 }
-interface FetchImagesCallback {
-    fun onProcessFinish(result: Bitmap?)
+
+interface FetchDataCallBack {
+    fun onFetched(fetchedData: String?)
 }
+

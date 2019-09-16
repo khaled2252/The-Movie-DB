@@ -16,7 +16,7 @@ class MainModel : Contract.MainModel {
         searchedWord: String?,
         fetchedData: (String?) -> Unit
     ) {
-        var fetchJsonObject = FetchJson(object : FetchDataCallBack {
+        val fetchJsonObject = FetchJson(object : FetchDataCallBack {
             override fun onFetched(fetchedData: String?) {
                 fetchedData(fetchedData)
             }
