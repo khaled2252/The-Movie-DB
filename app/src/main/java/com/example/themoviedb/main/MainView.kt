@@ -20,9 +20,9 @@ import com.example.themoviedb.persondetails.PersonDetailsActivity
 import com.example.themoviedb.pojos.Person
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainView : AppCompatActivity(),Contract.MainView {
 
-    private lateinit var controller: MainController
+    private lateinit var presenter: MainPresenter
     private lateinit var searchEditText: EditText
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
@@ -32,62 +32,58 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        controller = MainController(this)
+        presenter = MainPresenter(this,MainModel())
 
         mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = PopularPeopleAdapter(controller.resultList)
+            layoutManager = LinearLayoutManager(this@MainView)
+            adapter = PopularPeopleAdapter(presenter.resultList)
             addOnScrollListener(RecyclerViewListener())
             setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
         }
 
-        mSwipeRefreshLayout = this@MainActivity.srl
+        mSwipeRefreshLayout = this@MainView.srl
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
-            controller.layoutOnRefreshed()
+            presenter.layoutOnRefreshed()
         }
 
         searchEditText = findViewById(R.id.searchEditText)
         val searchButton = findViewById<Button>(R.id.searchBtn)
         searchButton.setOnClickListener {
-            controller.searchOnClicked()
+            presenter.searchOnClicked()
         }
 
         val finishSearchBtn = findViewById<Button>(R.id.finishSearchBtn)
         finishSearchBtn.setOnClickListener {
-            controller.finishSearchOnClicked()
+            presenter.finishSearchOnClicked()
         }
 
-        controller.viewOnCreated()
+        presenter.viewOnCreated()
     }
 
-    fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int) {
+    override fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int) {
         this.mRecyclerView.adapter?.notifyItemRangeInserted(start, itemCount)
     }
 
-    fun notifyItemRemovedFromRecyclerView(index: Int) {
+    override fun notifyItemRemovedFromRecyclerView(index: Int) {
         this.mRecyclerView.adapter?.notifyItemRemoved(index)
     }
 
-    fun notifyItemRangeChangedInRecyclerView(itemCount: Int) {
+    override fun notifyItemRangeChangedInRecyclerView(itemCount: Int) {
         this.mRecyclerView.adapter?.notifyItemRangeChanged(
             this.mRecyclerView.adapter!!.itemCount,
             itemCount
         )
     }
 
-    fun notifyItemRangeRemovedInRecyclerView(itemCount: Int) {
-        this.mRecyclerView.adapter?.notifyItemRangeRemoved(0, itemCount)
-    }
-
-    fun removeRefreshingIcon() {
+    override fun removeRefreshingIcon() {
         if (mSwipeRefreshLayout.isRefreshing) {
             mSwipeRefreshLayout.isRefreshing = false
         }
     }
 
-    fun navigateToPersonDetailsActivity(person: Person) {
+    override fun navigateToPersonDetailsActivity(person: Person) {
         val intent = Intent(applicationContext, PersonDetailsActivity::class.java)
         intent.putExtra("profile_id", person.id)
         intent.putExtra("person_name", person.name)
@@ -97,23 +93,31 @@ class MainActivity : AppCompatActivity() {
         applicationContext.startActivity(intent)
     }
 
-    fun instaniateNewAdapter() {
-        mRecyclerView.adapter = PopularPeopleAdapter(controller.resultList)
+    override fun instantiateNewAdapter() {
+        mRecyclerView.adapter = PopularPeopleAdapter(presenter.resultList)
     }
 
-    fun clearSearchText() {
+    override fun setSearchFlag(b: Boolean) {
+        searchFlag = b
+    }
+
+    override fun getSearchFlag() : Boolean{
+        return searchFlag
+    }
+
+    override fun clearSearchText() {
         searchEditText.setText("")
     }
 
-    fun getSearchText(): String {
+    override fun getSearchText(): String {
         return searchEditText.text.toString()
     }
 
-    fun clearEditTextFocus() {
+    override fun clearEditTextFocus() {
         searchEditText.clearFocus()
     }
 
-    fun hideKeyBoard() {
+    override fun hideKeyBoard() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
     }
@@ -153,7 +157,7 @@ class MainActivity : AppCompatActivity() {
                 holder.itemView.setOnClickListener {
                     val bitmap =
                         (holder.itemView.findViewById<ImageView>(R.id.iv_profile).drawable as BitmapDrawable).bitmap
-                    controller.itemViewOnClick(arrayOf(applicationContext, bitmap), person)
+                    presenter.itemViewOnClick(arrayOf(applicationContext, bitmap), person)
                 }
             } else {
                 (holder as ProgressViewHolder).progressBar.isIndeterminate = true
@@ -177,7 +181,7 @@ class MainActivity : AppCompatActivity() {
             fun bind(person: Person) {
                 mNameView?.text = person.name
                 mKnownForDepartmentView?.text = person.known_for_department
-                controller.loadImage(person.profile_path) {
+                presenter.loadImage(person.profile_path) {
                     if (it != null) {
                         mProfilePicture?.setImageBitmap(it as Bitmap)
                     } else
@@ -199,7 +203,7 @@ class MainActivity : AppCompatActivity() {
             val pos =
                 (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
             val numItems = recyclerView.adapter?.itemCount!! - 1
-            controller.recyclerViewOnScrolled(pos, numItems)
+            presenter.recyclerViewOnScrolled(pos, numItems)
 
         }
     }

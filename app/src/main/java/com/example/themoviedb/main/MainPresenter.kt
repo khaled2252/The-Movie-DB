@@ -4,8 +4,7 @@ import com.example.themoviedb.pojos.KnownFor
 import com.example.themoviedb.pojos.Person
 import org.json.JSONObject
 
-class MainController(private val view: MainActivity) {
-    private var model: MainModel = MainModel(this)
+class MainPresenter(private val view: Contract.MainView,private val model: Contract.MainModel) {
     private var visibleThreshHold = 0
     private var isLoading = false
     private var currentPage = 1
@@ -17,7 +16,7 @@ class MainController(private val view: MainActivity) {
                 isDataFetched(true)
                 onDataFetched(fetchedData)
             }
-        }).executeOnExecutor(model.executor, currentPage.toString())
+        })//.executeOnExecutor(executor, currentPage.toString())
     }
 
     private fun loadSearchData(searchedWord: String, isDataFetched: (Boolean) -> Unit) {
@@ -26,12 +25,12 @@ class MainController(private val view: MainActivity) {
                 isDataFetched(true)
                 onDataFetched(fetchedData)
             }
-        }).executeOnExecutor(model.executor, currentPage.toString(), searchedWord)
+        })//.executeOnExecutor(executor, currentPage.toString(), searchedWord)
     }
 
     private fun loadData(dataFetched: (Boolean) -> Unit) {
         isLoading = true
-        if (view.searchFlag) {
+            if (view.getSearchFlag()) {
             loadSearchData(view.getSearchText()) {
                 isLoading = false
                 dataFetched(true)
@@ -47,7 +46,7 @@ class MainController(private val view: MainActivity) {
     private fun clearData() {
         currentPage = 1
         resultList.clear()
-        view.instaniateNewAdapter() //To remove cached and unrecycled itemViews
+        view.instantiateNewAdapter() //To remove cached and unrecycled itemViews
     }
 
     private fun removeProgressBar() {
@@ -69,7 +68,7 @@ class MainController(private val view: MainActivity) {
             override fun onFetched(fetchedImage: Any?) {
                 bitmap(fetchedImage) //Calls the high order function and gives it a bitmap when image is fetched
             }
-        }).executeOnExecutor(model.executor, path)
+        })//.executeOnExecutor(executor, path)
     }
 
     fun viewOnCreated() {
@@ -158,7 +157,7 @@ class MainController(private val view: MainActivity) {
 
     fun searchOnClicked() {
         if (view.getSearchText().trim().isNotEmpty()) {
-            view.searchFlag = true
+            view.setSearchFlag(true)
             view.hideKeyBoard()
             view.clearEditTextFocus()
 
@@ -174,8 +173,8 @@ class MainController(private val view: MainActivity) {
         view.clearSearchText()
         view.clearEditTextFocus()
         view.hideKeyBoard()
-        if (view.searchFlag) {
-            view.searchFlag = false
+        if (view.getSearchFlag()) {
+            view.setSearchFlag(false)
             clearData()
             loadData {
                 isLoading = false

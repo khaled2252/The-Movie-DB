@@ -9,12 +9,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executor
 
-class MainModel(mainController: MainController) {
-    init {
-        controller = mainController
-    }
+class MainModel : Contract.MainModel {
 
-    val executor: Executor? = AsyncTask.THREAD_POOL_EXECUTOR // To make parallel async task
+    private val executor: Executor? = AsyncTask.THREAD_POOL_EXECUTOR // To make parallel async task
 
     class FetchJson(fetchDataCallBack: FetchDataCallBack) :
         AsyncTask<String, String, String?>() { //takes reference from callback interface
@@ -78,7 +75,16 @@ class MainModel(mainController: MainController) {
         }
     }
 
-    fun saveImage(arr: Array<Any>) {
+    override fun fetchJson(currentPage : Int) {
+        FetchJson(object : FetchDataCallBack {
+            override fun onFetched(fetchedData: String?) {
+
+            }
+        }).executeOnExecutor(executor, currentPage.toString())
+    }
+    override fun fetchImage() {}
+
+    override fun saveImage(arr: Array<Any>) {
         lateinit var fos: FileOutputStream
         val context: Context = arr[0] as Context
         val b: Bitmap = arr[1] as Bitmap
@@ -96,8 +102,6 @@ class MainModel(mainController: MainController) {
     }
 
     companion object {
-        lateinit var controller: MainController
-
         const val API_KEY = "api_key=3e68c56cf7097768305e38273efd342c"
         const val PAGE_ATTRIBUTE = "&page="
         const val POPULAR_PEOPLE = "https://api.themoviedb.org/3/person/popular?"
