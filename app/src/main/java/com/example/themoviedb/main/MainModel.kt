@@ -11,7 +11,54 @@ import java.util.concurrent.Executor
 
 class MainModel : Contract.MainModel {
 
-    private val executor: Executor? = AsyncTask.THREAD_POOL_EXECUTOR // To make parallel async task
+    override fun fetchJson(
+        currentPage: Int,
+        searchedWord: String?,
+        fetchedData: (String?) -> Unit
+    ) {
+        var fetchJsonObject = FetchJson(object : FetchDataCallBack {
+            override fun onFetched(fetchedData: String?) {
+                fetchedData(fetchedData)
+            }
+        })
+        if (searchedWord == null)
+            fetchJsonObject.executeOnExecutor(
+                AsyncTask.THREAD_POOL_EXECUTOR,
+                currentPage.toString()
+            )
+        else
+            fetchJsonObject.executeOnExecutor(
+                AsyncTask.THREAD_POOL_EXECUTOR,
+                currentPage.toString(),
+                searchedWord
+            )
+
+    }
+
+    override fun fetchImage(path: String, fetchedImage: (Any?) -> Unit) {
+        FetchImage(object : FetchImageCallBack {
+            override fun onFetched(fetchedImage: Any?) {
+                fetchedImage(fetchedImage)
+            }
+        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, path)
+    }
+
+    override fun saveImage(arr: Array<Any>) {
+        lateinit var fos: FileOutputStream
+        val context: Context = arr[0] as Context
+        val b: Bitmap = arr[1] as Bitmap
+
+        try {
+            fos = context.openFileOutput("profile_picture", Context.MODE_PRIVATE)
+            b.compress(Bitmap.CompressFormat.PNG, 100, fos)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            fos.close()
+        }
+    }
 
     class FetchJson(fetchDataCallBack: FetchDataCallBack) :
         AsyncTask<String, String, String?>() { //takes reference from callback interface
@@ -72,32 +119,6 @@ class MainModel : Contract.MainModel {
 
         override fun onPostExecute(result: Bitmap?) {
             delegate.onFetched(result)
-        }
-    }
-
-    override fun fetchJson(currentPage : Int) {
-        FetchJson(object : FetchDataCallBack {
-            override fun onFetched(fetchedData: String?) {
-
-            }
-        }).executeOnExecutor(executor, currentPage.toString())
-    }
-    override fun fetchImage() {}
-
-    override fun saveImage(arr: Array<Any>) {
-        lateinit var fos: FileOutputStream
-        val context: Context = arr[0] as Context
-        val b: Bitmap = arr[1] as Bitmap
-
-        try {
-            fos = context.openFileOutput("profile_picture", Context.MODE_PRIVATE)
-            b.compress(Bitmap.CompressFormat.PNG, 100, fos)
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } finally {
-            fos.close()
         }
     }
 

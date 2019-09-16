@@ -20,19 +20,19 @@ import com.example.themoviedb.persondetails.PersonDetailsActivity
 import com.example.themoviedb.pojos.Person
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainView : AppCompatActivity(),Contract.MainView {
+class MainView : AppCompatActivity(), Contract.MainView {
 
     private lateinit var presenter: MainPresenter
     private lateinit var searchEditText: EditText
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
-    internal var searchFlag: Boolean = false
+    private var searchFlag: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        presenter = MainPresenter(this,MainModel())
+        presenter = MainPresenter(this, MainModel())
 
         mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
@@ -101,7 +101,7 @@ class MainView : AppCompatActivity(),Contract.MainView {
         searchFlag = b
     }
 
-    override fun getSearchFlag() : Boolean{
+    override fun getSearchFlag(): Boolean {
         return searchFlag
     }
 

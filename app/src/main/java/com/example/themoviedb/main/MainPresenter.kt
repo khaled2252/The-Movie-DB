@@ -4,109 +4,46 @@ import com.example.themoviedb.pojos.KnownFor
 import com.example.themoviedb.pojos.Person
 import org.json.JSONObject
 
-class MainPresenter(private val view: Contract.MainView,private val model: Contract.MainModel) {
+class MainPresenter(private val view: Contract.MainView, private val model: Contract.MainModel) {
     private var visibleThreshHold = 0
     private var isLoading = false
     private var currentPage = 1
     internal var resultList = ArrayList<Person?>()
 
     private fun loadDefaultData(isDataFetched: (Boolean) -> Unit) {
-        MainModel.FetchJson(object : FetchDataCallBack {
-            override fun onFetched(fetchedData: String?) {
-                isDataFetched(true)
-                onDataFetched(fetchedData)
-            }
-        })//.executeOnExecutor(executor, currentPage.toString())
+        model.fetchJson(currentPage, null) {
+            isDataFetched(true)
+            onDataFetched(it)
+        }
     }
 
     private fun loadSearchData(searchedWord: String, isDataFetched: (Boolean) -> Unit) {
-        MainModel.FetchJson(object : FetchDataCallBack {
-            override fun onFetched(fetchedData: String?) {
-                isDataFetched(true)
-                onDataFetched(fetchedData)
-            }
-        })//.executeOnExecutor(executor, currentPage.toString(), searchedWord)
+        model.fetchJson(currentPage, searchedWord) {
+            isDataFetched(true)
+            onDataFetched(it)
+        }
     }
 
     private fun loadData(dataFetched: (Boolean) -> Unit) {
         isLoading = true
-            if (view.getSearchFlag()) {
+        if (view.getSearchFlag()) {
             loadSearchData(view.getSearchText()) {
-                isLoading = false
-                dataFetched(true)
+                if (it) {
+                    isLoading = false
+                    dataFetched(true)
+                }
             }
         } else {
             loadDefaultData {
-                isLoading = false
-                dataFetched(true)
+                if (it) {
+                    isLoading = false
+                    dataFetched(true)
+                }
             }
         }
     }
 
-    private fun clearData() {
-        currentPage = 1
-        resultList.clear()
-        view.instantiateNewAdapter() //To remove cached and unrecycled itemViews
-    }
-
-    private fun removeProgressBar() {
-        resultList.remove(null)
-        view.notifyItemRemovedFromRecyclerView(resultList.size)
-    }
-
-    private fun addProgressBar() {
-        //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
-        resultList.add(null)
-        view.notifyItemRangeInsertedFromRecyclerView(resultList.size, 1)
-    }
-
-    fun loadImage(
-        path: String?,
-        bitmap: (Any?) -> Unit
-    ) { //High order function (Callback) which takes a bitmap (casted in view)
-        MainModel.FetchImage(object : FetchImageCallBack {
-            override fun onFetched(fetchedImage: Any?) {
-                bitmap(fetchedImage) //Calls the high order function and gives it a bitmap when image is fetched
-            }
-        })//.executeOnExecutor(executor, path)
-    }
-
-    fun viewOnCreated() {
-        view.clearEditTextFocus()
-        loadData {
-            isLoading = false
-        }
-    }
-
-    fun itemViewOnClick(arr: Array<Any>, person: Person) {
-        model.saveImage(arr)
-        view.navigateToPersonDetailsActivity(person)
-    }
-
-    fun recyclerViewOnScrolled(pos: Int, numItems: Int) {
-        if (pos >= numItems && !isLoading) //Reached end of screen
-        {
-            isLoading = true
-            currentPage++
-
-            if (resultList.size != 0) //Avoid adding progress bar when the list is empty i.e when using search after clearing data
-                addProgressBar()
-
-            loadData {
-                isLoading = false
-                removeProgressBar()
-            }
-        }
-    }
-
-    fun layoutOnRefreshed() {
-        clearData()
-        loadData {
-            view.removeRefreshingIcon()
-        }
-    }
-
-    fun onDataFetched(result: String?) {
+    private fun onDataFetched(result: String?) {
         if (!result.isNullOrEmpty()) {
 
             val jsonArrayOfResults =
@@ -152,6 +89,67 @@ class MainPresenter(private val view: Contract.MainView,private val model: Contr
             }
 
             view.notifyItemRangeChangedInRecyclerView(visibleThreshHold)
+        }
+    }
+
+    private fun clearData() {
+        currentPage = 1
+        resultList.clear()
+        view.instantiateNewAdapter() //To remove cached and unrecycled itemViews
+    }
+
+    private fun removeProgressBar() {
+        resultList.remove(null)
+        view.notifyItemRemovedFromRecyclerView(resultList.size)
+    }
+
+    private fun addProgressBar() {
+        //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
+        resultList.add(null)
+        view.notifyItemRangeInsertedFromRecyclerView(resultList.size, 1)
+    }
+
+    fun loadImage(
+        path: String?,
+        bitmap: (Any?) -> Unit  //High order function (Callback) which takes a bitmap (casted in view)
+    ) {
+        model.fetchImage(path!!) {
+            bitmap(it) //Calls the high order function and gives it a bitmap when image is fetched
+        }
+    }
+
+    fun viewOnCreated() {
+        view.clearEditTextFocus()
+        loadData {
+            isLoading = false
+        }
+    }
+
+    fun itemViewOnClick(arr: Array<Any>, person: Person) {
+        model.saveImage(arr)
+        view.navigateToPersonDetailsActivity(person)
+    }
+
+    fun recyclerViewOnScrolled(pos: Int, numItems: Int) {
+        if (pos >= numItems && !isLoading) //Reached end of screen
+        {
+            isLoading = true
+            currentPage++
+
+            if (resultList.size != 0) //Avoid adding progress bar when the list is empty i.e when using search after clearing data
+                addProgressBar()
+
+            loadData {
+                isLoading = false
+                removeProgressBar()
+            }
+        }
+    }
+
+    fun layoutOnRefreshed() {
+        clearData()
+        loadData {
+            view.removeRefreshingIcon()
         }
     }
 
