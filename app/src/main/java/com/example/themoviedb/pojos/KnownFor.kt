@@ -2,7 +2,7 @@ package com.example.themoviedb.pojos
 
 import java.io.Serializable
 
-class KnownFor :Serializable{
+class KnownFor : Serializable {
     var overview: String? = null
     var original_language: String? = null
     var original_title: String? = null

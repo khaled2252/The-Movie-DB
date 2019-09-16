@@ -1,6 +1,6 @@
 package com.example.themoviedb.pojos
 
-    class Person  {
+class Person {
     var gender: String? = null
     var known_for_department: String? = null
     var popularity: String? = null

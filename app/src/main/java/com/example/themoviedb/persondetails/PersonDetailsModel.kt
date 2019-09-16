@@ -95,7 +95,7 @@ class PersonDetailsModel : Contract.PersonDetailsModel {
             var bmp: Bitmap? = null
             try {
                 //params[0] is profile id
-                val input = URL(PROFILE_IMAGE_PATH+params[0]).openStream()
+                val input = URL(PROFILE_IMAGE_PATH + params[0]).openStream()
                 bmp = BitmapFactory.decodeStream(input)
             } catch (e: Exception) {
                 e.printStackTrace()

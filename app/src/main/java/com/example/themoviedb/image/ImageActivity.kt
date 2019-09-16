@@ -1,7 +1,11 @@
 package com.example.themoviedb.image
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
@@ -9,44 +13,70 @@ import com.example.themoviedb.R
 import kotlinx.android.synthetic.main.activity_image.*
 
 
-class ImageActivity : AppCompatActivity() {
+class ImageActivity : AppCompatActivity(), Contract.ImageActivityView {
 
-    private lateinit var imageController: ImageController
+    private lateinit var presenter: ImagePresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image)
 
-        imageController = ImageController(this)
-
-        imageController.requestPermission()
-
-        displayImage(imageController.bitmap)
+        presenter = ImagePresenter(this, ImageModel())
 
         this.btn_saveToGallery.setOnClickListener {
             val builder = AlertDialog.Builder(this@ImageActivity)
             builder.setTitle("Download image")
             builder.setMessage("Do you want to save image to gallery?")
             builder.setPositiveButton("YES") { _, _ ->
-                imageController.saveImage(imageController.bitmap)
+                presenter.yesOnClicked(applicationContext)
             }
             builder.setNegativeButton("No") { _, _ ->
             }
             val dialog: AlertDialog = builder.create()
             dialog.show()
         }
+
+        presenter.viewOnCreated(this)
     }
 
-    fun showImageSavedToast(){
+    override fun showImageSavedToast() {
         Toast.makeText(this, "Image saved to gallery !", Toast.LENGTH_LONG).show()
     }
-    fun showErrorToast(){
+
+    override fun showErrorToast() {
         Toast.makeText(this, "Failed to save image", Toast.LENGTH_LONG).show()
     }
 
-    fun displayImage(bitmap: Bitmap){
+    override fun displayImage(bitmap: Bitmap) {
         this.iv_saveToGallery.setImageBitmap(bitmap)
     }
 
+    override fun requestPermission() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    1
+                )
+            } else {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    1
+                )
+            }
+        }
+    }
 
 }

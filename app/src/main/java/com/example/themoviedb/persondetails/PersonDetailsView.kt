@@ -129,7 +129,7 @@ class PersonDetailsView : AppCompatActivity(), Contract.PersonDetailsView {
             holder.bind(personImages!!)
             holder.itemView.setOnClickListener {
                 val bitmap =
-                    (holder.itemView.findViewById<ImageView>(R.id.iv_profile).drawable as BitmapDrawable).bitmap
+                    (holder.itemView.findViewById<ImageView>(R.id.iv_image).drawable as BitmapDrawable).bitmap
                 presenter.itemViewOnClick(arrayOf(holder.itemView.context, bitmap))
 
             }

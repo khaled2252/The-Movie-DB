@@ -3,7 +3,10 @@ package com.example.themoviedb.persondetails
 import com.example.themoviedb.pojos.PersonImages
 import org.json.JSONObject
 
-class PersonDetailsPresenter(private val view: PersonDetailsView,private val model: PersonDetailsModel) {
+class PersonDetailsPresenter(
+    private val view: Contract.PersonDetailsView,
+    private val model: Contract.PersonDetailsModel
+) {
 
     internal var resultList = ArrayList<PersonImages?>()
 
@@ -34,8 +37,8 @@ class PersonDetailsPresenter(private val view: PersonDetailsView,private val mod
 
     fun viewOnCreated() {
         view.setUiFromIntent()
-        loadProfiles{}
-        }
+        loadProfiles {}
+    }
 
     fun itemViewOnClick(arr: Array<Any>) {
         model.saveImage(arr)
