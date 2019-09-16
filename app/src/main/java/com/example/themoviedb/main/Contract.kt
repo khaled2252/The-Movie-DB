@@ -1,12 +1,11 @@
 package com.example.themoviedb.main
 
-import com.example.themoviedb.pojos.Person
-
 interface Contract {
     interface MainModel {
         fun fetchJson(currentPage: Int, searchedWord: String?, fetchedData: (String?) -> Unit)
         fun fetchImage(path: String, fetchedImage: (Any?) -> Unit)
         fun saveImage(arr: Array<Any>)
+        fun enqueueCall(currentPage: Int,searchedWord: String?,resultList: (ArrayList<Person>?)->Unit)
     }
 
     interface MainView {

@@ -17,8 +17,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.example.themoviedb.R
 import com.example.themoviedb.persondetails.PersonDetailsView
-import com.example.themoviedb.pojos.Person
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.Serializable
 
 class MainView : AppCompatActivity(), Contract.MainView {
 
@@ -87,8 +87,8 @@ class MainView : AppCompatActivity(), Contract.MainView {
         val intent = Intent(applicationContext, PersonDetailsView::class.java)
         intent.putExtra("profile_id", person.id)
         intent.putExtra("person_name", person.name)
-        intent.putExtra("known_for", person.known_for)
-        intent.putExtra("known_for_department", person.known_for_department)
+        intent.putExtra("known_for", person.knownFor as Serializable)
+        intent.putExtra("known_for_department", person.knownForDepartment)
         intent.putExtra("popularity", person.popularity)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         applicationContext.startActivity(intent)
@@ -123,7 +123,7 @@ class MainView : AppCompatActivity(), Contract.MainView {
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
     }
 
-    inner class PopularPeopleAdapter(private var list: List<Person?>) :
+    inner class PopularPeopleAdapter(private var list: ArrayList<com.example.themoviedb.main.Person?>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val viewItem = 1
@@ -183,8 +183,8 @@ class MainView : AppCompatActivity(), Contract.MainView {
 
             fun bind(person: Person) {
                 mNameView?.text = person.name
-                mKnownForDepartmentView?.text = person.known_for_department
-                presenter.loadImage(person.profile_path) {
+                mKnownForDepartmentView?.text = person.knownForDepartment
+                presenter.loadImage(person.profilePath) {
                     mProgressBar.visibility = View.GONE
                     if (it != null) {
                         mProfilePicture?.setImageBitmap(it as Bitmap)
