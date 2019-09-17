@@ -6,10 +6,10 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,8 +24,8 @@ class MainView : AppCompatActivity(), Contract.MainView {
 
     private lateinit var presenter: MainPresenter
     private lateinit var searchEditText: EditText
-    private lateinit var mRecyclerView: RecyclerView
-    private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var mRecyclerView: androidx.recyclerview.widget.RecyclerView
+    private lateinit var mSwipeRefreshLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
     private var searchFlag: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +36,7 @@ class MainView : AppCompatActivity(), Contract.MainView {
 
         mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@MainView)
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@MainView)
             adapter = PopularPeopleAdapter(presenter.resultList)
             addOnScrollListener(RecyclerViewListener())
             setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
@@ -124,13 +124,13 @@ class MainView : AppCompatActivity(), Contract.MainView {
     }
 
     inner class PopularPeopleAdapter(private var list: ArrayList<com.example.themoviedb.main.Person?>) :
-        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
 
         private val viewItem = 1
         private val viewProgress = 0
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            val viewHolder: RecyclerView.ViewHolder
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
+            val viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder
             val inflater = LayoutInflater.from(parent.context)
 
             viewHolder = if (viewType == viewItem) {
@@ -151,7 +151,7 @@ class MainView : AppCompatActivity(), Contract.MainView {
             return if (list[position] != null) viewItem else viewProgress
         }
 
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
             if (holder is PopularPeopleViewHolder) {
                 val person: Person? = list[position]
                 holder.bind(person!!)
@@ -168,7 +168,7 @@ class MainView : AppCompatActivity(), Contract.MainView {
         override fun getItemCount(): Int = list.size
 
         inner class PopularPeopleViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
-            RecyclerView.ViewHolder(inflater.inflate(R.layout.row_layout, parent, false)) {
+            androidx.recyclerview.widget.RecyclerView.ViewHolder(inflater.inflate(R.layout.row_layout, parent, false)) {
             private var mNameView: TextView? = null
             private var mKnownForDepartmentView: TextView? = null
             private var mProfilePicture: ImageView? = null
@@ -184,28 +184,29 @@ class MainView : AppCompatActivity(), Contract.MainView {
             fun bind(person: Person) {
                 mNameView?.text = person.name
                 mKnownForDepartmentView?.text = person.knownForDepartment
-                presenter.loadImage(person.profilePath) {
-                    mProgressBar.visibility = View.GONE
-                    if (it != null) {
-                        mProfilePicture?.setImageBitmap(it as Bitmap)
-                    } else
-                        mProfilePicture?.setImageResource(R.drawable.no_image)
-
-                }
+                mProfilePicture?.setImageBitmap(presenter.loadImage(person.profilePath)as Bitmap)
+//                presenter.loadImage(person.profilePath) {
+//                    mProgressBar.visibility = View.GONE
+//                    if (it != null) {
+//                        mProfilePicture?.setImageBitmap(it as Bitmap)
+//                    } else
+//                        mProfilePicture?.setImageResource(R.drawable.no_image)
+//
+//                }
             }
         }
 
-        inner class ProgressViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        inner class ProgressViewHolder(v: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v) {
             var progressBar: ProgressBar = v.findViewById(R.id.pb)
         }
     }
 
-    inner class RecyclerViewListener : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+    inner class RecyclerViewListener : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
 
             val pos =
-                (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+                (recyclerView.layoutManager as androidx.recyclerview.widget.LinearLayoutManager).findLastCompletelyVisibleItemPosition()
             val numItems = recyclerView.adapter?.itemCount!! - 1
             presenter.recyclerViewOnScrolled(pos, numItems)
 

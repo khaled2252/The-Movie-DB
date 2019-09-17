@@ -2,31 +2,38 @@ package com.example.themoviedb.main
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.util.Log
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import java.io.*
-import java.net.HttpURLConnection
-import java.net.URL
 import com.google.gson.annotations.SerializedName
+import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
 import retrofit2.http.Query
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.Serializable
 
 
 class MainModel : Contract.MainModel {
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://api.themoviedb.org/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    private val service = retrofit.create(RetrofitService::class.java)
+    private lateinit var picasso : Picasso
+    private lateinit var retrofit : Retrofit
+    override fun fetchImage(path : String,imageFetched : com.squareup.picasso.Callback){
+        picasso = Picasso.get()
+        picasso.load(PROFILE_IMAGE+path).fetch(imageFetched)
+    }
+    override fun fetchData(currentPage: Int, searchedWord: String?, resultList: (ArrayList<Person>?)->Unit){
+        retrofit=Retrofit.Builder()
+            .baseUrl(POPULAR_PEOPLE)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val service = retrofit.create(RetrofitService::class.java)
 
-    override fun enqueueCall(currentPage: Int,searchedWord: String?,resultList: (ArrayList<Person>?)->Unit){
-        var call : Call<PopularPeopleResponse> = if (searchedWord == null) {
+        val call : Call<PopularPeopleResponse> = if (searchedWord == null) {
             service.getPopularPeople(API_KEY,currentPage.toString())
         } else
             service.getPopularPeopleSearh(API_KEY,currentPage.toString(),searchedWord)
@@ -44,36 +51,6 @@ class MainModel : Contract.MainModel {
                 resultList(response.body()?.results)
             }
         })
-    }
-    override fun fetchJson(
-        currentPage: Int,
-        searchedWord: String?,
-        fetchedData: (String?) -> Unit
-    ) {
-        val fetchJsonObject = FetchJson(object : FetchDataCallBack {
-            override fun onFetched(fetchedData: String?) {
-                fetchedData(fetchedData)
-            }
-        })
-        if (searchedWord == null)
-            fetchJsonObject.executeOnExecutor(
-                AsyncTask.THREAD_POOL_EXECUTOR,
-                currentPage.toString()
-            )
-        else
-            fetchJsonObject.executeOnExecutor(
-                AsyncTask.THREAD_POOL_EXECUTOR,
-                currentPage.toString(),
-                searchedWord
-            )
-    }
-
-    override fun fetchImage(path: String, fetchedImage: (Any?) -> Unit) {
-        FetchImage(object : FetchImageCallBack {
-            override fun onFetched(fetchedImage: Any?) {
-                fetchedImage(fetchedImage)
-            }
-        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, path)
     }
 
     override fun saveImage(arr: Array<Any>) {
@@ -93,84 +70,11 @@ class MainModel : Contract.MainModel {
         }
     }
 
-    class FetchJson(fetchDataCallBack: FetchDataCallBack) :
-        AsyncTask<String, String, String?>() { //takes reference from callback interface
-
-        private var delegate = fetchDataCallBack //Assigning callback interface through constructor
-        private var body: StringBuffer = StringBuffer()
-        private lateinit var url: String
-
-        override fun doInBackground(vararg params: String): String? {
-            try {
-                //params[0] is page number , params[1] is search queryz
-                url = if (params.size == 1)
-                    Companion.POPULAR_PEOPLE + Companion.API_KEY + Companion.PAGE_ATTRIBUTE + params[0]
-                else
-                    Companion.SEARCH_PERSON_NAME + params[1] + Companion.PAGE_ATTRIBUTE + params[0]
-
-                val urlConnection = URL(url).openConnection() as HttpURLConnection
-
-                try {
-                    val input = BufferedReader(
-                        InputStreamReader(urlConnection.inputStream)
-                    )
-
-                    var inputLine: String?
-                    do {
-                        inputLine = input.readLine()
-                        body.append(inputLine)
-                    } while (inputLine != null)
-                    input.close()
-                } finally {
-                    urlConnection.disconnect()
-                }
-
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-            return body.toString()
-        }
-
-        override fun onPostExecute(result: String?) {
-            super.onPostExecute(result)
-            delegate.onFetched(result)
-        }
-    }
-
-    class FetchImage(FetchImageCallBack: FetchImageCallBack) : AsyncTask<String, Void, Bitmap?>() {
-        private var delegate = FetchImageCallBack
-        override fun doInBackground(vararg params: String): Bitmap? {
-            var bmp: Bitmap? = null
-            try {
-                val input = URL(Companion.PROFILE_IMAGE_PATH + params[0]).openStream()
-                bmp = BitmapFactory.decodeStream(input)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            return bmp
-        }
-
-        override fun onPostExecute(result: Bitmap?) {
-            delegate.onFetched(result)
-        }
-    }
-
     companion object {
+        const val POPULAR_PEOPLE = "https://api.themoviedb.org/"
         const val API_KEY = "3e68c56cf7097768305e38273efd342c"
-        const val PAGE_ATTRIBUTE = "&page="
-        const val POPULAR_PEOPLE = "https://api.themoviedb.org/3/person/popular?"
-        const val SEARCH_PERSON_NAME =
-            "https://api.themoviedb.org/3/search/person?api_key=e6f20f39139b1f5a2be132cbaaa9ce43&query="
-        const val PROFILE_IMAGE_PATH = "https://image.tmdb.org/t/p/w300/"
+        const val PROFILE_IMAGE = "https://image.tmdb.org/t/p/w300/"
     }
-}
-
-interface FetchImageCallBack {
-    fun onFetched(fetchedImage: Any?)//Callback method which is called at the object which implements the interface
-}
-
-interface FetchDataCallBack {
-    fun onFetched(fetchedData: String?)
 }
 
 interface RetrofitService {

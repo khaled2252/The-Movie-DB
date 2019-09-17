@@ -9,13 +9,13 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
     private fun loadData(dataFetched: (Boolean) -> Unit) {
         isLoading = true
         if (view.getSearchFlag()) {
-            model.enqueueCall(currentPage,view.getSearchText()){model.enqueueCall(currentPage,null){
+            model.fetchData(currentPage,view.getSearchText()){model.fetchData(currentPage,null){
                 onDataFetched(it)
                 dataFetched(true)
             }
             }
         } else {
-            model.enqueueCall(currentPage,null){
+            model.fetchData(currentPage,null){
                 onDataFetched(it)
                 dataFetched(true)
             }
@@ -46,13 +46,8 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
         view.notifyItemRangeInsertedFromRecyclerView(resultList.size, 1)
     }
 
-    fun loadImage(
-        path: String?,
-        bitmap: (Any?) -> Unit  //High order function (Callback) which takes a bitmap (casted in view)
-    ) {
-        model.fetchImage(path!!) {
-            bitmap(it) //Calls the high order function and gives it a bitmap when image is fetched
-        }
+    fun loadImage(path: String?) : Any {
+        return  model.fetchImage(path!!){}
     }
 
     fun viewOnCreated() {
