@@ -91,7 +91,7 @@ class MainView : AppCompatActivity(), Contract.MainView {
         intent.putExtra("person_name", person.name)
         intent.putExtra("known_for", person.knownFor as Serializable)
         intent.putExtra("known_for_department", person.knownForDepartment)
-        intent.putExtra("popularity", person.popularity)
+        intent.putExtra("popularity", person.popularity.toString())
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         applicationContext.startActivity(intent)
     }

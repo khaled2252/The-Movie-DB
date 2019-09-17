@@ -7,7 +7,7 @@ import com.example.themoviedb.PersonProfilesResponse
 import com.example.themoviedb.Profile
 import com.example.themoviedb.RetrofitService
 import com.example.themoviedb.RetrofitService.Companion.API_KEY
-import com.example.themoviedb.RetrofitService.Companion.PERSON_DETAIL
+import com.example.themoviedb.RetrofitService.Companion.BASE_URL
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -20,13 +20,13 @@ import java.io.IOException
 class PersonDetailsModel : Contract.PersonDetailsModel {
     override fun fetchJson(profileId : String, resultList: (ArrayList<Profile>?)->Unit){
         val retrofit= Retrofit.Builder()
-            .baseUrl(PERSON_DETAIL)
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         val service = retrofit.create(RetrofitService::class.java)
 
         val call : Call<PersonProfilesResponse> =
-            service.getPopularPersonProfiles(API_KEY,profileId)
+            service.getPopularPersonProfiles(profileId,API_KEY)
 
         call.enqueue(object : Callback<PersonProfilesResponse> {
             override fun onFailure(call: Call<PersonProfilesResponse>, t: Throwable) {

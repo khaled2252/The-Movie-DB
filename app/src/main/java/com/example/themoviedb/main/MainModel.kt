@@ -7,7 +7,7 @@ import com.example.themoviedb.Person
 import com.example.themoviedb.PopularPeopleResponse
 import com.example.themoviedb.RetrofitService
 import com.example.themoviedb.RetrofitService.Companion.API_KEY
-import com.example.themoviedb.RetrofitService.Companion.POPULAR_PEOPLE
+import com.example.themoviedb.RetrofitService.Companion.BASE_URL
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,7 +22,7 @@ class MainModel : Contract.MainModel {
 
     override fun fetchJson(currentPage: Int, searchedWord: String?, resultList: (ArrayList<Person>?)->Unit){
         val retrofit=Retrofit.Builder()
-            .baseUrl(POPULAR_PEOPLE)
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         val service = retrofit.create(RetrofitService::class.java)

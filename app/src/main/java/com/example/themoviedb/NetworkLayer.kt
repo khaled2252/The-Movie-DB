@@ -8,21 +8,19 @@ import retrofit2.http.Query
 import java.io.Serializable
 
 interface RetrofitService {
-    @GET("3/person/popular?")
+    @GET("/3/person/popular?")
     fun getPopularPeople(@Query("api_key") apiKey: String, @Query("page") page: String): Call<PopularPeopleResponse>
 
-    @GET("3/person/popular?")
+    @GET("/3/person/popular?")
     fun getPopularPeopleSearh(@Query("api_key") apiKey: String, @Query("page") page: String, @Query("query")searchedWord: String?): Call<PopularPeopleResponse>
 
-    @GET("3/person/{profile_id}/images?")
-    fun getPopularPersonProfiles(@Query("api_key") apiKey: String,@Path("profile_id")profileId : String): Call<PersonProfilesResponse>
+    @GET("/3/person/{profile_id}/images?")
+    fun getPopularPersonProfiles(@Path("profile_id")profileId : String,@Query("api_key") apiKey: String): Call<PersonProfilesResponse>
 
     companion object {
-        const val POPULAR_PEOPLE = "https://api.themoviedb.org/"
+        const val BASE_URL = "https://api.themoviedb.org"
         const val API_KEY = "3e68c56cf7097768305e38273efd342c"
         const val PROFILE_IMAGE = "https://image.tmdb.org/t/p/w300/"
-        const val PROFILE_IMAGE_PATH = "https://image.tmdb.org/t/p/w300/"
-        const val PERSON_DETAIL = "https://api.themoviedb.org/3/person/"
     }
 }
 data class PopularPeopleResponse(
