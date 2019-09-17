@@ -1,11 +1,8 @@
 package com.example.themoviedb.main
 
-import android.graphics.Bitmap
-
 interface Contract {
     interface MainModel {
         fun fetchData(currentPage: Int, searchedWord: String?, resultList: (ArrayList<Person>?)->Unit)
-        fun fetchImage(path : String,imageFetched : com.squareup.picasso.Callback)
         fun saveImage(arr: Array<Any>)
     }
 

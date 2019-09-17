@@ -2,10 +2,8 @@ package com.example.themoviedb.main
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.AsyncTask
 import android.util.Log
 import com.google.gson.annotations.SerializedName
-import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -20,14 +18,9 @@ import java.io.Serializable
 
 
 class MainModel : Contract.MainModel {
-    private lateinit var picasso : Picasso
-    private lateinit var retrofit : Retrofit
-    override fun fetchImage(path : String,imageFetched : com.squareup.picasso.Callback){
-        picasso = Picasso.get()
-        picasso.load(PROFILE_IMAGE+path).fetch(imageFetched)
-    }
+
     override fun fetchData(currentPage: Int, searchedWord: String?, resultList: (ArrayList<Person>?)->Unit){
-        retrofit=Retrofit.Builder()
+        val retrofit=Retrofit.Builder()
             .baseUrl(POPULAR_PEOPLE)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

@@ -46,10 +46,6 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
         view.notifyItemRangeInsertedFromRecyclerView(resultList.size, 1)
     }
 
-    fun loadImage(path: String?) : Any {
-        return  model.fetchImage(path!!){}
-    }
-
     fun viewOnCreated() {
         view.clearEditTextFocus()
 
