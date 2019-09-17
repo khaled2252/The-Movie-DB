@@ -1,23 +1,26 @@
 package com.example.themoviedb.main
 
+import com.example.themoviedb.Person
+
 
 class MainPresenter(private val view: Contract.MainView, private val model: Contract.MainModel) {
     private var isLoading = false
     private var currentPage = 1
+
     internal var resultList = ArrayList<Person?>()
 
-    private fun loadData(dataFetched: (Boolean) -> Unit) {
+    private fun loadData(isDataFetched: (Boolean) -> Unit) {
         isLoading = true
         if (view.getSearchFlag()) {
-            model.fetchData(currentPage,view.getSearchText()){model.fetchData(currentPage,null){
+            model.fetchJson(currentPage,view.getSearchText()){model.fetchJson(currentPage,null){
                 onDataFetched(it)
-                dataFetched(true)
+                isDataFetched(true)
             }
             }
         } else {
-            model.fetchData(currentPage,null){
+            model.fetchJson(currentPage,null){
                 onDataFetched(it)
-                dataFetched(true)
+                isDataFetched(true)
             }
         }
     }

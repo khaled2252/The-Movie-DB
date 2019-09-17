@@ -3,23 +3,24 @@ package com.example.themoviedb.main
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import com.google.gson.annotations.SerializedName
+import com.example.themoviedb.Person
+import com.example.themoviedb.PopularPeopleResponse
+import com.example.themoviedb.RetrofitService
+import com.example.themoviedb.RetrofitService.Companion.API_KEY
+import com.example.themoviedb.RetrofitService.Companion.POPULAR_PEOPLE
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Query
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
-import java.io.Serializable
 
 
 class MainModel : Contract.MainModel {
 
-    override fun fetchData(currentPage: Int, searchedWord: String?, resultList: (ArrayList<Person>?)->Unit){
+    override fun fetchJson(currentPage: Int, searchedWord: String?, resultList: (ArrayList<Person>?)->Unit){
         val retrofit=Retrofit.Builder()
             .baseUrl(POPULAR_PEOPLE)
             .addConverterFactory(GsonConverterFactory.create())
@@ -62,80 +63,8 @@ class MainModel : Contract.MainModel {
             fos.close()
         }
     }
-
-    companion object {
-        const val POPULAR_PEOPLE = "https://api.themoviedb.org/"
-        const val API_KEY = "3e68c56cf7097768305e38273efd342c"
-        const val PROFILE_IMAGE = "https://image.tmdb.org/t/p/w300/"
-    }
 }
 
-interface RetrofitService {
-    @GET("3/person/popular?")
-    fun getPopularPeople(@Query("api_key") apiKey: String, @Query("page") page: String): Call<PopularPeopleResponse>
 
-    @GET("3/person/popular?")
-    fun getPopularPeopleSearh(@Query("api_key") apiKey: String, @Query("page") page: String,@Query("query")searchedWord: String?): Call<PopularPeopleResponse>
-
-}
-data class PopularPeopleResponse(
-    @SerializedName("page")
-    val page: Int,
-    @SerializedName("results")
-    val results: ArrayList<Person>,
-    @SerializedName("total_pages")
-    val totalPages: Int,
-    @SerializedName("total_results")
-    val totalResults: Int
-)
-data class Person(
-    @SerializedName("adult")
-    val adult: Boolean,
-    @SerializedName("gender")
-    val gender: Int,
-    @SerializedName("id")
-    val id: Int,
-    @SerializedName("known_for")
-    val knownFor: List<KnownFor>,
-    @SerializedName("known_for_department")
-    val knownForDepartment: String,
-    @SerializedName("name")
-    val name: String,
-    @SerializedName("popularity")
-    val popularity: Double,
-    @SerializedName("profile_path")
-    val profilePath: String
-)
-
-data class KnownFor(
-    @SerializedName("adult")
-    val adult: Boolean,
-    @SerializedName("backdrop_path")
-    val backdropPath: String,
-    @SerializedName("genre_ids")
-    val genreIds: List<Int>,
-    @SerializedName("id")
-    val id: Int,
-    @SerializedName("media_type")
-    val mediaType: String,
-    @SerializedName("original_language")
-    val originalLanguage: String,
-    @SerializedName("original_title")
-    val originalTitle: String,
-    @SerializedName("overview")
-    val overview: String,
-    @SerializedName("poster_path")
-    val posterPath: String,
-    @SerializedName("release_date")
-    val releaseDate: String,
-    @SerializedName("title")
-    val title: String,
-    @SerializedName("video")
-    val video: Boolean,
-    @SerializedName("vote_average")
-    val voteAverage: Double,
-    @SerializedName("vote_count")
-    val voteCount: Int
-):Serializable
 
 

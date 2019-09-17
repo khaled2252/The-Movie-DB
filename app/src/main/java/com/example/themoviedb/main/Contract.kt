@@ -1,8 +1,10 @@
 package com.example.themoviedb.main
 
+import com.example.themoviedb.Person
+
 interface Contract {
     interface MainModel {
-        fun fetchData(currentPage: Int, searchedWord: String?, resultList: (ArrayList<Person>?)->Unit)
+        fun fetchJson(currentPage: Int, searchedWord: String?, resultList: (ArrayList<Person>?)->Unit)
         fun saveImage(arr: Array<Any>)
     }
 

@@ -1,37 +1,19 @@
 package com.example.themoviedb.persondetails
 
-import com.example.themoviedb.pojos.PersonImages
-import org.json.JSONObject
+import com.example.themoviedb.Profile
 
 class PersonDetailsPresenter(
     private val view: Contract.PersonDetailsView,
     private val model: Contract.PersonDetailsModel
 ) {
 
-    internal var resultList = ArrayList<PersonImages?>()
+    internal var resultList = ArrayList<Profile?>()
 
     private fun loadProfiles(isDataFetched: (Boolean) -> Unit) {
         model.fetchJson(view.getProfileId()) {
             isDataFetched(true)
-            if (!it.isNullOrEmpty()) {
-                val jsonArrayOfProfiles = JSONObject(it).getJSONArray("profiles")
-
-                for (i in 0 until jsonArrayOfProfiles.length()) {
-                    val personImages = PersonImages()
-                    personImages.personId = JSONObject(it).getString("id")
-                    personImages.filePath =
-                        jsonArrayOfProfiles.getJSONObject(i).getString("file_path")
-                    resultList.add(personImages)
-                }
-                view.notifyItemRangeChangedInRecyclerView(jsonArrayOfProfiles.length())
-            }
-
-        }
-    }
-
-    fun loadImage(path: String?, bitmap: (Any?) -> Unit) {
-        model.fetchImage(path!!) {
-            bitmap(it)
+            resultList.addAll(it!!)
+            view.notifyItemRangeChangedInRecyclerView(it.size)
         }
     }
 

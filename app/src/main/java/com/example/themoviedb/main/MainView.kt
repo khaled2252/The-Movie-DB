@@ -2,12 +2,10 @@ package com.example.themoviedb.main
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,8 +14,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import com.example.themoviedb.Person
 import com.example.themoviedb.R
-import com.example.themoviedb.main.MainModel.Companion.PROFILE_IMAGE
+import com.example.themoviedb.RetrofitService.Companion.PROFILE_IMAGE
 import com.example.themoviedb.persondetails.PersonDetailsView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -28,9 +27,7 @@ import java.lang.Exception
 class MainView : AppCompatActivity(), Contract.MainView {
 
     private lateinit var presenter: MainPresenter
-    private lateinit var searchEditText: EditText
-    private lateinit var mRecyclerView: RecyclerView
-    private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
+
     private var searchFlag: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +36,7 @@ class MainView : AppCompatActivity(), Contract.MainView {
 
         presenter = MainPresenter(this, MainModel())
 
-        mRecyclerView = this.rv_popular_popular!!
+        val mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainView)
             adapter = PopularPeopleAdapter(presenter.resultList)
@@ -47,13 +44,13 @@ class MainView : AppCompatActivity(), Contract.MainView {
             setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
         }
 
-        mSwipeRefreshLayout = this@MainView.srl
+        val mSwipeRefreshLayout = this@MainView.srl
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
             presenter.layoutOnRefreshed()
         }
 
-        searchEditText = findViewById(R.id.searchEditText)
+        val searchEditText = findViewById<EditText>(R.id.searchEditText)
         val searchButton = findViewById<Button>(R.id.searchBtn)
         searchButton.setOnClickListener {
             presenter.searchOnClicked()
@@ -68,29 +65,29 @@ class MainView : AppCompatActivity(), Contract.MainView {
     }
 
     override fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int) {
-        this.mRecyclerView.adapter?.notifyItemRangeInserted(start, itemCount)
+        rv_popular_popular.adapter?.notifyItemRangeInserted(start, itemCount)
     }
 
     override fun notifyItemRemovedFromRecyclerView(index: Int) {
-        this.mRecyclerView.adapter?.notifyItemRemoved(index)
+        rv_popular_popular.adapter?.notifyItemRemoved(index)
     }
 
     override fun notifyItemRangeChangedInRecyclerView(itemCount: Int) {
-        this.mRecyclerView.adapter?.notifyItemRangeChanged(
-            this.mRecyclerView.adapter!!.itemCount,
+        rv_popular_popular.adapter?.notifyItemRangeChanged(
+        rv_popular_popular.adapter!!.itemCount,
             itemCount
         )
     }
 
     override fun removeRefreshingIcon() {
-        if (mSwipeRefreshLayout.isRefreshing) {
-            mSwipeRefreshLayout.isRefreshing = false
+        if (srl.isRefreshing) {
+            srl.isRefreshing = false
         }
     }
 
     override fun navigateToPersonDetailsActivity(person: Person) {
         val intent = Intent(applicationContext, PersonDetailsView::class.java)
-        intent.putExtra("profile_id", person.id)
+        intent.putExtra("profile_id", person.id.toString())
         intent.putExtra("person_name", person.name)
         intent.putExtra("known_for", person.knownFor as Serializable)
         intent.putExtra("known_for_department", person.knownForDepartment)
@@ -100,7 +97,7 @@ class MainView : AppCompatActivity(), Contract.MainView {
     }
 
     override fun instantiateNewAdapter() {
-        mRecyclerView.adapter = PopularPeopleAdapter(presenter.resultList)
+        rv_popular_popular.adapter = PopularPeopleAdapter(presenter.resultList)
     }
 
     override fun setSearchFlag(b: Boolean) {

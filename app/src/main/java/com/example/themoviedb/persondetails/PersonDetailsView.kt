@@ -14,16 +14,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
+import com.example.themoviedb.KnownFor
+import com.example.themoviedb.Profile
 import com.example.themoviedb.R
+import com.example.themoviedb.RetrofitService
 import com.example.themoviedb.image.ImageActivity
-import com.example.themoviedb.main.KnownFor
-import com.example.themoviedb.pojos.PersonImages
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_person_details.*
+import java.lang.Exception
 
 
 class PersonDetailsView : AppCompatActivity(), Contract.PersonDetailsView {
     private lateinit var presenter: PersonDetailsPresenter
-    private lateinit var mRecyclerView: androidx.recyclerview.widget.RecyclerView
     private lateinit var profileId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,20 +35,20 @@ class PersonDetailsView : AppCompatActivity(), Contract.PersonDetailsView {
 
         presenter = PersonDetailsPresenter(this, PersonDetailsModel())
 
-        mRecyclerView = this.rv_pictures
+       val mRecyclerView = this.rv_pictures
         mRecyclerView.apply {
             layoutManager =
-                androidx.recyclerview.widget.GridLayoutManager(this@PersonDetailsView, 3)
+                GridLayoutManager(this@PersonDetailsView, 3)
             adapter = PopularPersonAdapter(presenter.resultList)
             setItemViewCacheSize(50)
 
             //To remove spaces in grid view
             mRecyclerView.addItemDecoration(
-                object : androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
+                object : RecyclerView.ItemDecoration() {
                     val spaceInPixels = 10
                     override fun getItemOffsets(
                         outRect: Rect, view: View,
-                        parent: androidx.recyclerview.widget.RecyclerView, state: androidx.recyclerview.widget.RecyclerView.State
+                        parent: RecyclerView, state: RecyclerView.State
                     ) {
                         outRect.left = spaceInPixels
                         outRect.right = spaceInPixels
@@ -99,22 +102,22 @@ class PersonDetailsView : AppCompatActivity(), Contract.PersonDetailsView {
     }
 
     override fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int) {
-        this.mRecyclerView.adapter?.notifyItemRangeInserted(start, itemCount)
+        rv_pictures.adapter?.notifyItemRangeInserted(start, itemCount)
     }
 
     override fun notifyItemRemovedFromRecyclerView(index: Int) {
-        this.mRecyclerView.adapter?.notifyItemRemoved(index)
+        rv_pictures.adapter?.notifyItemRemoved(index)
     }
 
     override fun notifyItemRangeChangedInRecyclerView(itemCount: Int) {
-        this.mRecyclerView.adapter?.notifyItemRangeChanged(
-            this.mRecyclerView.adapter!!.itemCount,
+        rv_pictures.adapter?.notifyItemRangeChanged(
+            rv_pictures.adapter!!.itemCount,
             itemCount
         )
     }
 
-    inner class PopularPersonAdapter(private val list: List<PersonImages?>) :
-        androidx.recyclerview.widget.RecyclerView.Adapter<PopularPersonAdapter.ViewHolder>() {
+    inner class PopularPersonAdapter(private val list: List<Profile?>) :
+        RecyclerView.Adapter<PopularPersonAdapter.ViewHolder>() {
         override fun getItemCount(): Int {
             return list.size
         }
@@ -126,7 +129,7 @@ class PersonDetailsView : AppCompatActivity(), Contract.PersonDetailsView {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val personImages: PersonImages? = list[position]
+            val personImages: Profile? = list[position]
             holder.bind(personImages!!)
             holder.itemView.setOnClickListener {
                 val bitmap =
@@ -136,17 +139,23 @@ class PersonDetailsView : AppCompatActivity(), Contract.PersonDetailsView {
             }
         }
 
-        inner class ViewHolder(mView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(mView) {
+        inner class ViewHolder(mView: View) : RecyclerView.ViewHolder(mView) {
             private val mImageView: ImageView = mView.findViewById(R.id.iv_image)
             private val mProgressBar: ProgressBar = mView.findViewById(R.id.progressBar)
-            fun bind(personImages: PersonImages) {
-                presenter.loadImage(personImages.filePath) {
-                    mProgressBar.visibility = View.GONE
-                    if (it != null) {
-                        mImageView.setImageBitmap(it as Bitmap)
-                    } else
-                        mImageView.setImageResource(R.drawable.no_image)
-                }
+            fun bind(personImages: Profile) {
+                Picasso.get()
+                    .load(RetrofitService.PROFILE_IMAGE +personImages.filePath)
+                    .into(mImageView,object : Callback {
+                        override fun onSuccess() {
+                            mProgressBar.visibility=View.GONE
+                        }
+
+                        override fun onError(e: Exception?) {
+                            mImageView.setImageBitmap(
+                                BitmapFactory.decodeResource(applicationContext.resources,
+                                    R.drawable.no_image))
+                        }
+                    })
             }
         }
     }
