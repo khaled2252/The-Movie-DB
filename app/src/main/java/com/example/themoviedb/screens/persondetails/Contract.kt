@@ -1,9 +1,10 @@
-package com.example.themoviedb.persondetails
+package com.example.themoviedb.screens.persondetails
+
+import com.example.themoviedb.network.Profile
 
 interface Contract {
     interface PersonDetailsModel {
-        fun fetchJson(profileId: String, fetchedData: (String?) -> Unit)
-        fun fetchImage(path: String, fetchedImage: (Any?) -> Unit)
+        fun fetchJson(profileId: String, resultList: (ArrayList<Profile>?) -> Unit)
         fun saveImage(arr: Array<Any>)
     }
 
@@ -14,5 +15,6 @@ interface Contract {
         fun notifyItemRemovedFromRecyclerView(index: Int)
         fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int)
         fun notifyItemRangeChangedInRecyclerView(itemCount: Int)
+        fun showPersonInfo()
     }
 }

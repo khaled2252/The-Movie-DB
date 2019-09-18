@@ -1,11 +1,15 @@
-package com.example.themoviedb.main
+package com.example.themoviedb.screens.main
 
-import com.example.themoviedb.pojos.Person
+import com.example.themoviedb.network.Person
 
 interface Contract {
     interface MainModel {
-        fun fetchJson(currentPage: Int, searchedWord: String?, fetchedData: (String?) -> Unit)
-        fun fetchImage(path: String, fetchedImage: (Any?) -> Unit)
+        fun fetchJson(
+            currentPage: Int,
+            searchedWord: String?,
+            resultList: (ArrayList<Person>?) -> Unit
+        )
+
         fun saveImage(arr: Array<Any>)
     }
 

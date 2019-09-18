@@ -1,40 +1,43 @@
-package com.example.themoviedb.main
+package com.example.themoviedb.screens.main
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
-import com.example.themoviedb.persondetails.PersonDetailsView
-import com.example.themoviedb.pojos.Person
+import com.example.themoviedb.network.Person
+import com.example.themoviedb.screens.persondetails.PersonDetailsView
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.Serializable
 
 class MainView : AppCompatActivity(), Contract.MainView {
 
     private lateinit var presenter: MainPresenter
-    private lateinit var searchEditText: EditText
-    private lateinit var mRecyclerView: RecyclerView
-    private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
+
     private var searchFlag: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        presenter = MainPresenter(this, MainModel())
+        presenter = MainPresenter(
+            this,
+            MainModel()
+        )
 
-        mRecyclerView = this.rv_popular_popular!!
+        val mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainView)
             adapter = PopularPeopleAdapter(presenter.resultList)
@@ -42,13 +45,13 @@ class MainView : AppCompatActivity(), Contract.MainView {
             setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
         }
 
-        mSwipeRefreshLayout = this@MainView.srl
+        val mSwipeRefreshLayout = this@MainView.srl
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
             presenter.layoutOnRefreshed()
         }
 
-        searchEditText = findViewById(R.id.searchEditText)
+        val searchEditText = findViewById<EditText>(R.id.searchEditText)
         val searchButton = findViewById<Button>(R.id.searchBtn)
         searchButton.setOnClickListener {
             presenter.searchOnClicked()
@@ -63,39 +66,39 @@ class MainView : AppCompatActivity(), Contract.MainView {
     }
 
     override fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int) {
-        this.mRecyclerView.adapter?.notifyItemRangeInserted(start, itemCount)
+        rv_popular_popular.adapter?.notifyItemRangeInserted(start, itemCount)
     }
 
     override fun notifyItemRemovedFromRecyclerView(index: Int) {
-        this.mRecyclerView.adapter?.notifyItemRemoved(index)
+        rv_popular_popular.adapter?.notifyItemRemoved(index)
     }
 
     override fun notifyItemRangeChangedInRecyclerView(itemCount: Int) {
-        this.mRecyclerView.adapter?.notifyItemRangeChanged(
-            this.mRecyclerView.adapter!!.itemCount,
+        rv_popular_popular.adapter?.notifyItemRangeChanged(
+            rv_popular_popular.adapter!!.itemCount,
             itemCount
         )
     }
 
     override fun removeRefreshingIcon() {
-        if (mSwipeRefreshLayout.isRefreshing) {
-            mSwipeRefreshLayout.isRefreshing = false
+        if (srl.isRefreshing) {
+            srl.isRefreshing = false
         }
     }
 
     override fun navigateToPersonDetailsActivity(person: Person) {
         val intent = Intent(applicationContext, PersonDetailsView::class.java)
-        intent.putExtra("profile_id", person.id)
+        intent.putExtra("profile_id", person.id.toString())
         intent.putExtra("person_name", person.name)
-        intent.putExtra("known_for", person.known_for)
-        intent.putExtra("known_for_department", person.known_for_department)
-        intent.putExtra("popularity", person.popularity)
+        intent.putExtra("known_for", person.knownFor as Serializable)
+        intent.putExtra("known_for_department", person.knownForDepartment)
+        intent.putExtra("popularity", person.popularity.toString())
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         applicationContext.startActivity(intent)
     }
 
     override fun instantiateNewAdapter() {
-        mRecyclerView.adapter = PopularPeopleAdapter(presenter.resultList)
+        rv_popular_popular.adapter = PopularPeopleAdapter(presenter.resultList)
     }
 
     override fun setSearchFlag(b: Boolean) {
@@ -123,7 +126,7 @@ class MainView : AppCompatActivity(), Contract.MainView {
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
     }
 
-    inner class PopularPeopleAdapter(private var list: List<Person?>) :
+    inner class PopularPeopleAdapter(private var list: ArrayList<Person?>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val viewItem = 1
@@ -157,8 +160,10 @@ class MainView : AppCompatActivity(), Contract.MainView {
                 holder.bind(person!!)
                 holder.itemView.setOnClickListener {
                     val bitmap =
-                        (holder.itemView.findViewById<ImageView>(R.id.iv_profile).drawable as BitmapDrawable).bitmap
-                    presenter.itemViewOnClick(arrayOf(applicationContext, bitmap), person)
+                        (holder.itemView.findViewById<ImageView>(R.id.iv_profile).drawable as? BitmapDrawable)?.bitmap
+                    if (bitmap != null) { //To avoid clicking while bitmap is not loaded yet
+                        presenter.itemViewOnClick(arrayOf(applicationContext, bitmap), person)
+                    }
                 }
             } else {
                 (holder as ProgressViewHolder).progressBar.isIndeterminate = true
@@ -183,15 +188,23 @@ class MainView : AppCompatActivity(), Contract.MainView {
 
             fun bind(person: Person) {
                 mNameView?.text = person.name
-                mKnownForDepartmentView?.text = person.known_for_department
-                presenter.loadImage(person.profile_path) {
-                    mProgressBar.visibility = View.GONE
-                    if (it != null) {
-                        mProfilePicture?.setImageBitmap(it as Bitmap)
-                    } else
-                        mProfilePicture?.setImageResource(R.drawable.no_image)
+                mKnownForDepartmentView?.text = person.knownForDepartment
+                Picasso.get()
+                    .load("https://image.tmdb.org/t/p/w300/" + person.profilePath)
+                    .into(mProfilePicture, object : Callback {
+                        override fun onSuccess() {
+                            mProgressBar.visibility = View.GONE
+                        }
 
-                }
+                        override fun onError(e: Exception?) {
+                            mProfilePicture?.setImageBitmap(
+                                BitmapFactory.decodeResource(
+                                    applicationContext.resources,
+                                    R.drawable.no_image
+                                )
+                            )
+                        }
+                    })
             }
         }
 

@@ -1,4 +1,4 @@
-package com.example.themoviedb.image
+package com.example.themoviedb.screens.image
 
 class ImagePresenter(
     private val view: Contract.ImageActivityView,

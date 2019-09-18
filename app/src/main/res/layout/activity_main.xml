@@ -3,7 +3,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.themoviedb.main.MainView"
+        tools:context="com.example.themoviedb.screens.main.MainView"
         android:orientation="vertical"
         android:padding="10dp">
 
@@ -44,13 +44,13 @@
 
 
     </LinearLayout>
-    <android.support.v4.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/srl"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical" >
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_popular_popular"
                 tools:listitem="@layout/row_layout"
                 android:layout_width="match_parent"
@@ -58,5 +58,5 @@
                 android:layout_margin="16dp"
                 android:layout_marginTop="16dp"/>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </LinearLayout>
