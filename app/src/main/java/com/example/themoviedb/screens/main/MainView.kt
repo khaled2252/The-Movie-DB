@@ -1,4 +1,4 @@
-package com.example.themoviedb.main
+package com.example.themoviedb.screens.main
 
 import android.content.Context
 import android.content.Intent
@@ -6,23 +6,21 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import com.example.themoviedb.Person
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
-import com.example.themoviedb.RetrofitService.Companion.PROFILE_IMAGE
-import com.example.themoviedb.persondetails.PersonDetailsView
+import com.example.themoviedb.network.Person
+import com.example.themoviedb.screens.persondetails.PersonDetailsView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
-import java.lang.Exception
 
 class MainView : AppCompatActivity(), Contract.MainView {
 
@@ -34,7 +32,10 @@ class MainView : AppCompatActivity(), Contract.MainView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        presenter = MainPresenter(this, MainModel())
+        presenter = MainPresenter(
+            this,
+            MainModel()
+        )
 
         val mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
@@ -74,7 +75,7 @@ class MainView : AppCompatActivity(), Contract.MainView {
 
     override fun notifyItemRangeChangedInRecyclerView(itemCount: Int) {
         rv_popular_popular.adapter?.notifyItemRangeChanged(
-        rv_popular_popular.adapter!!.itemCount,
+            rv_popular_popular.adapter!!.itemCount,
             itemCount
         )
     }
@@ -187,16 +188,19 @@ class MainView : AppCompatActivity(), Contract.MainView {
                 mNameView?.text = person.name
                 mKnownForDepartmentView?.text = person.knownForDepartment
                 Picasso.get()
-                    .load(PROFILE_IMAGE+person.profilePath)
-                    .into(mProfilePicture,object :Callback{
+                    .load("https://image.tmdb.org/t/p/w300/" + person.profilePath)
+                    .into(mProfilePicture, object : Callback {
                         override fun onSuccess() {
-                            mProgressBar.visibility=View.GONE
+                            mProgressBar.visibility = View.GONE
                         }
 
                         override fun onError(e: Exception?) {
                             mProfilePicture?.setImageBitmap(
-                                BitmapFactory.decodeResource(applicationContext.resources,
-                                R.drawable.no_image))
+                                BitmapFactory.decodeResource(
+                                    applicationContext.resources,
+                                    R.drawable.no_image
+                                )
+                            )
                         }
                     })
             }

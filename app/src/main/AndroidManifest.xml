@@ -12,12 +12,12 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".image.ImageActivity"></activity>
+        <activity android:name=".screens.image.ImageActivityView"></activity>
         <activity
-                android:name=".persondetails.PersonDetailsView"
+                android:name=".screens.persondetails.PersonDetailsView"
                 android:label="@string/title_activity_person_details"
                 android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".main.MainView">
+        <activity android:name=".screens.main.MainView">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

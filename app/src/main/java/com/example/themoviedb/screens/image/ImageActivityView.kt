@@ -1,19 +1,20 @@
-package com.example.themoviedb.image
+package com.example.themoviedb.screens.image
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.themoviedb.R
 import kotlinx.android.synthetic.main.activity_image.*
 
 
-class ImageActivity : AppCompatActivity(), Contract.ImageActivityView {
+class ImageActivityView : AppCompatActivity(),
+    Contract.ImageActivityView {
 
     private lateinit var presenter: ImagePresenter
 
@@ -21,10 +22,13 @@ class ImageActivity : AppCompatActivity(), Contract.ImageActivityView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image)
 
-        presenter = ImagePresenter(this, ImageModel())
+        presenter = ImagePresenter(
+            this,
+            ImageModel()
+        )
 
         this.btn_saveToGallery.setOnClickListener {
-            val builder = AlertDialog.Builder(this@ImageActivity)
+            val builder = AlertDialog.Builder(this@ImageActivityView)
             builder.setTitle("Download image")
             builder.setMessage("Do you want to save image to gallery?")
             builder.setPositiveButton("YES") { _, _ ->

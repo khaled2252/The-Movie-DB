@@ -1,31 +1,30 @@
-package com.example.themoviedb.persondetails
+package com.example.themoviedb.screens.persondetails
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
-import com.example.themoviedb.KnownFor
-import com.example.themoviedb.Profile
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
-import com.example.themoviedb.RetrofitService
-import com.example.themoviedb.image.ImageActivity
+import com.example.themoviedb.network.KnownFor
+import com.example.themoviedb.network.Profile
+import com.example.themoviedb.screens.image.ImageActivityView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_person_details.*
-import java.lang.Exception
 
 
-class PersonDetailsView : AppCompatActivity(), Contract.PersonDetailsView {
+class PersonDetailsView : AppCompatActivity(),
+    Contract.PersonDetailsView {
+
     private lateinit var presenter: PersonDetailsPresenter
     private lateinit var profileId: String
 
@@ -33,9 +32,12 @@ class PersonDetailsView : AppCompatActivity(), Contract.PersonDetailsView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_person_details)
 
-        presenter = PersonDetailsPresenter(this, PersonDetailsModel())
+        presenter = PersonDetailsPresenter(
+            this,
+            PersonDetailsModel()
+        )
 
-       val mRecyclerView = this.rv_pictures
+        val mRecyclerView = this.rv_pictures
         mRecyclerView.apply {
             layoutManager =
                 GridLayoutManager(this@PersonDetailsView, 3)
@@ -96,7 +98,7 @@ class PersonDetailsView : AppCompatActivity(), Contract.PersonDetailsView {
     }
 
     override fun navigateToImageActivity() {
-        val intent = Intent(applicationContext, ImageActivity::class.java)
+        val intent = Intent(applicationContext, ImageActivityView::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         applicationContext.startActivity(intent)
     }
@@ -114,6 +116,10 @@ class PersonDetailsView : AppCompatActivity(), Contract.PersonDetailsView {
             rv_pictures.adapter!!.itemCount,
             itemCount
         )
+    }
+
+    override fun showPersonInfo() {
+        tv_knownFor.visibility = View.VISIBLE
     }
 
     inner class PopularPersonAdapter(private val list: List<Profile?>) :
@@ -144,16 +150,19 @@ class PersonDetailsView : AppCompatActivity(), Contract.PersonDetailsView {
             private val mProgressBar: ProgressBar = mView.findViewById(R.id.progressBar)
             fun bind(personImages: Profile) {
                 Picasso.get()
-                    .load(RetrofitService.PROFILE_IMAGE +personImages.filePath)
-                    .into(mImageView,object : Callback {
+                    .load("https://image.tmdb.org/t/p/w300/" + personImages.filePath)
+                    .into(mImageView, object : Callback {
                         override fun onSuccess() {
-                            mProgressBar.visibility=View.GONE
+                            mProgressBar.visibility = View.GONE
                         }
 
                         override fun onError(e: Exception?) {
                             mImageView.setImageBitmap(
-                                BitmapFactory.decodeResource(applicationContext.resources,
-                                    R.drawable.no_image))
+                                BitmapFactory.decodeResource(
+                                    applicationContext.resources,
+                                    R.drawable.no_image
+                                )
+                            )
                         }
                     })
             }

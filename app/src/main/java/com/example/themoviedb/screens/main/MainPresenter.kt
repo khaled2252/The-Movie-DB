@@ -1,6 +1,6 @@
-package com.example.themoviedb.main
+package com.example.themoviedb.screens.main
 
-import com.example.themoviedb.Person
+import com.example.themoviedb.network.Person
 
 
 class MainPresenter(private val view: Contract.MainView, private val model: Contract.MainModel) {
@@ -12,13 +12,12 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
     private fun loadData(isDataFetched: (Boolean) -> Unit) {
         isLoading = true
         if (view.getSearchFlag()) {
-            model.fetchJson(currentPage,view.getSearchText()){model.fetchJson(currentPage,null){
+            model.fetchJson(currentPage, view.getSearchText()) {
                 onDataFetched(it)
                 isDataFetched(true)
             }
-            }
         } else {
-            model.fetchJson(currentPage,null){
+            model.fetchJson(currentPage, null) {
                 onDataFetched(it)
                 isDataFetched(true)
             }

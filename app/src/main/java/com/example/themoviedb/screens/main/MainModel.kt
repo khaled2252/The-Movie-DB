@@ -1,18 +1,16 @@
-package com.example.themoviedb.main
+package com.example.themoviedb.screens.main
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import com.example.themoviedb.Person
-import com.example.themoviedb.PopularPeopleResponse
-import com.example.themoviedb.RetrofitService
-import com.example.themoviedb.RetrofitService.Companion.API_KEY
-import com.example.themoviedb.RetrofitService.Companion.BASE_URL
+import com.example.themoviedb.network.Person
+import com.example.themoviedb.network.PopularPeopleResponse
+import com.example.themoviedb.network.RetrofitClient
+import com.example.themoviedb.network.RetrofitClient.Companion.API_KEY
+import com.example.themoviedb.network.RetrofitClient.Companion.BASE_URL
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
@@ -20,28 +18,29 @@ import java.io.IOException
 
 class MainModel : Contract.MainModel {
 
-    override fun fetchJson(currentPage: Int, searchedWord: String?, resultList: (ArrayList<Person>?)->Unit){
-        val retrofit=Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val service = retrofit.create(RetrofitService::class.java)
+    override fun fetchJson(
+        currentPage: Int,
+        searchedWord: String?,
+        resultList: (ArrayList<Person>?) -> Unit
+    ) {
 
-        val call : Call<PopularPeopleResponse> = if (searchedWord == null) {
-            service.getPopularPeople(API_KEY,currentPage.toString())
+        val apiService = RetrofitClient.getApiService(BASE_URL)
+
+        val call: Call<PopularPeopleResponse> = if (searchedWord == null) {
+            apiService.getPopularPeople(API_KEY, currentPage.toString())
         } else
-            service.getPopularPeopleSearh(API_KEY,currentPage.toString(),searchedWord)
+            apiService.getPopularPeopleSearch(API_KEY, currentPage.toString(), searchedWord)
 
         call.enqueue(object : Callback<PopularPeopleResponse> {
             override fun onFailure(call: Call<PopularPeopleResponse>, t: Throwable) {
-                Log.e("Response","Failed to get response")
+                Log.e("Response", "Failed to get response")
             }
 
             override fun onResponse(
                 call: Call<PopularPeopleResponse>,
                 response: Response<PopularPeopleResponse>
             ) {
-                Log.i("Response",response.toString())
+                Log.i("Response", response.toString())
                 resultList(response.body()?.results)
             }
         })

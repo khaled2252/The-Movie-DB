@@ -1,28 +1,8 @@
-package com.example.themoviedb
+package com.example.themoviedb.network
 
 import com.google.gson.annotations.SerializedName
-import retrofit2.Call
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
 import java.io.Serializable
 
-interface RetrofitService {
-    @GET("/3/person/popular?")
-    fun getPopularPeople(@Query("api_key") apiKey: String, @Query("page") page: String): Call<PopularPeopleResponse>
-
-    @GET("/3/person/popular?")
-    fun getPopularPeopleSearh(@Query("api_key") apiKey: String, @Query("page") page: String, @Query("query")searchedWord: String?): Call<PopularPeopleResponse>
-
-    @GET("/3/person/{profile_id}/images?")
-    fun getPopularPersonProfiles(@Path("profile_id")profileId : String,@Query("api_key") apiKey: String): Call<PersonProfilesResponse>
-
-    companion object {
-        const val BASE_URL = "https://api.themoviedb.org"
-        const val API_KEY = "3e68c56cf7097768305e38273efd342c"
-        const val PROFILE_IMAGE = "https://image.tmdb.org/t/p/w300/"
-    }
-}
 data class PopularPeopleResponse(
     @SerializedName("page")
     val page: Int,
@@ -33,6 +13,7 @@ data class PopularPeopleResponse(
     @SerializedName("total_results")
     val totalResults: Int
 )
+
 data class Person(
     @SerializedName("adult")
     val adult: Boolean,
@@ -81,7 +62,7 @@ data class KnownFor(
     val voteAverage: Double,
     @SerializedName("vote_count")
     val voteCount: Int
-): Serializable
+) : Serializable
 
 data class PersonProfilesResponse(
     @SerializedName("id")

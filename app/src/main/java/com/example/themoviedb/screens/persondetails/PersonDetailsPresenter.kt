@@ -1,6 +1,6 @@
-package com.example.themoviedb.persondetails
+package com.example.themoviedb.screens.persondetails
 
-import com.example.themoviedb.Profile
+import com.example.themoviedb.network.Profile
 
 class PersonDetailsPresenter(
     private val view: Contract.PersonDetailsView,
@@ -14,6 +14,7 @@ class PersonDetailsPresenter(
             isDataFetched(true)
             resultList.addAll(it!!)
             view.notifyItemRangeChangedInRecyclerView(it.size)
+            view.showPersonInfo()
         }
     }
 

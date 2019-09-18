@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".persondetails.PersonDetailsView">
+        tools:context=".screens.persondetails.PersonDetailsView">
 
     <ScrollView
             android:layout_width="match_parent"
@@ -48,6 +48,14 @@
                     tools:layout_editor_absoluteX="27dp"
                     tools:layout_editor_absoluteY="184dp" />
 
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_pictures"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/iv_profileImage"
+                    tools:layout_editor_absoluteX="172dp"
+                    />
             <TextView
                     android:id="@+id/tv_knownFor"
                     android:layout_width="match_parent"
@@ -57,14 +65,9 @@
                     android:paddingRight="30dp"
                     android:paddingBottom="30dp"
                     android:text="TextView"
+                    android:visibility="invisible"
                     android:textSize="20sp" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_pictures"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@+id/iv_profileImage"
-                    tools:layout_editor_absoluteX="172dp" />
         </LinearLayout>
     </ScrollView>
 </androidx.appcompat.widget.LinearLayoutCompat>

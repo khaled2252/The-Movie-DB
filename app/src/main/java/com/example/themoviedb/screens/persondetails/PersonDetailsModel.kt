@@ -1,43 +1,38 @@
-package com.example.themoviedb.persondetails
+package com.example.themoviedb.screens.persondetails
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import com.example.themoviedb.PersonProfilesResponse
-import com.example.themoviedb.Profile
-import com.example.themoviedb.RetrofitService
-import com.example.themoviedb.RetrofitService.Companion.API_KEY
-import com.example.themoviedb.RetrofitService.Companion.BASE_URL
+import com.example.themoviedb.network.PersonProfilesResponse
+import com.example.themoviedb.network.Profile
+import com.example.themoviedb.network.RetrofitClient
+import com.example.themoviedb.network.RetrofitClient.Companion.API_KEY
+import com.example.themoviedb.network.RetrofitClient.Companion.BASE_URL
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
-class PersonDetailsModel : Contract.PersonDetailsModel {
-    override fun fetchJson(profileId : String, resultList: (ArrayList<Profile>?)->Unit){
-        val retrofit= Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val service = retrofit.create(RetrofitService::class.java)
+class PersonDetailsModel :
+    Contract.PersonDetailsModel {
+    override fun fetchJson(profileId: String, resultList: (ArrayList<Profile>?) -> Unit) {
+        val apiService = RetrofitClient.getApiService(BASE_URL)
 
-        val call : Call<PersonProfilesResponse> =
-            service.getPopularPersonProfiles(profileId,API_KEY)
+        val call: Call<PersonProfilesResponse> =
+            apiService.getPopularPersonProfiles(profileId, API_KEY)
 
         call.enqueue(object : Callback<PersonProfilesResponse> {
             override fun onFailure(call: Call<PersonProfilesResponse>, t: Throwable) {
-                Log.e("Response","Failed to get response")
+                Log.e("Response", "Failed to get response")
             }
 
             override fun onResponse(
                 call: Call<PersonProfilesResponse>,
                 response: Response<PersonProfilesResponse>
             ) {
-                Log.i("Response",response.toString())
+                Log.i("Response", response.toString())
                 resultList(response.body()?.profiles)
             }
         })
