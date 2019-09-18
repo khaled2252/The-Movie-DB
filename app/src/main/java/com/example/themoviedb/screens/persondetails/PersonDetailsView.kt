@@ -139,8 +139,10 @@ class PersonDetailsView : AppCompatActivity(),
             holder.bind(personImages!!)
             holder.itemView.setOnClickListener {
                 val bitmap =
-                    (holder.itemView.findViewById<ImageView>(R.id.iv_image).drawable as BitmapDrawable).bitmap
-                presenter.itemViewOnClick(arrayOf(holder.itemView.context, bitmap))
+                    (holder.itemView.findViewById<ImageView>(R.id.iv_image).drawable as? BitmapDrawable)?.bitmap
+                if (bitmap != null) { //To avoid clicking while bitmap is not loaded yet
+                    presenter.itemViewOnClick(arrayOf(holder.itemView.context, bitmap))
+                }
 
             }
         }
