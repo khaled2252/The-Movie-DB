@@ -15,7 +15,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 
-class MainModel : Contract.MainModel {
+open class MainModel : Contract.MainModel {
 
     override fun fetchJson(
         currentPage: Int,

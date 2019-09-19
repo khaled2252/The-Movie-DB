@@ -9,7 +9,7 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
 
     internal var resultList = ArrayList<Person?>()
 
-     fun loadData(isDataFetched: (Boolean) -> Unit) {
+    private fun loadData(isDataFetched: (Boolean) -> Unit) {
         isLoading = true
         if (view.getSearchFlag()) {
             model.fetchJson(currentPage, view.getSearchText()) {
