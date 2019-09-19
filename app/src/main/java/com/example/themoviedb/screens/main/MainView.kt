@@ -51,10 +51,10 @@ class MainView : AppCompatActivity(), Contract.MainView {
             presenter.layoutOnRefreshed()
         }
 
-        val searchEditText = findViewById<EditText>(R.id.searchEditText)
         val searchButton = findViewById<Button>(R.id.searchBtn)
         searchButton.setOnClickListener {
-            presenter.searchOnClicked()
+            val query = searchEditText.text.toString()
+            presenter.searchOnClicked(query)
         }
 
         val finishSearchBtn = findViewById<Button>(R.id.finishSearchBtn)

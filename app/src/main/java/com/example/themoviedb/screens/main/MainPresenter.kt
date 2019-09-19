@@ -9,7 +9,7 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
 
     internal var resultList = ArrayList<Person?>()
 
-    private fun loadData(isDataFetched: (Boolean) -> Unit) {
+     fun loadData(isDataFetched: (Boolean) -> Unit) {
         isLoading = true
         if (view.getSearchFlag()) {
             model.fetchJson(currentPage, view.getSearchText()) {
@@ -84,8 +84,8 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
         }
     }
 
-    fun searchOnClicked() {
-        if (view.getSearchText().trim().isNotEmpty()) {
+    fun searchOnClicked(query:String) {
+        if (query.trim().isNotEmpty()) {
             view.setSearchFlag(true)
             view.hideKeyBoard()
             view.clearEditTextFocus()
