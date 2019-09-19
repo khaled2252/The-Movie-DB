@@ -3,11 +3,10 @@ package com.example.themoviedb.screens.main
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import com.example.themoviedb.network.Api
+import com.example.themoviedb.network.Api.Factory.API_KEY
 import com.example.themoviedb.network.Person
 import com.example.themoviedb.network.PopularPeopleResponse
-import com.example.themoviedb.network.RetrofitClient
-import com.example.themoviedb.network.RetrofitClient.Companion.API_KEY
-import com.example.themoviedb.network.RetrofitClient.Companion.BASE_URL
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -23,9 +22,7 @@ class MainModel : Contract.MainModel {
         searchedWord: String?,
         resultList: (ArrayList<Person>?) -> Unit
     ) {
-
-        val apiService = RetrofitClient.getApiService(BASE_URL)
-
+        val apiService = Api.create()
         val call: Call<PopularPeopleResponse> = if (searchedWord == null) {
             apiService.getPopularPeople(API_KEY, currentPage.toString())
         } else
