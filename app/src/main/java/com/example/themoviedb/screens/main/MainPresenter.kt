@@ -2,24 +2,22 @@ package com.example.themoviedb.screens.main
 
 import com.example.themoviedb.network.Person
 
-
 class MainPresenter(private val view: Contract.MainView, private val model: Contract.MainModel) {
     private var isLoading = false
     private var currentPage = 1
 
     internal var resultList = ArrayList<Person?>()
 
-    private fun loadData(isDataFetched: (Boolean) -> Unit) {
+    private fun loadData(vararg query: String, @Suppress("UNUSED_PARAMETER") callBack: (Unit) -> Unit) {//TODO Make callback fn without having to give it a name
+
         isLoading = true
-        if (view.getSearchFlag()) {
-            model.fetchJson(currentPage, view.getSearchText()) {
+        if (query.isEmpty())
+            model.fetchJson(currentPage,null) {
                 onDataFetched(it)
-                isDataFetched(true)
             }
-        } else {
-            model.fetchJson(currentPage, null) {
+        else {
+            model.fetchJson(currentPage, query[0]) {
                 onDataFetched(it)
-                isDataFetched(true)
             }
         }
     }
@@ -84,14 +82,14 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
         }
     }
 
-    fun searchOnClicked(query:String) {
+    fun searchOnClicked(query: String) {
         if (query.trim().isNotEmpty()) {
             view.setSearchFlag(true)
             view.hideKeyBoard()
             view.clearEditTextFocus()
 
             clearData()
-            loadData {
+            loadData(query) {
                 isLoading = false
             }
 

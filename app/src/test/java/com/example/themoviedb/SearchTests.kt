@@ -28,7 +28,7 @@ class SearchTests {
     }
 
     @Test
-    fun search_with_empty_string_callsSetSearchFlag() {
+    fun search_with_empty_string_never_callsSetSearchFlag() {
         presenter.searchOnClicked("")
         verify(view, never()).setSearchFlag(any())
     }
