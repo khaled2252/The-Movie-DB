@@ -2,22 +2,24 @@ package com.example.themoviedb.screens.main
 
 import com.example.themoviedb.network.Person
 
+
 class MainPresenter(private val view: Contract.MainView, private val model: Contract.MainModel) {
     private var isLoading = false
     private var currentPage = 1
 
     internal var resultList = ArrayList<Person?>()
 
-    private fun loadData(vararg query: String, @Suppress("UNUSED_PARAMETER") callBack: (Unit) -> Unit) {//TODO Make callback fn without having to give it a name
-
+    private fun loadData(vararg query: String, isDataFetched: (Boolean) -> Unit) {
         isLoading = true
-        if (query.isEmpty())
-            model.fetchJson(currentPage,null) {
-                onDataFetched(it)
-            }
-        else {
+        if (query.isNotEmpty())
             model.fetchJson(currentPage, query[0]) {
                 onDataFetched(it)
+                isDataFetched(true)
+            }
+        else {
+            model.fetchJson(currentPage, null) {
+                onDataFetched(it)
+                isDataFetched(true)
             }
         }
     }
@@ -50,7 +52,8 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
         view.clearEditTextFocus()
 
         loadData {
-            isLoading = false
+            if (it)
+                isLoading = false
         }
     }
 
@@ -69,8 +72,10 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
                 addProgressBar()
 
             loadData {
-                isLoading = false
-                removeProgressBar()
+                if (it) {
+                    isLoading = false
+                    removeProgressBar()
+                }
             }
         }
     }
@@ -78,7 +83,8 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
     fun layoutOnRefreshed() {
         clearData()
         loadData {
-            view.removeRefreshingIcon()
+            if (it)
+                view.removeRefreshingIcon()
         }
     }
 
@@ -90,7 +96,8 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
 
             clearData()
             loadData(query) {
-                isLoading = false
+                if (it)
+                    isLoading = false
             }
 
         }
@@ -104,7 +111,8 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
             view.setSearchFlag(false)
             clearData()
             loadData {
-                isLoading = false
+                if (it)
+                    isLoading = false
             }
         }
     }

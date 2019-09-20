@@ -5,12 +5,12 @@ import com.example.themoviedb.network.Person
 import com.example.themoviedb.screens.main.Contract
 import com.example.themoviedb.screens.main.MainPresenter
 import com.nhaarman.mockito_kotlin.*
-import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.verify
 import org.junit.Before
 import org.junit.Test
-import org.mockito.*
+import org.mockito.ArgumentMatchers
+import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.mockito.MockitoAnnotations
 
 
 class SearchResultsTests {
