@@ -48,7 +48,8 @@ open class MainView : AppCompatActivity(), Contract.MainView {
         val mSwipeRefreshLayout = this@MainView.srl
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
-            presenter.layoutOnRefreshed()
+            val query = searchEditText.text.toString()
+            presenter.layoutOnRefreshed(query)
         }
 
         val searchButton = findViewById<Button>(R.id.searchBtn)
