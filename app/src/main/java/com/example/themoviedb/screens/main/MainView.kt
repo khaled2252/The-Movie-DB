@@ -22,7 +22,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
 
-open class MainView : AppCompatActivity(), Contract.MainView {
+ class MainView : AppCompatActivity(), Contract.MainView {
 
     private lateinit var presenter: MainPresenter
 
