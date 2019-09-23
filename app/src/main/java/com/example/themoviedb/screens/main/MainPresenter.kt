@@ -5,7 +5,7 @@ import com.example.themoviedb.network.Person
 
 class MainPresenter(private val view: Contract.MainView, private val model: Contract.MainModel) {
     private var isLoading = false
-    private var currentPage = 1
+     var currentPage = 1
 
     internal var resultList = ArrayList<Person?>()
 
@@ -34,7 +34,7 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
     private fun clearData() {
         currentPage = 1
         resultList.clear()
-        view.instantiateNewAdapter() //To remove cached and unrecycled itemViews
+        view.instantiateNewAdapter() //To remove cached and un-recycled itemViews
     }
 
     private fun removeProgressBar() {
