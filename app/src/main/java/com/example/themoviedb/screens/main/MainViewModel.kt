@@ -1,15 +1,18 @@
 package com.example.themoviedb.screens.main
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.example.themoviedb.network.Person
 
 
-class MainPresenter(private val view: Contract.MainView, private val model: Contract.MainModel) {
+class MainViewModel(private val model: Contract.MainModel): ViewModel() {
     private var isLoading = false
     var currentPage = 1
 
-    internal var resultList = ArrayList<Person?>()
+    internal var resultList = MutableLiveData<ArrayList<Person?>>()
 
-    private fun loadData(vararg query: String, dataLoaded: () -> Unit) {
+    fun loadData(vararg query: String, dataLoaded: () -> Unit): LiveData<ArrayList<Person>> {
         isLoading = true
         if (query.isNotEmpty())
             model.fetchJson(currentPage, query[0]) {
@@ -26,36 +29,35 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
 
     private fun onDataFetched(it: ArrayList<Person>?) {
         isLoading = false
-        resultList.addAll(it!!)
-        view.notifyItemRangeChangedInRecyclerView(it.size)
+        resultList.value?.addAll(it!!)
+        ////view.notifyItemRangeChangedInRecyclerView(it.size)
     }
-
-
+    
     private fun clearData() {
         currentPage = 1
-        resultList.clear()
-        view.instantiateNewAdapter() //To remove cached and un-recycled itemViews
+        resultList.value?.clear()
+        ////view.instantiateNewAdapter() //To remove cached and un-recycled itemViews
     }
 
     private fun removeProgressBar() {
-        resultList.remove(null)
-        view.notifyItemRemovedFromRecyclerView(resultList.size)
+        resultList.value?.remove(null)
+        //view.notifyItemRemovedFromRecyclerView(resultList.value?.size)
     }
 
     fun addProgressBar() {
         //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
-        resultList.add(null)
-        view.notifyItemRangeInsertedFromRecyclerView(resultList.size, 1)
+        resultList.value?.add(null)
+        //view.notifyItemRangeInsertedFromRecyclerView(resultList.value?.size, 1)
     }
 
     fun viewOnCreated() {
-        view.clearEditTextFocus()
+        //view.clearEditTextFocus()
         loadData {}
     }
 
     fun itemViewOnClick(arr: Array<Any>, person: Person) {
         model.saveImage(arr)
-        view.navigateToPersonDetailsActivity(person)
+        //view.navigateToPersonDetailsActivity(person)
     }
 
     fun recyclerViewOnScrolled(pos: Int, numItems: Int) {
@@ -63,7 +65,7 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
             isLoading = true
             currentPage++
 
-            if (resultList.size != 0) //Avoid adding progress bar when the list is empty i.e when using search after clearing data
+            if (resultList.value?.size != 0) //Avoid adding progress bar when the list is empty i.e when using search after clearing data
                 addProgressBar()
 
             loadData {
@@ -80,19 +82,19 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
         clearData()
         if (query.trim().isNotEmpty()) {
             loadData(query) {
-                view.removeRefreshingIcon()
+                //view.removeRefreshingIcon()
             }
         } else
             loadData {
-                view.removeRefreshingIcon()
+                //view.removeRefreshingIcon()
             }
     }
 
     fun searchOnClicked(query: String) {
         if (query.trim().isNotEmpty()) {
-            view.setSearchFlag(true)
-            view.hideKeyBoard()
-            view.clearEditTextFocus()
+            //view.setSearchFlag(true)
+            //view.hideKeyBoard()
+            //view.clearEditTextFocus()
 
             clearData()
             loadData(query) {}
@@ -100,14 +102,14 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
     }
 
     fun finishSearchOnClicked() {
-        view.clearSearchText()
-        view.clearEditTextFocus()
-        view.hideKeyBoard()
-        if (view.getSearchFlag()) {
-            view.setSearchFlag(false)
-            clearData()
-            loadData {}
-        }
+        //view.clearSearchText()
+        //view.clearEditTextFocus()
+        //view.hideKeyBoard()
+        //if (view.getSearchFlag()) {
+        //view.setSearchFlag(false)
+        clearData()
+        loadData {}
+        // }
     }
 
 }

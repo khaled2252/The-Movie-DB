@@ -1,7 +1,7 @@
 package com.example.themoviedb
 
 import com.example.themoviedb.screens.main.Contract
-import com.example.themoviedb.screens.main.MainPresenter
+import com.example.themoviedb.screens.main.MainViewModel
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Before
 import org.junit.Test
@@ -10,7 +10,7 @@ import org.mockito.ArgumentMatchers.anyString
 
 
 class SearchTests {
-    private lateinit var presenter: MainPresenter
+    private lateinit var viewModel: MainViewModel
     private lateinit var view: Contract.MainView
     private lateinit var model: Contract.MainModel
 
@@ -18,7 +18,7 @@ class SearchTests {
     fun setup() {
         view = mock()
         model = mock()
-        presenter = MainPresenter(view, model)
+        viewModel = MainViewModel(view, model)
     }
 
     @Test
@@ -28,7 +28,7 @@ class SearchTests {
         val query = "jason"
 
         //when
-        presenter.searchOnClicked(query)
+        viewModel.searchOnClicked(query)
 
         //then
         verify(model).fetchJson(
@@ -44,7 +44,7 @@ class SearchTests {
         val query = ""
 
         //when
-        presenter.searchOnClicked(query)
+        viewModel.searchOnClicked(query)
 
         //then
         verify(model, never()).fetchJson(

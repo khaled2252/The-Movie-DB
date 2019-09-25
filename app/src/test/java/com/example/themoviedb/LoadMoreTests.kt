@@ -1,9 +1,8 @@
 package com.example.themoviedb
 
-import com.example.themoviedb.network.KnownFor
 import com.example.themoviedb.network.Person
 import com.example.themoviedb.screens.main.Contract
-import com.example.themoviedb.screens.main.MainPresenter
+import com.example.themoviedb.screens.main.MainViewModel
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -11,7 +10,7 @@ import org.junit.Test
 
 
 class LoadMoreTests {
-    private lateinit var presenter: MainPresenter
+    private lateinit var viewModel: MainViewModel
     private lateinit var view: Contract.MainView
     private lateinit var model: Contract.MainModel
 
@@ -19,15 +18,15 @@ class LoadMoreTests {
     fun setupWithSpy() {
         view = mock()
         model = mock()
-        presenter = spy(MainPresenter(view, model))
+        viewModel = spy(MainViewModel(view, model))
     }
 
     @Test
     fun scrolling_at_end_of_page_incrementsCurrentPage() {
         val currentPage = 1
-        presenter.recyclerViewOnScrolled(any(), any())
+        viewModel.recyclerViewOnScrolled(any(), any())
 
-        whenever(presenter.reachedEndOfScreen(any(), any())).thenReturn(true)
+        whenever(viewModel.reachedEndOfScreen(any(), any())).thenReturn(true)
 
         assertEquals(2, currentPage + 1)
     }
@@ -37,9 +36,9 @@ class LoadMoreTests {
     fun scrolling_at_end_of_page_callsFetchJson_on_next_page() {
         val currentPage = 1
 
-        presenter.recyclerViewOnScrolled(any(), any())
+        viewModel.recyclerViewOnScrolled(any(), any())
 
-        whenever(presenter.reachedEndOfScreen(any(), any())).thenReturn(true)
+        whenever(viewModel.reachedEndOfScreen(any(), any())).thenReturn(true)
 
         verify(model).fetchJson(
             eq(currentPage + 1),
@@ -54,12 +53,12 @@ class LoadMoreTests {
         val arrayList = arrayOfNulls<Person>(20).let { arrayList ->
             ArrayList<Person?>(arrayList.size).apply { arrayList.forEach { add(it) } }
         }
-        presenter.resultList = arrayList
-        presenter.recyclerViewOnScrolled(any(), any())
+        viewModel.resultList = arrayList
+        viewModel.recyclerViewOnScrolled(any(), any())
 
-        whenever(presenter.reachedEndOfScreen(any(), any())).thenReturn(true)
+        whenever(viewModel.reachedEndOfScreen(any(), any())).thenReturn(true)
 
-        verify(presenter).addProgressBar()
+        verify(viewModel).addProgressBar()
     }
 /*
     //Not complete -> fetchJsonCallBack.firstValue gives outOfBounds Exception in debug
@@ -81,14 +80,14 @@ class LoadMoreTests {
             ))
         }
         val fetchJsonCallBack = argumentCaptor<(ArrayList<Person>?) -> Unit>()
-        presenter.resultList = arrayList
-        presenter.recyclerViewOnScrolled(any(), any())
+        viewModel.resultList = arrayList
+        viewModel.recyclerViewOnScrolled(any(), any())
 
-        whenever(presenter.reachedEndOfScreen(any(), any())).thenReturn(true)
+        whenever(viewModel.reachedEndOfScreen(any(), any())).thenReturn(true)
         whenever(model.fetchJson(any(), any(), fetchJsonCallBack.capture()))
             .then { fetchJsonCallBack.firstValue.invoke(responseArrayList) }
 
-        assertEquals(arrayList.size + 20, presenter.resultList.size)
+        assertEquals(arrayList.size + 20, viewModel.resultList.size)
     }
 */
 }

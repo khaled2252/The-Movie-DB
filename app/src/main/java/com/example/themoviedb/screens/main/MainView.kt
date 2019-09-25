@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
@@ -22,9 +24,9 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
 
- class MainView : AppCompatActivity(), Contract.MainView {
+class MainView : AppCompatActivity(), Contract.MainView {
 
-    private lateinit var presenter: MainPresenter
+    private lateinit var viewModel: MainViewModel
 
     private var searchFlag: Boolean = false
 
@@ -32,15 +34,17 @@ import java.io.Serializable
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        presenter = MainPresenter(
-            this,
+        viewModel = MainViewModel(
             MainModel()
         )
+        val model = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        subscribeUi(model)
+
 
         val mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainView)
-            adapter = PopularPeopleAdapter(presenter.resultList)
+            //adapter = PopularPeopleAdapter(viewModel.resultList)
             addOnScrollListener(RecyclerViewListener())
             setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
         }
@@ -49,23 +53,28 @@ import java.io.Serializable
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
             val query = searchEditText.text.toString()
-            presenter.layoutOnRefreshed(query)
+            viewModel.layoutOnRefreshed(query)
         }
 
         val searchButton = findViewById<Button>(R.id.searchBtn)
         searchButton.setOnClickListener {
             val query = searchEditText.text.toString()
-            presenter.searchOnClicked(query)
+            viewModel.searchOnClicked(query)
         }
 
         val finishSearchBtn = findViewById<Button>(R.id.finishSearchBtn)
         finishSearchBtn.setOnClickListener {
-            presenter.finishSearchOnClicked()
+            viewModel.finishSearchOnClicked()
         }
 
-        presenter.viewOnCreated()
+        viewModel.viewOnCreated()
     }
+    fun subscribeUi(viewModel: MainViewModel) {
+        viewModel.loadData{}.observe(this, Observer {
+            rv_popular_popular.adapter?.notifyDataSetChanged()
+        })
 
+    }
     override fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int) {
         rv_popular_popular.adapter?.notifyItemRangeInserted(start, itemCount)
     }
@@ -99,7 +108,7 @@ import java.io.Serializable
     }
 
     override fun instantiateNewAdapter() {
-        rv_popular_popular.adapter = PopularPeopleAdapter(presenter.resultList)
+        rv_popular_popular.adapter = PopularPeopleAdapter(viewModel.resultList)
     }
 
     override fun setSearchFlag(b: Boolean) {
@@ -163,7 +172,7 @@ import java.io.Serializable
                     val bitmap =
                         (holder.itemView.findViewById<ImageView>(R.id.iv_profile).drawable as? BitmapDrawable)?.bitmap
                     if (bitmap != null) { //To avoid clicking while bitmap is not loaded yet
-                        presenter.itemViewOnClick(arrayOf(applicationContext, bitmap), person)
+                        viewModel.itemViewOnClick(arrayOf(applicationContext, bitmap), person)
                     }
                 }
             } else {
@@ -221,7 +230,7 @@ import java.io.Serializable
             val pos =
                 (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
             val numItems = recyclerView.adapter?.itemCount!! - 1
-            presenter.recyclerViewOnScrolled(pos, numItems)
+            viewModel.recyclerViewOnScrolled(pos, numItems)
 
         }
     }
