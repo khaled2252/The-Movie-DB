@@ -3,11 +3,10 @@ package com.example.themoviedb.screens.persondetails
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import com.example.themoviedb.network.Api
+import com.example.themoviedb.network.Api.Factory.API_KEY
 import com.example.themoviedb.network.PersonProfilesResponse
 import com.example.themoviedb.network.Profile
-import com.example.themoviedb.network.RetrofitClient
-import com.example.themoviedb.network.RetrofitClient.Companion.API_KEY
-import com.example.themoviedb.network.RetrofitClient.Companion.BASE_URL
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,8 +17,7 @@ import java.io.IOException
 class PersonDetailsModel :
     Contract.PersonDetailsModel {
     override fun fetchJson(profileId: String, resultList: (ArrayList<Profile>?) -> Unit) {
-        val apiService = RetrofitClient.getApiService(BASE_URL)
-
+        val apiService = Api.create()
         val call: Call<PersonProfilesResponse> =
             apiService.getPopularPersonProfiles(profileId, API_KEY)
 

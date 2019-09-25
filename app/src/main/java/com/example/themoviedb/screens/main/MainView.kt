@@ -22,7 +22,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
 
-class MainView : AppCompatActivity(), Contract.MainView {
+ class MainView : AppCompatActivity(), Contract.MainView {
 
     private lateinit var presenter: MainPresenter
 
@@ -48,13 +48,14 @@ class MainView : AppCompatActivity(), Contract.MainView {
         val mSwipeRefreshLayout = this@MainView.srl
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
-            presenter.layoutOnRefreshed()
+            val query = searchEditText.text.toString()
+            presenter.layoutOnRefreshed(query)
         }
 
-        val searchEditText = findViewById<EditText>(R.id.searchEditText)
         val searchButton = findViewById<Button>(R.id.searchBtn)
         searchButton.setOnClickListener {
-            presenter.searchOnClicked()
+            val query = searchEditText.text.toString()
+            presenter.searchOnClicked(query)
         }
 
         val finishSearchBtn = findViewById<Button>(R.id.finishSearchBtn)

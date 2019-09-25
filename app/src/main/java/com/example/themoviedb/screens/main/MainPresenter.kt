@@ -5,21 +5,21 @@ import com.example.themoviedb.network.Person
 
 class MainPresenter(private val view: Contract.MainView, private val model: Contract.MainModel) {
     private var isLoading = false
-    private var currentPage = 1
+    var currentPage = 1
 
     internal var resultList = ArrayList<Person?>()
 
-    private fun loadData(isDataFetched: (Boolean) -> Unit) {
+    private fun loadData(vararg query: String, dataLoaded: () -> Unit) {
         isLoading = true
-        if (view.getSearchFlag()) {
-            model.fetchJson(currentPage, view.getSearchText()) {
+        if (query.isNotEmpty())
+            model.fetchJson(currentPage, query[0]) {
                 onDataFetched(it)
-                isDataFetched(true)
+                dataLoaded()
             }
-        } else {
+        else {
             model.fetchJson(currentPage, null) {
                 onDataFetched(it)
-                isDataFetched(true)
+                dataLoaded()
             }
         }
     }
@@ -34,7 +34,7 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
     private fun clearData() {
         currentPage = 1
         resultList.clear()
-        view.instantiateNewAdapter() //To remove cached and unrecycled itemViews
+        view.instantiateNewAdapter() //To remove cached and un-recycled itemViews
     }
 
     private fun removeProgressBar() {
@@ -42,7 +42,7 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
         view.notifyItemRemovedFromRecyclerView(resultList.size)
     }
 
-    private fun addProgressBar() {
+    fun addProgressBar() {
         //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
         resultList.add(null)
         view.notifyItemRangeInsertedFromRecyclerView(resultList.size, 1)
@@ -50,10 +50,7 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
 
     fun viewOnCreated() {
         view.clearEditTextFocus()
-
-        loadData {
-            isLoading = false
-        }
+        loadData {}
     }
 
     fun itemViewOnClick(arr: Array<Any>, person: Person) {
@@ -62,8 +59,7 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
     }
 
     fun recyclerViewOnScrolled(pos: Int, numItems: Int) {
-        if (pos >= numItems && !isLoading) //Reached end of screen
-        {
+        if (reachedEndOfScreen(pos, numItems)) {
             isLoading = true
             currentPage++
 
@@ -71,30 +67,35 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
                 addProgressBar()
 
             loadData {
-                isLoading = false
                 removeProgressBar()
             }
         }
     }
 
-    fun layoutOnRefreshed() {
-        clearData()
-        loadData {
-            view.removeRefreshingIcon()
-        }
+    fun reachedEndOfScreen(pos: Int, numItems: Int): Boolean {
+        return pos >= numItems && !isLoading
     }
 
-    fun searchOnClicked() {
-        if (view.getSearchText().trim().isNotEmpty()) {
+    fun layoutOnRefreshed(query: String) {
+        clearData()
+        if (query.trim().isNotEmpty()) {
+            loadData(query) {
+                view.removeRefreshingIcon()
+            }
+        } else
+            loadData {
+                view.removeRefreshingIcon()
+            }
+    }
+
+    fun searchOnClicked(query: String) {
+        if (query.trim().isNotEmpty()) {
             view.setSearchFlag(true)
             view.hideKeyBoard()
             view.clearEditTextFocus()
 
             clearData()
-            loadData {
-                isLoading = false
-            }
-
+            loadData(query) {}
         }
     }
 
@@ -105,9 +106,7 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
         if (view.getSearchFlag()) {
             view.setSearchFlag(false)
             clearData()
-            loadData {
-                isLoading = false
-            }
+            loadData {}
         }
     }
 
