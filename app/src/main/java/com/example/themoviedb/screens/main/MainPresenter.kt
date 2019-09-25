@@ -5,7 +5,7 @@ import com.example.themoviedb.network.Person
 
 class MainPresenter(private val view: Contract.MainView, private val model: Contract.MainModel) {
     private var isLoading = false
-     var currentPage = 1
+    var currentPage = 1
 
     internal var resultList = ArrayList<Person?>()
 
@@ -42,7 +42,7 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
         view.notifyItemRemovedFromRecyclerView(resultList.size)
     }
 
-    private fun addProgressBar() {
+    fun addProgressBar() {
         //Adapter will check if the the object is null then it will add ProgressViewHolder instead of PopularPeopleViewHolder
         resultList.add(null)
         view.notifyItemRangeInsertedFromRecyclerView(resultList.size, 1)
@@ -59,8 +59,7 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
     }
 
     fun recyclerViewOnScrolled(pos: Int, numItems: Int) {
-        if (pos >= numItems && !isLoading) //Reached end of screen
-        {
+        if (reachedEndOfScreen(pos, numItems)) {
             isLoading = true
             currentPage++
 
@@ -71,6 +70,10 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
                 removeProgressBar()
             }
         }
+    }
+
+    fun reachedEndOfScreen(pos: Int, numItems: Int): Boolean {
+        return pos >= numItems && !isLoading
     }
 
     fun layoutOnRefreshed(query: String) {

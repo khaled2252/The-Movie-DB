@@ -1,15 +1,12 @@
 package com.example.themoviedb
 
-import android.content.Context
 import com.example.themoviedb.screens.main.Contract
 import com.example.themoviedb.screens.main.MainPresenter
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
+import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.ArgumentMatchers.anyString
 
 
 class SearchTests {
@@ -17,25 +14,23 @@ class SearchTests {
     private lateinit var view: Contract.MainView
     private lateinit var model: Contract.MainModel
 
-    @Mock
-    private lateinit var mockApplicationContext: Context
-
     @Before
     fun setup() {
         view = mock()
         model = mock()
         presenter = MainPresenter(view, model)
-        MockitoAnnotations.initMocks(this) //To init context
     }
 
     @Test
     fun search_non_empty_string_callsFetchJson() {
+        //given
         val currentPage = 1
         val query = "jason"
 
+        //when
         presenter.searchOnClicked(query)
-        `when`(mockApplicationContext.getSystemService(Context.INPUT_METHOD_SERVICE)).thenReturn("")
 
+        //then
         verify(model).fetchJson(
             eq(currentPage),
             eq(query),
@@ -45,13 +40,16 @@ class SearchTests {
 
     @Test
     fun search_empty_string_never_callsFetchJson() {
+        //given
         val query = ""
 
+        //when
         presenter.searchOnClicked(query)
-        `when`(mockApplicationContext.getSystemService(Context.INPUT_METHOD_SERVICE)).thenReturn("")
+
+        //then
         verify(model, never()).fetchJson(
-            ArgumentMatchers.anyInt(),
-            ArgumentMatchers.anyString(),
+            anyInt(),
+            anyString(),
             any()
         )
     }
