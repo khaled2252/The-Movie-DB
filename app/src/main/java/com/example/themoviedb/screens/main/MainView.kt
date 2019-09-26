@@ -24,10 +24,10 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
 
-class MainView : AppCompatActivity(), Contract.MainView {
+class MainView : AppCompatActivity(){
 
     private lateinit var viewModel: MainViewModel
-
+    private var popularPeopleList : ArrayList<Person?> = ArrayList()
     private var searchFlag: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,14 +37,13 @@ class MainView : AppCompatActivity(), Contract.MainView {
         viewModel = MainViewModel(
             MainModel()
         )
-        val model = ViewModelProviders.of(this).get(MainViewModel::class.java)
-        subscribeUi(model)
 
+        subscribeUi(viewModel)
 
         val mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainView)
-            //adapter = PopularPeopleAdapter(viewModel.resultList)
+            adapter = PopularPeopleAdapter(popularPeopleList)
             addOnScrollListener(RecyclerViewListener())
             setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
         }
@@ -69,34 +68,28 @@ class MainView : AppCompatActivity(), Contract.MainView {
 
         viewModel.viewOnCreated()
     }
-    fun subscribeUi(viewModel: MainViewModel) {
-        viewModel.loadData{}.observe(this, Observer {
-            rv_popular_popular.adapter?.notifyDataSetChanged()
+    private fun subscribeUi(viewModel: MainViewModel) {
+        viewModel.resultList.observe(this, Observer {
+            popularPeopleList.addAll(it)
+            rv_popular_popular.adapter?.notifyItemRangeChanged(rv_popular_popular.adapter!!.itemCount,it.size)
         })
 
     }
-    override fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int) {
+     fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int) {
         rv_popular_popular.adapter?.notifyItemRangeInserted(start, itemCount)
     }
 
-    override fun notifyItemRemovedFromRecyclerView(index: Int) {
+     fun notifyItemRemovedFromRecyclerView(index: Int) {
         rv_popular_popular.adapter?.notifyItemRemoved(index)
     }
 
-    override fun notifyItemRangeChangedInRecyclerView(itemCount: Int) {
-        rv_popular_popular.adapter?.notifyItemRangeChanged(
-            rv_popular_popular.adapter!!.itemCount,
-            itemCount
-        )
-    }
-
-    override fun removeRefreshingIcon() {
+     fun removeRefreshingIcon() {
         if (srl.isRefreshing) {
             srl.isRefreshing = false
         }
     }
 
-    override fun navigateToPersonDetailsActivity(person: Person) {
+     fun navigateToPersonDetailsActivity(person: Person) {
         val intent = Intent(applicationContext, PersonDetailsView::class.java)
         intent.putExtra("profile_id", person.id.toString())
         intent.putExtra("person_name", person.name)
@@ -107,31 +100,31 @@ class MainView : AppCompatActivity(), Contract.MainView {
         applicationContext.startActivity(intent)
     }
 
-    override fun instantiateNewAdapter() {
-        rv_popular_popular.adapter = PopularPeopleAdapter(viewModel.resultList)
+     fun instantiateNewAdapter() {
+        //rv_popular_popular.adapter = PopularPeopleAdapter(viewModel.resultList)
     }
 
-    override fun setSearchFlag(b: Boolean) {
+     fun setSearchFlag(b: Boolean) {
         searchFlag = b
     }
 
-    override fun getSearchFlag(): Boolean {
+     fun getSearchFlag(): Boolean {
         return searchFlag
     }
 
-    override fun clearSearchText() {
+     fun clearSearchText() {
         searchEditText.setText("")
     }
 
-    override fun getSearchText(): String {
+     fun getSearchText(): String {
         return searchEditText.text.toString()
     }
 
-    override fun clearEditTextFocus() {
+     fun clearEditTextFocus() {
         searchEditText.clearFocus()
     }
 
-    override fun hideKeyBoard() {
+     fun hideKeyBoard() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
     }

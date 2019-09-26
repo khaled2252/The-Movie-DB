@@ -3,6 +3,8 @@ package com.example.themoviedb.screens.main
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.themoviedb.network.Api
 import com.example.themoviedb.network.Api.Factory.API_KEY
 import com.example.themoviedb.network.Person
@@ -20,8 +22,8 @@ import java.io.IOException
     override fun fetchJson(
         currentPage: Int,
         searchedWord: String?,
-        resultList: (ArrayList<Person>?) -> Unit
-    ) {
+        jsonFetched: (ArrayList<Person?>?) -> Unit
+    )  {
         val apiService = Api.create()
         val call: Call<PopularPeopleResponse> = if (searchedWord == null) {
             apiService.getPopularPeople(API_KEY, currentPage.toString())
@@ -38,7 +40,7 @@ import java.io.IOException
                 response: Response<PopularPeopleResponse>
             ) {
                 Log.i("Response", response.toString())
-                resultList(response.body()?.results)
+                jsonFetched(response.body()?.results)
             }
         })
     }

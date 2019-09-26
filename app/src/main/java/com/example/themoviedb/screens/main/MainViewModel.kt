@@ -1,6 +1,5 @@
 package com.example.themoviedb.screens.main
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.themoviedb.network.Person
@@ -9,10 +8,9 @@ import com.example.themoviedb.network.Person
 class MainViewModel(private val model: Contract.MainModel): ViewModel() {
     private var isLoading = false
     var currentPage = 1
-
     internal var resultList = MutableLiveData<ArrayList<Person?>>()
 
-    fun loadData(vararg query: String, dataLoaded: () -> Unit): LiveData<ArrayList<Person>> {
+    private fun loadData(vararg query: String, dataLoaded: () -> Unit) {
         isLoading = true
         if (query.isNotEmpty())
             model.fetchJson(currentPage, query[0]) {
@@ -27,16 +25,15 @@ class MainViewModel(private val model: Contract.MainModel): ViewModel() {
         }
     }
 
-    private fun onDataFetched(it: ArrayList<Person>?) {
+    private fun onDataFetched(it: ArrayList<Person?>?) {
         isLoading = false
-        resultList.value?.addAll(it!!)
-        ////view.notifyItemRangeChangedInRecyclerView(it.size)
+        resultList.value=it
     }
-    
+
     private fun clearData() {
         currentPage = 1
         resultList.value?.clear()
-        ////view.instantiateNewAdapter() //To remove cached and un-recycled itemViews
+        //view.instantiateNewAdapter() //To remove cached and un-recycled itemViews
     }
 
     private fun removeProgressBar() {
@@ -74,7 +71,7 @@ class MainViewModel(private val model: Contract.MainModel): ViewModel() {
         }
     }
 
-    fun reachedEndOfScreen(pos: Int, numItems: Int): Boolean {
+    private fun reachedEndOfScreen(pos: Int, numItems: Int): Boolean {
         return pos >= numItems && !isLoading
     }
 
