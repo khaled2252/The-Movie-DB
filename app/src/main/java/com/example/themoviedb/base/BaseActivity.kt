@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import com.example.themoviedb.base.BaseContract
+import com.example.themoviedb.base.BasePresenter
 
 abstract class BaseActivity<Presenter : BasePresenter<*, *>> : AppCompatActivity(),
     BaseContract.BaseIView {

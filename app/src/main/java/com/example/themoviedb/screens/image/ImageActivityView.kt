@@ -24,7 +24,7 @@ class ImageActivityView : AppCompatActivity(),
 
         presenter = ImagePresenter(
             this,
-            ImageModel()
+            ImageRepository()
         )
 
         this.btn_saveToGallery.setOnClickListener {

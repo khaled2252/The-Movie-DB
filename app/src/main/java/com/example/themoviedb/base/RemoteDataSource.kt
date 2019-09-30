@@ -1,64 +1,88 @@
-package com.example.mvp.base
+package com.example.themoviedb.base
 
 import com.example.themoviedb.BuildConfig
+import com.example.themoviedb.models.PersonProfilesResponse
+import com.example.themoviedb.models.PopularPeopleResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
 class RemoteDataSource {
-    companion object{
+    companion object {
         val Instance = RemoteDataSource()
-
-        private const val API_KEY = "3e68c56cf7097768305e38273efd342c"
-        private const val PARAM_API_KEY = "api_key"
-        private const val PARAM_PAGE = "page"
-        private const val POPULAR_PEOPLE_URL = "person/popular"
-        private const val TMDB_BAse_URL = "https://api.themoviedb.org/3/"
-        private const val PROFILE_IMAGE_URL = "https://image.tmdb.org/t/p/w300"
     }
 
-    private val loggingInterceptor: HttpLoggingInterceptor
-        get() {
-            val log = HttpLoggingInterceptor()
-            log.level =
-                if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
-                else HttpLoggingInterceptor.Level.NONE
-            return log
+    val api = Api.create()
+
+    interface Api {
+
+        @GET("/3/person/popular?")
+        fun getPopularPeople(@Query("page") page: String): Call<PopularPeopleResponse>
+
+        @GET("/3/search/person?")
+        fun getPopularPeopleSearch(
+            @Query("page") page: String, @Query(
+                "query"
+            ) searchedWord: String?
+        ): Call<PopularPeopleResponse>
+
+        @GET("/3/person/{profile_id}/images?")
+        fun getPopularPersonProfiles(@Path("profile_id") profileId: String): Call<PersonProfilesResponse>
+
+        companion object Factory {
+            private val loggingInterceptor: HttpLoggingInterceptor
+                get() {
+                    val log = HttpLoggingInterceptor()
+                    log.level =
+                        if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+                        else HttpLoggingInterceptor.Level.NONE
+                    return log
+                }
+
+            private val okHttpClient =
+                OkHttpClient
+                    .Builder()
+                    .addInterceptor { chain ->
+                        val request = chain.request()
+
+                        val url = request.url
+
+                        val newUrl = url.newBuilder()
+                            .addQueryParameter(PARAM_API_KEY, API_KEY).build()
+
+                        val builder = request.newBuilder()
+                        builder.url(newUrl)
+
+                        chain.proceed(builder.build())
+                    }
+                    .addInterceptor(loggingInterceptor)
+                    .callTimeout(10, TimeUnit.SECONDS)
+                    .connectTimeout(10, TimeUnit.SECONDS)
+                    .writeTimeout(10, TimeUnit.SECONDS)
+                    .build()
+
+            fun create(): Api {
+
+                val retrofit = Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(okHttpClient)
+                    .build()
+
+                return retrofit.create(Api::class.java)
+            }
+
+            private const val BASE_URL = "https://api.themoviedb.org"
+            private const val API_KEY = "3e68c56cf7097768305e38273efd342c"
+            private const val PARAM_API_KEY = "api_key"
         }
 
-    private val okHttpClient =
-        OkHttpClient
-            .Builder()
-            .addInterceptor { chain ->
-                val request = chain.request()
-
-                val url = request.url
-
-                val newUrl = url.newBuilder()
-                    .addQueryParameter(PARAM_API_KEY, API_KEY).build()
-
-                val builder = request.newBuilder()
-                builder.url(newUrl)
-
-                chain.proceed(builder.build())
-            }
-            .addInterceptor(loggingInterceptor)
-            .callTimeout(10, TimeUnit.SECONDS)
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .writeTimeout(10, TimeUnit.SECONDS)
-            .build()
-
-    private val retrofit =
-        Retrofit
-            .Builder()
-            .baseUrl(TMDB_BAse_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
-            .build()
-
-    val api = retrofit.create(Api::class.java)
-
+    }
 
 }

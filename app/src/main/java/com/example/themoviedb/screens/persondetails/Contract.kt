@@ -1,9 +1,9 @@
 package com.example.themoviedb.screens.persondetails
 
-import com.example.themoviedb.network.Profile
+import com.example.themoviedb.models.Profile
 
 interface Contract {
-    interface PersonDetailsModel {
+    interface PersonDetailsRepository {
         fun fetchJson(profileId: String, resultList: (ArrayList<Profile>?) -> Unit)
         fun saveImage(arr: Array<Any>)
     }

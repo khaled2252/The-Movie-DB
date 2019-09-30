@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
-import com.example.themoviedb.network.Person
+import com.example.themoviedb.models.Person
 import com.example.themoviedb.screens.persondetails.PersonDetailsView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -34,7 +34,7 @@ import java.io.Serializable
 
         presenter = MainPresenter(
             this,
-            MainModel()
+            MainRepository()
         )
 
         val mRecyclerView = this.rv_popular_popular!!

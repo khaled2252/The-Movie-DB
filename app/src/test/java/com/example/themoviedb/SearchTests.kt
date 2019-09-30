@@ -12,13 +12,13 @@ import org.mockito.ArgumentMatchers.anyString
 class SearchTests {
     private lateinit var presenter: MainPresenter
     private lateinit var view: Contract.MainView
-    private lateinit var model: Contract.MainModel
+    private lateinit var repository: Contract.MainRepository
 
     @Before
     fun setup() {
         view = mock()
-        model = mock()
-        presenter = MainPresenter(view, model)
+        repository = mock()
+        presenter = MainPresenter(view, repository)
     }
 
     @Test
@@ -31,7 +31,7 @@ class SearchTests {
         presenter.searchOnClicked(query)
 
         //then
-        verify(model).fetchJson(
+        verify(repository).fetchJson(
             eq(currentPage),
             eq(query),
             any()
@@ -47,7 +47,7 @@ class SearchTests {
         presenter.searchOnClicked(query)
 
         //then
-        verify(model, never()).fetchJson(
+        verify(repository, never()).fetchJson(
             anyInt(),
             anyString(),
             any()

@@ -1,7 +1,6 @@
 package com.example.themoviedb
 
-import com.example.themoviedb.network.KnownFor
-import com.example.themoviedb.network.Person
+import com.example.themoviedb.models.Person
 import com.example.themoviedb.screens.main.Contract
 import com.example.themoviedb.screens.main.MainPresenter
 import com.nhaarman.mockito_kotlin.*
@@ -13,13 +12,13 @@ import org.junit.Test
 class LoadMoreTests {
     private lateinit var presenter: MainPresenter
     private lateinit var view: Contract.MainView
-    private lateinit var model: Contract.MainModel
+    private lateinit var repository: Contract.MainRepository
 
     @Before
     fun setupWithSpy() {
         view = mock()
-        model = mock()
-        presenter = spy(MainPresenter(view, model))
+        repository = mock()
+        presenter = spy(MainPresenter(view, repository))
     }
 
     @Test
@@ -41,7 +40,7 @@ class LoadMoreTests {
 
         whenever(presenter.reachedEndOfScreen(any(), any())).thenReturn(true)
 
-        verify(model).fetchJson(
+        verify(repository).fetchJson(
             eq(currentPage + 1),
             anyOrNull(),
             any()
@@ -85,7 +84,7 @@ class LoadMoreTests {
         presenter.recyclerViewOnScrolled(any(), any())
 
         whenever(presenter.reachedEndOfScreen(any(), any())).thenReturn(true)
-        whenever(model.fetchJson(any(), any(), fetchJsonCallBack.capture()))
+        whenever(repository.fetchJson(any(), any(), fetchJsonCallBack.capture()))
             .then { fetchJsonCallBack.firstValue.invoke(responseArrayList) }
 
         assertEquals(arrayList.size + 20, presenter.resultList.size)

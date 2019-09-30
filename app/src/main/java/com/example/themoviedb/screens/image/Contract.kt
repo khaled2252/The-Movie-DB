@@ -3,7 +3,7 @@ package com.example.themoviedb.screens.image
 import android.graphics.Bitmap
 
 interface Contract {
-    interface ImageModel {
+    interface ImageRepository {
         fun saveImageToGallery(image: Any, imageSaved: (Boolean) -> Unit)
         fun getSavedImage(context: Any): Bitmap
     }

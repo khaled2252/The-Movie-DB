@@ -1,9 +1,9 @@
 package com.example.themoviedb.screens.main
 
-import com.example.themoviedb.network.Person
+import com.example.themoviedb.models.Person
 
 interface Contract {
-    interface MainModel {
+    interface MainRepository {
         fun fetchJson(
             currentPage: Int,
             searchedWord: String?,

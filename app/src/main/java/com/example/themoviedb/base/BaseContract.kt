@@ -1,4 +1,4 @@
-package com.example.mvp.base
+package com.example.themoviedb.base
 
 import android.os.Bundle
 import androidx.annotation.LayoutRes

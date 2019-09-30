@@ -1,9 +1,9 @@
 package com.example.themoviedb.screens.main
 
-import com.example.themoviedb.network.Person
+import com.example.themoviedb.models.Person
 
 
-class MainPresenter(private val view: Contract.MainView, private val model: Contract.MainModel) {
+class MainPresenter(private val view: Contract.MainView, private val repository: Contract.MainRepository) {
     private var isLoading = false
     var currentPage = 1
 
@@ -12,12 +12,12 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
     private fun loadData(vararg query: String, dataLoaded: () -> Unit) {
         isLoading = true
         if (query.isNotEmpty())
-            model.fetchJson(currentPage, query[0]) {
+            repository.fetchJson(currentPage, query[0]) {
                 onDataFetched(it)
                 dataLoaded()
             }
         else {
-            model.fetchJson(currentPage, null) {
+            repository.fetchJson(currentPage, null) {
                 onDataFetched(it)
                 dataLoaded()
             }
@@ -54,7 +54,7 @@ class MainPresenter(private val view: Contract.MainView, private val model: Cont
     }
 
     fun itemViewOnClick(arr: Array<Any>, person: Person) {
-        model.saveImage(arr)
+        repository.saveImage(arr)
         view.navigateToPersonDetailsActivity(person)
     }
 

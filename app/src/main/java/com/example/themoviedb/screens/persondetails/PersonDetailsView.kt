@@ -14,8 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
-import com.example.themoviedb.network.KnownFor
-import com.example.themoviedb.network.Profile
+import com.example.themoviedb.models.KnownFor
+import com.example.themoviedb.models.Profile
 import com.example.themoviedb.screens.image.ImageActivityView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -34,7 +34,7 @@ class PersonDetailsView : AppCompatActivity(),
 
         presenter = PersonDetailsPresenter(
             this,
-            PersonDetailsModel()
+            PersonDetailsRepository()
         )
 
         val mRecyclerView = this.rv_pictures

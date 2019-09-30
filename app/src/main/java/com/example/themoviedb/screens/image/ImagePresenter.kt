@@ -2,12 +2,12 @@ package com.example.themoviedb.screens.image
 
 class ImagePresenter(
     private val view: Contract.ImageActivityView,
-    private val model: Contract.ImageModel
+    private val repository: Contract.ImageRepository
 ) {
 
     fun yesOnClicked(context: Any) {
-
-        model.saveImageToGallery(model.getSavedImage(context)) {
+        val bitmap = repository.getSavedImage(context)
+        repository.saveImageToGallery(bitmap) {
             if (it)
                 view.showImageSavedToast()
             else
@@ -17,6 +17,6 @@ class ImagePresenter(
 
     fun viewOnCreated(context: Any) {
         view.requestPermission()
-        view.displayImage(model.getSavedImage(context))
+        view.displayImage(repository.getSavedImage(context))
     }
 }

@@ -1,16 +1,16 @@
 package com.example.themoviedb.screens.persondetails
 
-import com.example.themoviedb.network.Profile
+import com.example.themoviedb.models.Profile
 
 class PersonDetailsPresenter(
     private val view: Contract.PersonDetailsView,
-    private val model: Contract.PersonDetailsModel
+    private val repository: Contract.PersonDetailsRepository
 ) {
 
     internal var resultList = ArrayList<Profile?>()
 
     private fun loadProfiles(isDataFetched: (Boolean) -> Unit) {
-        model.fetchJson(view.getProfileId()) {
+        repository.fetchJson(view.getProfileId()) {
             isDataFetched(true)
             resultList.addAll(it!!)
             view.notifyItemRangeChangedInRecyclerView(it.size)
@@ -24,7 +24,7 @@ class PersonDetailsPresenter(
     }
 
     fun itemViewOnClick(arr: Array<Any>) {
-        model.saveImage(arr)
+        repository.saveImage(arr)
         view.navigateToImageActivity()
     }
 }
