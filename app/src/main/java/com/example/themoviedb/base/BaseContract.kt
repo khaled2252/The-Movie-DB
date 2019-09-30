@@ -8,8 +8,6 @@ interface BaseContract {
 
         val presenter: BaseIPresenter
 
-        fun showLoading()
-        fun hideLoading()
         fun onViewReady(savedInstanceState: Bundle?)
 
         @LayoutRes
@@ -17,7 +15,8 @@ interface BaseContract {
     }
 
     interface BaseIPresenter {
-        fun onViewReady()
+        fun viewOnCreated()
+        fun onViewDestroy()
     }
 
     interface BaseIRepository {

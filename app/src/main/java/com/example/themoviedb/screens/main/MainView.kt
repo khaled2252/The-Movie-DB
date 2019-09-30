@@ -10,11 +10,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
+import com.example.themoviedb.base.BaseView
 import com.example.themoviedb.models.Person
 import com.example.themoviedb.screens.persondetails.PersonDetailsView
 import com.squareup.picasso.Callback
@@ -22,21 +25,8 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
 
- class MainView : AppCompatActivity(), Contract.MainView {
-
-    private lateinit var presenter: MainPresenter
-
-    private var searchFlag: Boolean = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        presenter = MainPresenter(
-            this,
-            MainRepository()
-        )
-
+class MainView : BaseView<MainPresenter>(), Contract.MainView {
+    override fun onViewReady(savedInstanceState: Bundle?) {
         val mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainView)
@@ -62,9 +52,15 @@ import java.io.Serializable
         finishSearchBtn.setOnClickListener {
             presenter.finishSearchOnClicked()
         }
-
-        presenter.viewOnCreated()
     }
+
+    override fun getLayoutResourceId(): Int {
+        return R.layout.activity_main
+    }
+
+    override val presenter = MainPresenter(this, MainRepository())
+
+    private var searchFlag: Boolean = false
 
     override fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int) {
         rv_popular_popular.adapter?.notifyItemRangeInserted(start, itemCount)

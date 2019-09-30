@@ -1,13 +1,11 @@
-package com.example.mvp.base
+package com.example.themoviedb.base
 
 import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
-import com.example.themoviedb.base.BaseContract
-import com.example.themoviedb.base.BasePresenter
 
-abstract class BaseActivity<Presenter : BasePresenter<*, *>> : AppCompatActivity(),
+abstract class BaseView<Presenter : BasePresenter<*, *>> : AppCompatActivity(),
     BaseContract.BaseIView {
     abstract override val presenter: Presenter
     abstract override fun onViewReady(savedInstanceState: Bundle?)
@@ -19,10 +17,9 @@ abstract class BaseActivity<Presenter : BasePresenter<*, *>> : AppCompatActivity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(getLayoutResourceId())
-        //Implement some code
 
         onViewReady(savedInstanceState)
-        presenter.onViewReady()
+        presenter.viewOnCreated()
     }
 
     override fun onDestroy() {
@@ -30,12 +27,5 @@ abstract class BaseActivity<Presenter : BasePresenter<*, *>> : AppCompatActivity
         presenter.onViewDestroy()
     }
 
-    override fun showLoading() {
-        TODO()
-    }
-
-    override fun hideLoading() {
-        TODO()
-    }
 
 }

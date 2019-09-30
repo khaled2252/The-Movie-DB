@@ -5,8 +5,8 @@ abstract class BasePresenter<View : BaseContract.BaseIView, Repository : BaseCon
     val repository: Repository
 ) : BaseContract.BaseIPresenter {
 
-    abstract override fun onViewReady()
-    fun onViewDestroy() {
+    abstract override fun viewOnCreated()
+    override fun onViewDestroy() {
         view = null
     }
 }

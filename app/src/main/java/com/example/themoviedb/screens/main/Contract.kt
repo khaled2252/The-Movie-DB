@@ -1,9 +1,10 @@
 package com.example.themoviedb.screens.main
 
+import com.example.themoviedb.base.BaseContract
 import com.example.themoviedb.models.Person
 
 interface Contract {
-    interface MainRepository {
+    interface MainRepository : BaseContract.BaseIRepository {
         fun fetchJson(
             currentPage: Int,
             searchedWord: String?,
@@ -13,7 +14,7 @@ interface Contract {
         fun saveImage(arr: Array<Any>)
     }
 
-    interface MainView {
+    interface MainView : BaseContract.BaseIView {
         fun setSearchFlag(b: Boolean)
         fun getSearchFlag(): Boolean
         fun getSearchText(): String
