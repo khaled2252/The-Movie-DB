@@ -2,7 +2,7 @@ package com.example.themoviedb.screens.main
 
 import com.example.themoviedb.base.BasePresenter
 import com.example.themoviedb.models.Person
-
+import io.reactivex.functions.Consumer
 
 class MainPresenter(
     view: Contract.MainView,
@@ -10,22 +10,22 @@ class MainPresenter(
 ) : BasePresenter<Contract.MainView, Contract.MainRepository>(view, repository) {
 
     private var isLoading = false
-    var currentPage = 1
+    private var currentPage = 1
 
     internal var resultList = ArrayList<Person?>()
 
     private fun loadData(vararg query: String, dataLoaded: () -> Unit) {
         isLoading = true
-        if (query.isNotEmpty())
-            repository.fetchJson(currentPage, query[0]) {
-                onDataFetched(it)
+        if (query.isNotEmpty()) {
+            subscribe(repository.fetchJson(currentPage, query[0]), Consumer {
+                onDataFetched(it.results)
                 dataLoaded()
-            }
-        else {
-            repository.fetchJson(currentPage, null) {
-                onDataFetched(it)
+            })
+        } else {
+            subscribe(repository.fetchJson(currentPage, null), Consumer {
+                onDataFetched(it.results)
                 dataLoaded()
-            }
+            })
         }
     }
 

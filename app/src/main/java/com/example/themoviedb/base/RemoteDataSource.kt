@@ -3,10 +3,12 @@ package com.example.themoviedb.base
 import com.example.themoviedb.BuildConfig
 import com.example.themoviedb.models.PersonProfilesResponse
 import com.example.themoviedb.models.PopularPeopleResponse
+import io.reactivex.Single
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -23,14 +25,14 @@ class RemoteDataSource {
     interface Api {
 
         @GET("/3/person/popular?")
-        fun getPopularPeople(@Query("page") page: String): Call<PopularPeopleResponse>
+        fun getPopularPeople(@Query("page") page: String): Single<PopularPeopleResponse>
 
         @GET("/3/search/person?")
         fun getPopularPeopleSearch(
             @Query("page") page: String, @Query(
                 "query"
             ) searchedWord: String?
-        ): Call<PopularPeopleResponse>
+        ): Single<PopularPeopleResponse>
 
         @GET("/3/person/{profile_id}/images?")
         fun getPopularPersonProfiles(@Path("profile_id") profileId: String): Call<PersonProfilesResponse>
@@ -72,6 +74,7 @@ class RemoteDataSource {
                 val retrofit = Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .client(okHttpClient)
                     .build()
 

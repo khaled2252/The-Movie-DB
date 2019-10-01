@@ -2,14 +2,15 @@ package com.example.themoviedb.screens.main
 
 import com.example.themoviedb.base.BaseContract
 import com.example.themoviedb.models.Person
+import com.example.themoviedb.models.PopularPeopleResponse
+import io.reactivex.Single
 
 interface Contract {
     interface MainRepository : BaseContract.BaseIRepository {
         fun fetchJson(
             currentPage: Int,
-            searchedWord: String?,
-            resultList: (ArrayList<Person>?) -> Unit
-        )
+            searchedWord: String?
+        ): Single<PopularPeopleResponse>
 
         fun saveImage(arr: Array<Any>)
     }
