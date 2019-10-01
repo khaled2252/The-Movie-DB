@@ -31,7 +31,7 @@ class SearchTests {
         presenter.searchOnClicked(query)
 
         //then
-        verify(repository).fetchJson(
+        verify(repository).getPopularPeople(
             eq(currentPage),
             eq(query),
             any()
@@ -47,7 +47,7 @@ class SearchTests {
         presenter.searchOnClicked(query)
 
         //then
-        verify(repository, never()).fetchJson(
+        verify(repository, never()).getPopularPeople(
             anyInt(),
             anyString(),
             any()

@@ -1,62 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.example.themoviedb.screens.main.MainView"
-        android:orientation="vertical"
-        android:padding="10dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context="com.example.themoviedb.screens.main.MainView">
 
     <LinearLayout
-            android:id="@+id/constraintLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:focusable="true"
-            android:focusableInTouchMode="true">
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="horizontal">
 
         <EditText
-                android:id="@+id/searchEditText"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:drawablePadding="10dp"
-                android:hint="Search Name"
-                android:textSize="18sp"
-                android:padding="10dp"
-                android:textColorHint="@color/colorPrimary"
-                android:imeOptions="actionDone"
-                android:maxLines="1"
-                android:inputType="text"/>
+            android:id="@+id/searchEditText"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawablePadding="10dp"
+            android:hint="Search Name"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:textColorHint="@color/colorPrimary"
+            android:textSize="18sp" />
 
         <Button
-                android:id="@+id/finishSearchBtn"
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
-                android:text="X"
-                android:background="#F8F8FF"/>
+            android:id="@+id/finishSearchBtn"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:background="#F8F8FF"
+            android:text="X" />
 
         <Button
-                android:id="@+id/searchBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SEARCH" />
+            android:id="@+id/searchBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SEARCH" />
 
 
     </LinearLayout>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/srl"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
+        android:id="@+id/srl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_popular_popular"
-                tools:listitem="@layout/row_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="16dp"
-                android:layout_marginTop="16dp"/>
+            android:id="@+id/rv_popular_popular"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="16dp"
+            android:layout_marginTop="16dp"
+            tools:listitem="@layout/row_layout" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </LinearLayout>

@@ -26,6 +26,14 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
 
 class MainView : BaseView<MainPresenter>(), Contract.MainView {
+    private var searchFlag: Boolean = false
+
+    override val presenter = MainPresenter(this, MainRepository())
+
+    override fun getLayoutResourceId(): Int {
+        return R.layout.activity_main
+    }
+
     override fun onViewReady(savedInstanceState: Bundle?) {
         val mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
@@ -53,14 +61,6 @@ class MainView : BaseView<MainPresenter>(), Contract.MainView {
             presenter.finishSearchOnClicked()
         }
     }
-
-    override fun getLayoutResourceId(): Int {
-        return R.layout.activity_main
-    }
-
-    override val presenter = MainPresenter(this, MainRepository())
-
-    private var searchFlag: Boolean = false
 
     override fun notifyItemRangeInsertedFromRecyclerView(start: Int, itemCount: Int) {
         rv_popular_popular.adapter?.notifyItemRangeInserted(start, itemCount)

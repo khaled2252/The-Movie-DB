@@ -17,12 +17,12 @@ class MainPresenter(
     private fun loadData(vararg query: String, dataLoaded: () -> Unit) {
         isLoading = true
         if (query.isNotEmpty()) {
-            subscribe(repository.fetchJson(currentPage, query[0]), Consumer {
+            subscribe(repository.getPopularPeople(currentPage, query[0]), Consumer {
                 onDataFetched(it.results)
                 dataLoaded()
             })
         } else {
-            subscribe(repository.fetchJson(currentPage, null), Consumer {
+            subscribe(repository.getPopularPeople(currentPage, null), Consumer {
                 onDataFetched(it.results)
                 dataLoaded()
             })

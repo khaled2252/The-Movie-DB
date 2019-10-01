@@ -1,22 +1,24 @@
 package com.example.themoviedb.screens.image
 
+import com.example.themoviedb.base.BasePresenter
+
 class ImagePresenter(
-    private val view: Contract.ImageActivityView,
-    private val repository: Contract.ImageRepository
-) {
+    view: Contract.ImageActivityView,
+    repository: Contract.ImageRepository
+) : BasePresenter<Contract.ImageActivityView, Contract.ImageRepository>(view, repository) {
+
+    override fun viewOnCreated() {
+        view?.requestPermission()
+        view?.displayImage(repository.getSavedImage(view?.getContext()!!))
+    }
 
     fun yesOnClicked(context: Any) {
         val bitmap = repository.getSavedImage(context)
         repository.saveImageToGallery(bitmap) {
             if (it)
-                view.showImageSavedToast()
+                view?.showImageSavedToast()
             else
-                view.showErrorToast()
+                view?.showErrorToast()
         }
-    }
-
-    fun viewOnCreated(context: Any) {
-        view.requestPermission()
-        view.displayImage(repository.getSavedImage(context))
     }
 }

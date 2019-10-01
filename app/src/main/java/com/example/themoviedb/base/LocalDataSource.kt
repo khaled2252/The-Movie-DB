@@ -11,7 +11,7 @@ import java.io.IOException
 import java.util.*
 
 class LocalDataSource {
-    companion object{
+    companion object {
         val Instance = LocalDataSource()
     }
 

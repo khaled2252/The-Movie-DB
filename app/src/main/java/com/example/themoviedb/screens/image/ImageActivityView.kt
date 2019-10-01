@@ -6,27 +6,23 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.themoviedb.R
+import com.example.themoviedb.base.BaseView
 import kotlinx.android.synthetic.main.activity_image.*
 
 
-class ImageActivityView : AppCompatActivity(),
+class ImageActivityView : BaseView<ImagePresenter>(),
     Contract.ImageActivityView {
 
-    private lateinit var presenter: ImagePresenter
+    override val presenter = ImagePresenter(this, ImageRepository())
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_image)
+    override fun getLayoutResourceId(): Int {
+        return R.layout.activity_image
+    }
 
-        presenter = ImagePresenter(
-            this,
-            ImageRepository()
-        )
-
+    override fun onViewReady(savedInstanceState: Bundle?) {
         this.btn_saveToGallery.setOnClickListener {
             val builder = AlertDialog.Builder(this@ImageActivityView)
             builder.setTitle("Download image")
@@ -39,8 +35,6 @@ class ImageActivityView : AppCompatActivity(),
             val dialog: AlertDialog = builder.create()
             dialog.show()
         }
-
-        presenter.viewOnCreated(this)
     }
 
     override fun showImageSavedToast() {
@@ -53,6 +47,10 @@ class ImageActivityView : AppCompatActivity(),
 
     override fun displayImage(bitmap: Bitmap) {
         this.iv_saveToGallery.setImageBitmap(bitmap)
+    }
+
+    override fun getContext(): Any {
+        return applicationContext
     }
 
     override fun requestPermission() {

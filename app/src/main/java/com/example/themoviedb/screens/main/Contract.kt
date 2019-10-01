@@ -7,7 +7,7 @@ import io.reactivex.Single
 
 interface Contract {
     interface MainRepository : BaseContract.BaseIRepository {
-        fun fetchJson(
+        fun getPopularPeople(
             currentPage: Int,
             searchedWord: String?
         ): Single<PopularPeopleResponse>

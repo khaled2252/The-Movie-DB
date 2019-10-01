@@ -1,14 +1,15 @@
 package com.example.themoviedb.screens.persondetails
 
+import com.example.themoviedb.base.BaseContract
 import com.example.themoviedb.models.Profile
 
 interface Contract {
-    interface PersonDetailsRepository {
-        fun fetchJson(profileId: String, resultList: (ArrayList<Profile>?) -> Unit)
+    interface PersonDetailsRepository : BaseContract.BaseIRepository {
+        fun getProfile(profileId: String, resultList: (ArrayList<Profile>?) -> Unit)
         fun saveImage(arr: Array<Any>)
     }
 
-    interface PersonDetailsView {
+    interface PersonDetailsView : BaseContract.BaseIView {
         fun navigateToImageActivity()
         fun setUiFromIntent()
         fun getProfileId(): String

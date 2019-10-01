@@ -6,12 +6,14 @@ import io.reactivex.Single
 
 
 class MainRepository : BaseRepository(),
-     Contract.MainRepository {
-    override fun fetchJson(currentPage: Int,
-                           searchedWord: String?): Single<PopularPeopleResponse> {
+    Contract.MainRepository {
+    override fun getPopularPeople(
+        currentPage: Int,
+        searchedWord: String?
+    ): Single<PopularPeopleResponse> {
         val apiService = remoteDataSource.api
 
-        return  if (searchedWord == null) {
+        return if (searchedWord == null) {
             apiService.getPopularPeople(currentPage.toString())
         } else
             apiService.getPopularPeopleSearch(currentPage.toString(), searchedWord)

@@ -40,7 +40,7 @@ class LoadMoreTests {
 
         whenever(presenter.reachedEndOfScreen(any(), any())).thenReturn(true)
 
-        verify(repository).fetchJson(
+        verify(repository).getPopularPeople(
             eq(currentPage + 1),
             anyOrNull(),
             any()
@@ -84,7 +84,7 @@ class LoadMoreTests {
         presenter.recyclerViewOnScrolled(any(), any())
 
         whenever(presenter.reachedEndOfScreen(any(), any())).thenReturn(true)
-        whenever(repository.fetchJson(any(), any(), fetchJsonCallBack.capture()))
+        whenever(repository.getPopularPeople(any(), any(), fetchJsonCallBack.capture()))
             .then { fetchJsonCallBack.firstValue.invoke(responseArrayList) }
 
         assertEquals(arrayList.size + 20, presenter.resultList.size)

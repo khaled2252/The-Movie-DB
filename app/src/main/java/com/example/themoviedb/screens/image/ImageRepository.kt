@@ -3,10 +3,10 @@ package com.example.themoviedb.screens.image
 import android.graphics.Bitmap
 import com.example.themoviedb.base.BaseRepository
 
-class ImageRepository : BaseRepository(),Contract.ImageRepository {
+class ImageRepository : BaseRepository(), Contract.ImageRepository {
     override fun saveImageToGallery(image: Any, imageSaved: (Boolean) -> Unit) {
-        localDataSource.saveImageToGallery(image){
-            if(it)
+        localDataSource.saveImageToGallery(image) {
+            if (it)
                 imageSaved(true)
             else
                 imageSaved(false)

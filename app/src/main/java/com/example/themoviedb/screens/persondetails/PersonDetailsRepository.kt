@@ -9,8 +9,8 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class PersonDetailsRepository :
-    BaseRepository(),Contract.PersonDetailsRepository {
-    override fun fetchJson(profileId: String, resultList: (ArrayList<Profile>?) -> Unit) {
+    BaseRepository(), Contract.PersonDetailsRepository {
+    override fun getProfile(profileId: String, resultList: (ArrayList<Profile>?) -> Unit) {
         val apiService = remoteDataSource.api
         val call: Call<PersonProfilesResponse> =
             apiService.getPopularPersonProfiles(profileId)

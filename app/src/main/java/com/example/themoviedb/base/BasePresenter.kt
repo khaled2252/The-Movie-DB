@@ -10,10 +10,9 @@ abstract class BasePresenter<View : BaseContract.BaseIView, Repository : BaseCon
     var view: View?,
     val repository: Repository
 ) : BaseContract.BaseIPresenter {
+    private val compositeDisposable = CompositeDisposable()
 
     abstract override fun viewOnCreated()
-
-    private val compositeDisposable = CompositeDisposable()
 
     override fun onViewDestroy() {
         view = null
@@ -23,7 +22,7 @@ abstract class BasePresenter<View : BaseContract.BaseIView, Repository : BaseCon
     fun <T> subscribe(
         observable: Single<T>,
         onSuccess: Consumer<T>,
-        onError: Consumer<Throwable> = Consumer {  }
+        onError: Consumer<Throwable> = Consumer { }
     ) {
         compositeDisposable.add(
             observable

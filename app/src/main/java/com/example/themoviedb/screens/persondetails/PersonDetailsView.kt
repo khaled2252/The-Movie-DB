@@ -10,10 +10,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
+import com.example.themoviedb.base.BaseView
 import com.example.themoviedb.models.KnownFor
 import com.example.themoviedb.models.Profile
 import com.example.themoviedb.screens.image.ImageActivityView
@@ -21,21 +21,17 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_person_details.*
 
-
-class PersonDetailsView : AppCompatActivity(),
+class PersonDetailsView : BaseView<PersonDetailsPresenter>(),
     Contract.PersonDetailsView {
-
-    private lateinit var presenter: PersonDetailsPresenter
     private lateinit var profileId: String
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_person_details)
+    override val presenter = PersonDetailsPresenter(this, PersonDetailsRepository())
 
-        presenter = PersonDetailsPresenter(
-            this,
-            PersonDetailsRepository()
-        )
+    override fun getLayoutResourceId(): Int {
+        return R.layout.activity_person_details
+    }
+
+    override fun onViewReady(savedInstanceState: Bundle?) {
 
         val mRecyclerView = this.rv_pictures
         mRecyclerView.apply {
@@ -65,9 +61,6 @@ class PersonDetailsView : AppCompatActivity(),
                 }
             )
         }
-
-        presenter.viewOnCreated()
-
     }
 
     override fun setUiFromIntent() {
