@@ -6,7 +6,6 @@ import com.example.themoviedb.models.PopularPeopleResponse
 import io.reactivex.Single
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -24,18 +23,18 @@ class RemoteDataSource {
 
     interface Api {
 
-        @GET("/3/person/popular?")
+        @GET("person/popular?")
         fun getPopularPeople(@Query("page") page: String): Single<PopularPeopleResponse>
 
-        @GET("/3/search/person?")
+        @GET("search/person?")
         fun getPopularPeopleSearch(
             @Query("page") page: String, @Query(
                 "query"
             ) searchedWord: String?
         ): Single<PopularPeopleResponse>
 
-        @GET("/3/person/{profile_id}/images?")
-        fun getPopularPersonProfiles(@Path("profile_id") profileId: String): Call<PersonProfilesResponse>
+        @GET("person/{profile_id}/images?")
+        fun getPopularPersonProfiles(@Path("profile_id") profileId: String): Single<PersonProfilesResponse>
 
         companion object Factory {
             private val loggingInterceptor: HttpLoggingInterceptor
@@ -81,7 +80,7 @@ class RemoteDataSource {
                 return retrofit.create(Api::class.java)
             }
 
-            private const val BASE_URL = "https://api.themoviedb.org"
+            private const val BASE_URL = "https://api.themoviedb.org/3/"
             private const val API_KEY = "3e68c56cf7097768305e38273efd342c"
             private const val PARAM_API_KEY = "api_key"
         }

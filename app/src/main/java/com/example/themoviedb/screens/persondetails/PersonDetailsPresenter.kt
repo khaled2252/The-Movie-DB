@@ -2,6 +2,7 @@ package com.example.themoviedb.screens.persondetails
 
 import com.example.themoviedb.base.BasePresenter
 import com.example.themoviedb.models.Profile
+import io.reactivex.functions.Consumer
 
 class PersonDetailsPresenter(
     view: Contract.PersonDetailsView,
@@ -14,13 +15,13 @@ class PersonDetailsPresenter(
 
     internal var resultList = ArrayList<Profile?>()
 
-    private fun loadProfiles(isDataFetched: (Boolean) -> Unit) {
-        repository.getProfile(view!!.getProfileId()) {
-            isDataFetched(true)
-            resultList.addAll(it!!)
-            view?.notifyItemRangeChangedInRecyclerView(it.size)
+    private fun loadProfiles(dataLoaded: () -> Unit) {
+        subscribe(repository.getProfile(view!!.getProfileId()), Consumer {
+            resultList.addAll(it.profiles)
+            view?.notifyItemRangeChangedInRecyclerView(it.profiles.size)
             view?.showPersonInfo()
-        }
+            dataLoaded()
+        })
     }
 
     fun itemViewOnClick(arr: Array<Any>) {
