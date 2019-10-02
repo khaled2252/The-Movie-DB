@@ -6,7 +6,7 @@ import com.example.themoviedb.models.PopularPeopleResponse
 import io.reactivex.Single
 
 interface Contract {
-    interface MainRepository : BaseContract.BaseIRepository {
+    interface MainRepository : BaseContract.BaseRepository {
         fun getPopularPeople(
             currentPage: Int,
             searchedWord: String?
@@ -15,7 +15,7 @@ interface Contract {
         fun saveImage(arr: Array<Any>)
     }
 
-    interface MainView : BaseContract.BaseIView {
+    interface MainView : BaseContract.BaseView {
         fun setSearchFlag(b: Boolean)
         fun getSearchFlag(): Boolean
         fun getSearchText(): String

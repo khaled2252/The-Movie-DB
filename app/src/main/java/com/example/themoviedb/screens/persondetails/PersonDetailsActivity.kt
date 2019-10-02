@@ -13,15 +13,15 @@ import android.widget.ProgressBar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
-import com.example.themoviedb.base.BaseView
+import com.example.themoviedb.base.BaseActivity
 import com.example.themoviedb.models.KnownFor
 import com.example.themoviedb.models.Profile
-import com.example.themoviedb.screens.image.ImageActivityView
+import com.example.themoviedb.screens.image.ImageActivityActivity
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_person_details.*
 
-class PersonDetailsView : BaseView<PersonDetailsPresenter>(),
+class PersonDetailsActivity : BaseActivity<PersonDetailsPresenter>(),
     Contract.PersonDetailsView {
     private lateinit var profileId: String
 
@@ -36,7 +36,7 @@ class PersonDetailsView : BaseView<PersonDetailsPresenter>(),
         val mRecyclerView = this.rv_pictures
         mRecyclerView.apply {
             layoutManager =
-                GridLayoutManager(this@PersonDetailsView, 3)
+                GridLayoutManager(this@PersonDetailsActivity, 3)
             adapter = PopularPersonAdapter(presenter.resultList)
             setItemViewCacheSize(50)
 
@@ -91,7 +91,7 @@ class PersonDetailsView : BaseView<PersonDetailsPresenter>(),
     }
 
     override fun navigateToImageActivity() {
-        val intent = Intent(applicationContext, ImageActivityView::class.java)
+        val intent = Intent(applicationContext, ImageActivityActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         applicationContext.startActivity(intent)
     }

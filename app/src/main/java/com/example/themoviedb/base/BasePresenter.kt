@@ -6,10 +6,10 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 
-abstract class BasePresenter<View : BaseContract.BaseIView, Repository : BaseContract.BaseIRepository>(
+abstract class BasePresenter<View : BaseContract.BaseView, Repository : BaseContract.BaseRepository>(
     var view: View?,
     val repository: Repository
-) : BaseContract.BaseIPresenter {
+) : BaseContract.BasePresenter {
     private val compositeDisposable = CompositeDisposable()
 
     abstract override fun viewOnCreated()

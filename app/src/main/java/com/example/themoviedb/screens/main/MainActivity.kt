@@ -17,15 +17,15 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
-import com.example.themoviedb.base.BaseView
+import com.example.themoviedb.base.BaseActivity
 import com.example.themoviedb.models.Person
-import com.example.themoviedb.screens.persondetails.PersonDetailsView
+import com.example.themoviedb.screens.persondetails.PersonDetailsActivity
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
 
-class MainView : BaseView<MainPresenter>(), Contract.MainView {
+class MainActivity : BaseActivity<MainPresenter>(), Contract.MainView {
     private var searchFlag: Boolean = false
 
     override val presenter = MainPresenter(this, MainRepository())
@@ -37,13 +37,13 @@ class MainView : BaseView<MainPresenter>(), Contract.MainView {
     override fun onViewReady(savedInstanceState: Bundle?) {
         val mRecyclerView = this.rv_popular_popular!!
         mRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@MainView)
+            layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = PopularPeopleAdapter(presenter.resultList)
             addOnScrollListener(RecyclerViewListener())
             setItemViewCacheSize(100) //Cache  100 items instead of caching the visible items only which is the default
         }
 
-        val mSwipeRefreshLayout = this@MainView.srl
+        val mSwipeRefreshLayout = this@MainActivity.srl
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED)
         mSwipeRefreshLayout.setOnRefreshListener {
             val query = searchEditText.text.toString()
@@ -84,7 +84,7 @@ class MainView : BaseView<MainPresenter>(), Contract.MainView {
     }
 
     override fun navigateToPersonDetailsActivity(person: Person) {
-        val intent = Intent(applicationContext, PersonDetailsView::class.java)
+        val intent = Intent(applicationContext, PersonDetailsActivity::class.java)
         intent.putExtra("profile_id", person.id.toString())
         intent.putExtra("person_name", person.name)
         intent.putExtra("known_for", person.knownFor as Serializable)

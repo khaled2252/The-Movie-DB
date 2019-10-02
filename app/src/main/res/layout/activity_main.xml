@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="10dp"
-    tools:context="com.example.themoviedb.screens.main.MainView">
+    tools:context="com.example.themoviedb.screens.main.MainActivity">
 
     <LinearLayout
         android:id="@+id/constraintLayout"

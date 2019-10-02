@@ -9,11 +9,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.themoviedb.R
-import com.example.themoviedb.base.BaseView
+import com.example.themoviedb.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_image.*
 
 
-class ImageActivityView : BaseView<ImagePresenter>(),
+class ImageActivityActivity : BaseActivity<ImagePresenter>(),
     Contract.ImageActivityView {
 
     override val presenter = ImagePresenter(this, ImageRepository())
@@ -24,7 +24,7 @@ class ImageActivityView : BaseView<ImagePresenter>(),
 
     override fun onViewReady(savedInstanceState: Bundle?) {
         this.btn_saveToGallery.setOnClickListener {
-            val builder = AlertDialog.Builder(this@ImageActivityView)
+            val builder = AlertDialog.Builder(this@ImageActivityActivity)
             builder.setTitle("Download image")
             builder.setMessage("Do you want to save image to gallery?")
             builder.setPositiveButton("YES") { _, _ ->

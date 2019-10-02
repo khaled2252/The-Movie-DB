@@ -5,12 +5,12 @@ import com.example.themoviedb.models.PersonProfilesResponse
 import io.reactivex.Single
 
 interface Contract {
-    interface PersonDetailsRepository : BaseContract.BaseIRepository {
+    interface PersonDetailsRepository : BaseContract.BaseRepository {
         fun getProfile(profileId: String): Single<PersonProfilesResponse>
         fun saveImage(arr: Array<Any>)
     }
 
-    interface PersonDetailsView : BaseContract.BaseIView {
+    interface PersonDetailsView : BaseContract.BaseView {
         fun navigateToImageActivity()
         fun setUiFromIntent()
         fun getProfileId(): String

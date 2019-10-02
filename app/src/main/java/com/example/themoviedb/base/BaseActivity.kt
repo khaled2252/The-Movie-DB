@@ -5,8 +5,8 @@ import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 
-abstract class BaseView<Presenter : BasePresenter<*, *>> : AppCompatActivity(),
-    BaseContract.BaseIView {
+abstract class BaseActivity<Presenter : BasePresenter<*, *>> : AppCompatActivity(),
+    BaseContract.BaseView {
     abstract override val presenter: Presenter
     abstract override fun onViewReady(savedInstanceState: Bundle?)
 
@@ -26,6 +26,4 @@ abstract class BaseView<Presenter : BasePresenter<*, *>> : AppCompatActivity(),
         super.onDestroy()
         presenter.onViewDestroy()
     }
-
-
 }

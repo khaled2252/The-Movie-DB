@@ -4,9 +4,9 @@ import android.os.Bundle
 import androidx.annotation.LayoutRes
 
 interface BaseContract {
-    interface BaseIView {
+    interface BaseView {
 
-        val presenter: BaseIPresenter
+        val presenter: BasePresenter
 
         fun onViewReady(savedInstanceState: Bundle?)
 
@@ -14,12 +14,10 @@ interface BaseContract {
         fun getLayoutResourceId(): Int
     }
 
-    interface BaseIPresenter {
+    interface BasePresenter {
         fun viewOnCreated()
         fun onViewDestroy()
     }
 
-    interface BaseIRepository {
-
-    }
+    interface BaseRepository
 }
