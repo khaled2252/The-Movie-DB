@@ -3,9 +3,9 @@ package com.example.themoviedb.screens.image
 import com.example.themoviedb.base.BasePresenter
 
 class ImagePresenter(
-    view: Contract.ImageActivityView,
+    view: Contract.ImageView,
     repository: Contract.ImageRepository
-) : BasePresenter<Contract.ImageActivityView, Contract.ImageRepository>(view, repository) {
+) : BasePresenter<Contract.ImageView, Contract.ImageRepository>(view, repository) {
 
     override fun viewOnCreated() {
         view?.requestPermission()

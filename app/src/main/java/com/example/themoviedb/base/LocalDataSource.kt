@@ -43,7 +43,7 @@ class LocalDataSource {
 
         var n = 10000
         n = generator.nextInt(n)
-        val fName = "Image-$n.jpg"
+        val fName = "ImageActivity-$n.jpg"
         val file = File(myDir, fName)
 
         try {

@@ -40,7 +40,6 @@ class MainPresenter(
         view?.notifyItemRangeChangedInRecyclerView(it.size)
     }
 
-
     private fun clearData() {
         currentPage = 1
         resultList.clear()
@@ -116,10 +115,3 @@ class MainPresenter(
     }
 
 }
-
-
-
-
-
-
-

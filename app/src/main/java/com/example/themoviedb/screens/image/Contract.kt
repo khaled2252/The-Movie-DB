@@ -9,7 +9,7 @@ interface Contract {
         fun getSavedImage(context: Any): Bitmap
     }
 
-    interface ImageActivityView : BaseContract.BaseView {
+    interface ImageView : BaseContract.BaseView {
 
         fun showImageSavedToast()
         fun showErrorToast()

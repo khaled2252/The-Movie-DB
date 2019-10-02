@@ -16,7 +16,7 @@ import com.example.themoviedb.R
 import com.example.themoviedb.base.BaseActivity
 import com.example.themoviedb.models.KnownFor
 import com.example.themoviedb.models.Profile
-import com.example.themoviedb.screens.image.ImageActivityActivity
+import com.example.themoviedb.screens.image.ImageActivity
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_person_details.*
@@ -91,7 +91,7 @@ class PersonDetailsActivity : BaseActivity<PersonDetailsPresenter>(),
     }
 
     override fun navigateToImageActivity() {
-        val intent = Intent(applicationContext, ImageActivityActivity::class.java)
+        val intent = Intent(applicationContext, ImageActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         applicationContext.startActivity(intent)
     }
@@ -164,7 +164,3 @@ class PersonDetailsActivity : BaseActivity<PersonDetailsPresenter>(),
         }
     }
 }
-
-
-
-

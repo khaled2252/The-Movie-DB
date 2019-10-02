@@ -12,9 +12,8 @@ import com.example.themoviedb.R
 import com.example.themoviedb.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_image.*
 
-
-class ImageActivityActivity : BaseActivity<ImagePresenter>(),
-    Contract.ImageActivityView {
+class ImageActivity : BaseActivity<ImagePresenter>(),
+    Contract.ImageView {
 
     override val presenter = ImagePresenter(this, ImageRepository())
 
@@ -24,7 +23,7 @@ class ImageActivityActivity : BaseActivity<ImagePresenter>(),
 
     override fun onViewReady(savedInstanceState: Bundle?) {
         this.btn_saveToGallery.setOnClickListener {
-            val builder = AlertDialog.Builder(this@ImageActivityActivity)
+            val builder = AlertDialog.Builder(this@ImageActivity)
             builder.setTitle("Download image")
             builder.setMessage("Do you want to save image to gallery?")
             builder.setPositiveButton("YES") { _, _ ->
@@ -38,7 +37,7 @@ class ImageActivityActivity : BaseActivity<ImagePresenter>(),
     }
 
     override fun showImageSavedToast() {
-        Toast.makeText(this, "Image saved to gallery !", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "ImageActivity saved to gallery !", Toast.LENGTH_LONG).show()
     }
 
     override fun showErrorToast() {

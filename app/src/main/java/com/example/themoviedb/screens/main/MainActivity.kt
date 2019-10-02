@@ -222,7 +222,3 @@ class MainActivity : BaseActivity<MainPresenter>(), Contract.MainView {
         }
     }
 }
-
-
-
-
