@@ -9,12 +9,12 @@ class ImagePresenter(
 
     override fun viewOnCreated() {
         view?.requestPermission()
-        view?.displayImage(repository.getSavedImage())
+        view?.displayImage(repository.getSavedImagePath())
     }
 
     fun yesOnClicked() {
-        val bitmap = repository.getSavedImage()
-        repository.saveImageToGallery(bitmap) {
+        val imagePath = repository.getSavedImagePath()
+        repository.saveImageToGallery(imagePath) {
             if (it)
                 view?.showImageSavedToast()
             else

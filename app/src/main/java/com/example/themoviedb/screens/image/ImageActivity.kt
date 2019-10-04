@@ -2,7 +2,7 @@ package com.example.themoviedb.screens.image
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -44,7 +44,8 @@ class ImageActivity : BaseActivity<ImagePresenter>(),
         Toast.makeText(this, "Failed to save image", Toast.LENGTH_LONG).show()
     }
 
-    override fun displayImage(bitmap: Bitmap) {
+    override fun displayImage(imagePath: String) {
+        val bitmap =  BitmapFactory.decodeFile(imagePath)
         this.iv_saveToGallery.setImageBitmap(bitmap)
     }
 

@@ -4,7 +4,7 @@ import android.app.Application
 
 class ApplicationSingleton : Application() {
     companion object {
-        lateinit var instance : ApplicationSingleton
+        lateinit var instance: ApplicationSingleton
     }
 
     override fun onCreate() {

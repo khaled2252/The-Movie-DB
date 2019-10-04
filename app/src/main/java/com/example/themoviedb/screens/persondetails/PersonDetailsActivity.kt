@@ -1,6 +1,7 @@
 package com.example.themoviedb.screens.persondetails
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
@@ -14,12 +15,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
 import com.example.themoviedb.base.BaseActivity
+import com.example.themoviedb.screens.image.ImageActivity
 import com.example.themoviedb.utils.models.KnownFor
 import com.example.themoviedb.utils.models.Profile
-import com.example.themoviedb.screens.image.ImageActivity
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_person_details.*
+import java.io.ByteArrayOutputStream
 
 class PersonDetailsActivity : BaseActivity<PersonDetailsPresenter>(),
     Contract.PersonDetailsView {
@@ -134,7 +136,10 @@ class PersonDetailsActivity : BaseActivity<PersonDetailsPresenter>(),
                 val bitmap =
                     (holder.itemView.findViewById<ImageView>(R.id.iv_image).drawable as? BitmapDrawable)?.bitmap
                 if (bitmap != null) { //To avoid clicking while bitmap is not loaded yet
-                    presenter.itemViewOnClick(bitmap)
+                    val stream = ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+                    val imageByteArray = stream.toByteArray()
+                    presenter.itemViewOnClick(imageByteArray)
                 }
 
             }

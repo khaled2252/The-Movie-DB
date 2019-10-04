@@ -1,11 +1,10 @@
 package com.example.themoviedb.screens.image
 
-import android.graphics.Bitmap
 import com.example.themoviedb.base.BaseRepository
 
 class ImageRepository : BaseRepository(), Contract.ImageRepository {
-    override fun saveImageToGallery(image: Bitmap, imageSaved: (Boolean) -> Unit) {
-        localDataSource.saveImageToGallery(image) {
+    override fun saveImageToGallery(imagePath: String, imageSaved: (Boolean) -> Unit) {
+        localDataSource.saveImageToGallery(imagePath) {
             if (it)
                 imageSaved(true)
             else
@@ -13,7 +12,7 @@ class ImageRepository : BaseRepository(), Contract.ImageRepository {
         }
     }
 
-    override fun getSavedImage(): Bitmap {
-        return localDataSource.getSavedImageFromStorage()
+    override fun getSavedImagePath(): String {
+        return localDataSource.getSavedImagePath()
     }
 }

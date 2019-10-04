@@ -1,6 +1,5 @@
 package com.example.themoviedb.screens.main
 
-import android.graphics.Bitmap
 import com.example.themoviedb.base.BaseContract
 import com.example.themoviedb.utils.models.Person
 import com.example.themoviedb.utils.models.PopularPeopleResponse
@@ -13,7 +12,7 @@ interface Contract {
             searchedWord: String?
         ): Single<PopularPeopleResponse>
 
-        fun saveImage(image : Bitmap)
+        fun saveImage(imageByteArray: ByteArray)
     }
 
     interface MainView : BaseContract.BaseView {

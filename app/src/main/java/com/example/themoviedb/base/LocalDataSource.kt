@@ -5,10 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
 import com.example.themoviedb.utils.ApplicationSingleton
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
 import java.util.*
 
 class LocalDataSource {
@@ -16,11 +13,15 @@ class LocalDataSource {
         val Instance = LocalDataSource()
     }
 
-    fun saveImageToStorage(image: Bitmap) {
+    fun saveImageToStorage(imageByteArray: ByteArray) {
         lateinit var fos: FileOutputStream
-
+        lateinit var image: Bitmap
         try {
-            fos = ApplicationSingleton.instance.openFileOutput("profile_picture", Context.MODE_PRIVATE)
+            fos = ApplicationSingleton.instance.openFileOutput(
+                "profile_picture",
+                Context.MODE_PRIVATE
+            )
+            image = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.size)
             image.compress(Bitmap.CompressFormat.PNG, 100, fos)
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
@@ -31,7 +32,7 @@ class LocalDataSource {
         }
     }
 
-    fun saveImageToGallery(image: Bitmap, imageSaved: (Boolean) -> Unit) {
+    fun saveImageToGallery(imagePath: String, imageSaved: (Boolean) -> Unit) {
         val root = Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_PICTURES
         ).toString()
@@ -41,12 +42,13 @@ class LocalDataSource {
 
         var n = 10000
         n = generator.nextInt(n)
-        val fName = "ImageActivity-$n.jpg"
+        val fName = "Image-$n.jpg"
         val file = File(myDir, fName)
 
         try {
             val out = FileOutputStream(file)
-            image.compress(Bitmap.CompressFormat.JPEG, 90, out)
+            val image = FileInputStream( File(imagePath))
+            image.copyTo(out)
             out.flush()
             out.close()
             imageSaved(true)
@@ -56,8 +58,7 @@ class LocalDataSource {
         }
     }
 
-    fun getSavedImageFromStorage(): Bitmap {
-        val photoPath = ApplicationSingleton.instance.openFileInput("profile_picture")
-        return BitmapFactory.decodeStream(photoPath)
+    fun getSavedImagePath(): String {
+        return ApplicationSingleton.instance.getFileStreamPath("profile_picture").absolutePath
     }
 }

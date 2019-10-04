@@ -1,19 +1,18 @@
 package com.example.themoviedb.screens.image
 
-import android.graphics.Bitmap
 import com.example.themoviedb.base.BaseContract
 
 interface Contract {
     interface ImageRepository : BaseContract.BaseRepository {
-        fun saveImageToGallery(image: Bitmap, imageSaved: (Boolean) -> Unit)
-        fun getSavedImage(): Bitmap
+        fun saveImageToGallery(imagePath: String, imageSaved: (Boolean) -> Unit)
+        fun getSavedImagePath(): String
     }
 
     interface ImageView : BaseContract.BaseView {
 
         fun showImageSavedToast()
         fun showErrorToast()
-        fun displayImage(bitmap: Bitmap)
+        fun displayImage(imagePath: String)
         fun requestPermission()
         fun getContext(): Any
     }
