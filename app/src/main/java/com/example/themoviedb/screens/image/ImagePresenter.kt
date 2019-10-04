@@ -9,11 +9,11 @@ class ImagePresenter(
 
     override fun viewOnCreated() {
         view?.requestPermission()
-        view?.displayImage(repository.getSavedImage(view?.getContext()!!))
+        view?.displayImage(repository.getSavedImage())
     }
 
-    fun yesOnClicked(context: Any) {
-        val bitmap = repository.getSavedImage(context)
+    fun yesOnClicked() {
+        val bitmap = repository.getSavedImage()
         repository.saveImageToGallery(bitmap) {
             if (it)
                 view?.showImageSavedToast()

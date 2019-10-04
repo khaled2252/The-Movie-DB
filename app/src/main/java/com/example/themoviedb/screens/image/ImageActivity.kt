@@ -27,7 +27,7 @@ class ImageActivity : BaseActivity<ImagePresenter>(),
             builder.setTitle("Download image")
             builder.setMessage("Do you want to save image to gallery?")
             builder.setPositiveButton("YES") { _, _ ->
-                presenter.yesOnClicked(applicationContext)
+                presenter.yesOnClicked()
             }
             builder.setNegativeButton("No") { _, _ ->
             }
@@ -37,7 +37,7 @@ class ImageActivity : BaseActivity<ImagePresenter>(),
     }
 
     override fun showImageSavedToast() {
-        Toast.makeText(this, "ImageActivity saved to gallery !", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "Image saved to gallery successfully !", Toast.LENGTH_LONG).show()
     }
 
     override fun showErrorToast() {

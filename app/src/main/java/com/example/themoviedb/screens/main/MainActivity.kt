@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
 import com.example.themoviedb.base.BaseActivity
-import com.example.themoviedb.models.Person
+import com.example.themoviedb.utils.models.Person
 import com.example.themoviedb.screens.persondetails.PersonDetailsActivity
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -159,7 +159,7 @@ class MainActivity : BaseActivity<MainPresenter>(), Contract.MainView {
                     val bitmap =
                         (holder.itemView.findViewById<ImageView>(R.id.iv_profile).drawable as? BitmapDrawable)?.bitmap
                     if (bitmap != null) { //To avoid clicking while bitmap is not loaded yet
-                        presenter.itemViewOnClick(arrayOf(applicationContext, bitmap), person)
+                        presenter.itemViewOnClick(bitmap, person)
                     }
                 }
             } else {

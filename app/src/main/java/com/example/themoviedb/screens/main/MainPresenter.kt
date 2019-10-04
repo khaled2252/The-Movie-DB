@@ -1,7 +1,8 @@
 package com.example.themoviedb.screens.main
 
+import android.graphics.Bitmap
 import com.example.themoviedb.base.BasePresenter
-import com.example.themoviedb.models.Person
+import com.example.themoviedb.utils.models.Person
 import io.reactivex.functions.Consumer
 
 class MainPresenter(
@@ -57,8 +58,8 @@ class MainPresenter(
         view?.notifyItemRangeInsertedFromRecyclerView(resultList.size, 1)
     }
 
-    fun itemViewOnClick(arr: Array<Any>, person: Person) {
-        repository.saveImage(arr)
+    fun itemViewOnClick(image: Bitmap, person: Person) {
+        repository.saveImage(image)
         view?.navigateToPersonDetailsActivity(person)
     }
 

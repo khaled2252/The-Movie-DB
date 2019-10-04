@@ -1,8 +1,8 @@
 package com.example.themoviedb.base
 
 import com.example.themoviedb.BuildConfig
-import com.example.themoviedb.models.PersonProfilesResponse
-import com.example.themoviedb.models.PopularPeopleResponse
+import com.example.themoviedb.utils.models.PersonProfilesResponse
+import com.example.themoviedb.utils.models.PopularPeopleResponse
 import io.reactivex.Single
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

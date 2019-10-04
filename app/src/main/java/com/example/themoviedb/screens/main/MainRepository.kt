@@ -1,7 +1,8 @@
 package com.example.themoviedb.screens.main
 
+import android.graphics.Bitmap
 import com.example.themoviedb.base.BaseRepository
-import com.example.themoviedb.models.PopularPeopleResponse
+import com.example.themoviedb.utils.models.PopularPeopleResponse
 import io.reactivex.Single
 
 
@@ -19,7 +20,7 @@ class MainRepository : BaseRepository(),
             apiService.getPopularPeopleSearch(currentPage.toString(), searchedWord)
     }
 
-    override fun saveImage(arr: Array<Any>) {
-        localDataSource.saveImageToStorage(arr)
+    override fun saveImage(image: Bitmap) {
+        localDataSource.saveImageToStorage(image)
     }
 }

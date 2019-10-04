@@ -1,6 +1,6 @@
 package com.example.themoviedb
 
-import com.example.themoviedb.models.Person
+import com.example.themoviedb.utils.models.Person
 import com.example.themoviedb.screens.main.Contract
 import com.example.themoviedb.screens.main.MainPresenter
 import com.nhaarman.mockito_kotlin.*

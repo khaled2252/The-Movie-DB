@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
 import com.example.themoviedb.base.BaseActivity
-import com.example.themoviedb.models.KnownFor
-import com.example.themoviedb.models.Profile
+import com.example.themoviedb.utils.models.KnownFor
+import com.example.themoviedb.utils.models.Profile
 import com.example.themoviedb.screens.image.ImageActivity
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -134,7 +134,7 @@ class PersonDetailsActivity : BaseActivity<PersonDetailsPresenter>(),
                 val bitmap =
                     (holder.itemView.findViewById<ImageView>(R.id.iv_image).drawable as? BitmapDrawable)?.bitmap
                 if (bitmap != null) { //To avoid clicking while bitmap is not loaded yet
-                    presenter.itemViewOnClick(arrayOf(holder.itemView.context, bitmap))
+                    presenter.itemViewOnClick(bitmap)
                 }
 
             }

@@ -5,8 +5,8 @@ import com.example.themoviedb.base.BaseContract
 
 interface Contract {
     interface ImageRepository : BaseContract.BaseRepository {
-        fun saveImageToGallery(image: Any, imageSaved: (Boolean) -> Unit)
-        fun getSavedImage(context: Any): Bitmap
+        fun saveImageToGallery(image: Bitmap, imageSaved: (Boolean) -> Unit)
+        fun getSavedImage(): Bitmap
     }
 
     interface ImageView : BaseContract.BaseView {

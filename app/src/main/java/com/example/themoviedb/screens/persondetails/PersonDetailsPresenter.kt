@@ -1,7 +1,8 @@
 package com.example.themoviedb.screens.persondetails
 
+import android.graphics.Bitmap
 import com.example.themoviedb.base.BasePresenter
-import com.example.themoviedb.models.Profile
+import com.example.themoviedb.utils.models.Profile
 import io.reactivex.functions.Consumer
 
 class PersonDetailsPresenter(
@@ -24,8 +25,8 @@ class PersonDetailsPresenter(
         })
     }
 
-    fun itemViewOnClick(arr: Array<Any>) {
-        repository.saveImage(arr)
+    fun itemViewOnClick(image: Bitmap) {
+        repository.saveImage(image)
         view?.navigateToImageActivity()
     }
 }

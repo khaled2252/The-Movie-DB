@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import com.example.themoviedb.base.BaseRepository
 
 class ImageRepository : BaseRepository(), Contract.ImageRepository {
-    override fun saveImageToGallery(image: Any, imageSaved: (Boolean) -> Unit) {
+    override fun saveImageToGallery(image: Bitmap, imageSaved: (Boolean) -> Unit) {
         localDataSource.saveImageToGallery(image) {
             if (it)
                 imageSaved(true)
@@ -13,7 +13,7 @@ class ImageRepository : BaseRepository(), Contract.ImageRepository {
         }
     }
 
-    override fun getSavedImage(context: Any): Bitmap {
-        return localDataSource.getSavedImageFromStorage(context)
+    override fun getSavedImage(): Bitmap {
+        return localDataSource.getSavedImageFromStorage()
     }
 }

@@ -1,13 +1,14 @@
 package com.example.themoviedb.screens.persondetails
 
+import android.graphics.Bitmap
 import com.example.themoviedb.base.BaseContract
-import com.example.themoviedb.models.PersonProfilesResponse
+import com.example.themoviedb.utils.models.PersonProfilesResponse
 import io.reactivex.Single
 
 interface Contract {
     interface PersonDetailsRepository : BaseContract.BaseRepository {
         fun getProfile(profileId: String): Single<PersonProfilesResponse>
-        fun saveImage(arr: Array<Any>)
+        fun saveImage(image: Bitmap)
     }
 
     interface PersonDetailsView : BaseContract.BaseView {
