@@ -1,4 +1,4 @@
-package com.example.themoviedb.screens.main
+package com.example.themoviedb.ui.main
 
 import com.example.themoviedb.base.BasePresenter
 import com.example.themoviedb.utils.models.Person

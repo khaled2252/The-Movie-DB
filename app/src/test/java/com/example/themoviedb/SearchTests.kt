@@ -1,7 +1,7 @@
 package com.example.themoviedb
 
-import com.example.themoviedb.screens.main.Contract
-import com.example.themoviedb.screens.main.MainPresenter
+import com.example.themoviedb.ui.main.Contract
+import com.example.themoviedb.ui.main.MainPresenter
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Before
 import org.junit.Test

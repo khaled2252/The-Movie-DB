@@ -13,12 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".utils.ApplicationSingleton">
-        <activity android:name=".screens.image.ImageActivity"></activity>
+        <activity android:name=".ui.image.ImageActivity"></activity>
         <activity
-            android:name=".screens.persondetails.PersonDetailsActivity"
+            android:name=".ui.persondetails.PersonDetailsActivity"
             android:label="@string/title_activity_person_details"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".screens.main.MainActivity">
+        <activity android:name=".ui.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

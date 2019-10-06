@@ -1,4 +1,4 @@
-package com.example.themoviedb.screens.image
+package com.example.themoviedb.ui.image
 
 import com.example.themoviedb.base.BaseRepository
 

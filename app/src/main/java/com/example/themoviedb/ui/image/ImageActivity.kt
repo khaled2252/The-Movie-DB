@@ -1,4 +1,4 @@
-package com.example.themoviedb.screens.image
+package com.example.themoviedb.ui.image
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -45,7 +45,7 @@ class ImageActivity : BaseActivity<ImagePresenter>(),
     }
 
     override fun displayImage(imagePath: String) {
-        val bitmap =  BitmapFactory.decodeFile(imagePath)
+        val bitmap = BitmapFactory.decodeFile(imagePath)
         this.iv_saveToGallery.setImageBitmap(bitmap)
     }
 

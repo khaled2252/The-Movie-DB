@@ -47,7 +47,7 @@ class LocalDataSource {
 
         try {
             val out = FileOutputStream(file)
-            val image = FileInputStream( File(imagePath))
+            val image = FileInputStream(File(imagePath))
             image.copyTo(out)
             out.flush()
             out.close()

@@ -1,4 +1,4 @@
-package com.example.themoviedb.screens.persondetails
+package com.example.themoviedb.ui.persondetails
 
 import com.example.themoviedb.base.BaseRepository
 import com.example.themoviedb.utils.models.PersonProfilesResponse
