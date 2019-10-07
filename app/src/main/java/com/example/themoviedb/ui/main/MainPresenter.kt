@@ -4,10 +4,7 @@ import com.example.themoviedb.base.BasePresenter
 import com.example.themoviedb.utils.models.Person
 import io.reactivex.functions.Consumer
 
-class MainPresenter(
-    view: Contract.MainView,
-    repository: Contract.MainRepository
-) : BasePresenter<Contract.MainView, Contract.MainRepository>(view, repository) {
+class MainPresenter : BasePresenter<Contract.MainView, Contract.MainRepository>() {
 
     private var isLoading = false
     private var currentPage = 1

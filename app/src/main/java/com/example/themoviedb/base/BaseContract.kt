@@ -15,6 +15,8 @@ interface BaseContract {
     }
 
     interface BasePresenter {
+        val view: BaseView
+        val repository : BaseRepository
         fun viewOnCreated()
         fun onViewDestroy()
     }

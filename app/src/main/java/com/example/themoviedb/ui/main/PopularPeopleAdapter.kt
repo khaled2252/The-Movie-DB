@@ -11,7 +11,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
-import com.example.themoviedb.utils.ApplicationSingleton
+import com.example.themoviedb.utils.TMDBApplication
 import com.example.themoviedb.utils.models.Person
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -95,7 +95,7 @@ class PopularPeopleAdapter(
                     override fun onError(e: Exception?) {
                         mProfilePicture?.setImageBitmap(
                             BitmapFactory.decodeResource(
-                                ApplicationSingleton.instance.resources,
+                                TMDBApplication.instance.resources,
                                 R.drawable.no_image
                             )
                         )

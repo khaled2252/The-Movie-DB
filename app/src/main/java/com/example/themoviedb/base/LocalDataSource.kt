@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
-import com.example.themoviedb.utils.ApplicationSingleton
+import com.example.themoviedb.utils.TMDBApplication
 import java.io.*
 import java.util.*
 
@@ -17,7 +17,7 @@ class LocalDataSource {
         lateinit var fos: FileOutputStream
         lateinit var image: Bitmap
         try {
-            fos = ApplicationSingleton.instance.openFileOutput(
+            fos = TMDBApplication.instance.openFileOutput(
                 "profile_picture",
                 Context.MODE_PRIVATE
             )
@@ -59,6 +59,6 @@ class LocalDataSource {
     }
 
     fun getSavedImagePath(): String {
-        return ApplicationSingleton.instance.getFileStreamPath("profile_picture").absolutePath
+        return TMDBApplication.instance.getFileStreamPath("profile_picture").absolutePath
     }
 }

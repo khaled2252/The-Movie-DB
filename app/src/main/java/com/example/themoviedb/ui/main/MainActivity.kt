@@ -11,14 +11,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.themoviedb.R
 import com.example.themoviedb.base.BaseActivity
 import com.example.themoviedb.ui.persondetails.PersonDetailsActivity
+import com.example.themoviedb.utils.TMDBApplication
 import com.example.themoviedb.utils.models.Person
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
+import javax.inject.Inject
 
 class MainActivity : BaseActivity<MainPresenter>(), Contract.MainView {
     private var searchFlag: Boolean = false
-
-    override val presenter = MainPresenter(this, MainRepository())
 
     override fun getLayoutResourceId(): Int {
         return R.layout.activity_main

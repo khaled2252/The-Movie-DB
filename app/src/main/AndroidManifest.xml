@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".utils.ApplicationSingleton">
+        android:name=".utils.TMDBApplication">
         <activity android:name=".ui.image.ImageActivity"></activity>
         <activity
             android:name=".ui.persondetails.PersonDetailsActivity"
